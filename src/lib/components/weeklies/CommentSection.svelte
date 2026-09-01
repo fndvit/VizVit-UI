@@ -3,7 +3,7 @@
 
 	/** One preflighted comment form (the main box, or one reply box). */
 	export type CommentFormInstance = RemoteFormInstance<
-		{ body: RemoteField; weeklySlug: RemoteField; parentId: RemoteField; locale: RemoteField },
+		{ body: RemoteField; weeklySlug: RemoteField; parentId: RemoteField },
 		FormResultOf
 	>;
 </script>

@@ -2,15 +2,15 @@
 	import type { FormResultOf, RemoteField, RemoteFormInstance } from '../../forms/types.js';
 
 	/** The preflighted display-name form. */
-	export type UpdateNameFormInstance = RemoteFormInstance<{
-		displayName: RemoteField;
-		locale: RemoteField;
-	}>;
+	export type UpdateNameFormInstance = RemoteFormInstance<{ displayName: RemoteField }>;
 
-	/** The newsletter toggle; its success names which way it toggled. */
+	/**
+	 * The newsletter toggle; a success names which way it toggled. The reason
+	 * is typed open — the host's result union may carry other successes.
+	 */
 	export type NewsletterToggleFormInstance = RemoteFormInstance<
 		{ action: RemoteField; locale: RemoteField },
-		FormResultOf<{ reason: 'subscribed' | 'unsubscribed' }>
+		FormResultOf<{ reason: string }>
 	>;
 
 	export type DeleteAccountFormInstance = RemoteFormInstance<{
