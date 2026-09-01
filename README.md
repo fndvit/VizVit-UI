@@ -68,7 +68,7 @@ don't prune them from your message catalogue.
 ## Edit mode
 
 Components render plain, already-localized strings. To make one editable,
-pass an *edit descriptor* naming what the string is — and install an
+pass an _edit descriptor_ naming what the string is — and install an
 `EditAdapter` that knows how to persist it. No adapter (or `isEditing`
 off) means every descriptor is inert and the render is byte-identical to
 the read-only one. **The package never talks to a database.**
