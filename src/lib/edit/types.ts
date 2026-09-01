@@ -21,11 +21,7 @@ export function localize(value: LocalizedText, locale: Locale): string {
  * the content tables so an adapter can route a save without a mapping layer.
  */
 export type EditableEntity =
-	| 'weeklies'
-	| 'projects'
-	| 'milestones'
-	| 'team_members'
-	| 'job_openings';
+	'weeklies' | 'projects' | 'milestones' | 'team_members' | 'job_openings';
 
 /**
  * The identity of one editable string in the content model: either a page

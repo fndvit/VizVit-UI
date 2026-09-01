@@ -58,18 +58,27 @@
 
 	let status = $state<'idle' | 'dirty' | 'saving' | 'error'>('idle');
 	/** Last persisted value: what Escape restores and blur diffs against. */
+	// svelte-ignore state_referenced_locally
 	let savedValue = $state(value);
 	/** What the child snippet renders. Only rewritten while the DOM is not
 	 * being typed in — Svelte and the reader must not fight over the node. */
+	// svelte-ignore state_referenced_locally
 	let renderText = $state(value);
 	let announcement = $state('');
 
-	// Follow the prop when the app reloads content underneath us, but never
-	// over a draft the reader is still holding.
+	// Follow the prop when the app reloads content underneath us — and only
+	// then. Diffing against savedValue instead would fire after every save,
+	// where savedValue has legitimately advanced past the prop, and repaint
+	// the committed draft with stale copy. Never over a draft being held.
+	// svelte-ignore state_referenced_locally
+	let lastPropValue = $state(value);
 	$effect(() => {
-		if (status === 'idle' && value !== savedValue) {
-			savedValue = value;
-			renderText = value;
+		if (value !== lastPropValue) {
+			lastPropValue = value;
+			if (status === 'idle') {
+				savedValue = value;
+				renderText = value;
+			}
 		}
 	});
 

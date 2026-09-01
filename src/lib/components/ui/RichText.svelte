@@ -26,14 +26,22 @@
 	const canEdit = $derived(edit !== undefined && (adapter?.isEditing ?? false));
 
 	/** Last persisted body: what renders, and what Cancel·la returns to. */
+	// svelte-ignore state_referenced_locally
 	let savedBody = $state(body);
 	let draft = $state('');
 	let isOpen = $state(false);
 	let status = $state<'idle' | 'saving' | 'error'>('idle');
 
-	// Follow the prop when the app reloads content, but never over an open editor.
+	// Follow the prop when the app reloads content — and only then (after a
+	// save, savedBody has legitimately advanced past the prop). Never over an
+	// open editor.
+	// svelte-ignore state_referenced_locally
+	let lastPropBody = $state(body);
 	$effect(() => {
-		if (!isOpen && body !== savedBody) savedBody = body;
+		if (body !== lastPropBody) {
+			lastPropBody = body;
+			if (!isOpen) savedBody = body;
+		}
 	});
 
 	const blocks = $derived(renderBody(savedBody));

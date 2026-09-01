@@ -16,11 +16,7 @@ export interface FieldConstraint {
  * the generic fallback itself).
  */
 export type FormFailReason =
-	| 'rateLimited'
-	| 'unauthenticated'
-	| 'forbidden'
-	| 'unavailable'
-	| 'error';
+	'rateLimited' | 'unauthenticated' | 'forbidden' | 'unavailable' | 'error';
 
 export type SortDirection = 'asc' | 'desc';
 
