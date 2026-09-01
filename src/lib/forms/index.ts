@@ -1,3 +1,10 @@
+export { default as Field } from '../components/ui/Field.svelte';
+export { default as FormErrorFeedback } from '../components/ui/FormErrorFeedback.svelte';
+export { default as FormFeedback } from '../components/ui/FormFeedback.svelte';
+export { default as FormResultSlot } from '../components/ui/FormResultSlot.svelte';
+export { default as Honeypot } from '../components/ui/Honeypot.svelte';
+export { default as LocaleField } from '../components/ui/LocaleField.svelte';
+export { default as NewsletterIntentField } from '../components/ui/NewsletterIntentField.svelte';
 export {
 	COMMENT_BODY,
 	CONTACT_MESSAGE,

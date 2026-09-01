@@ -1,27 +1,18 @@
-// Components, by group.
-export * from './components/account/index.js';
-export * from './components/auth/index.js';
-export * from './components/contact/index.js';
-export * from './components/ui/index.js';
-export * from './components/layout/index.js';
-export * from './components/weeklies/index.js';
-export * from './components/projects/index.js';
-export * from './components/team/index.js';
-export * from './components/timeline/index.js';
-export * from './components/jobs/index.js';
+// The whole surface, flat — importable piecemeal through the semantic
+// subpaths: ./primitives, ./forms, ./chrome, ./content, ./community,
+// ./edit, ./config, ./testing.
+export * from './primitives.js';
+export * from './chrome.js';
+export * from './content-components.js';
+export * from './community.js';
 
-// The form seam: structural remote-form types, transport constants, field bounds.
+// The form seam: form components, structural remote-form types, transport
+// constants, field bounds.
 export * from './forms/index.js';
 
 // App wiring: configuration context and the edit-mode contract.
 export * from './config/index.js';
 export * from './edit/index.js';
 
-// Content shapes and the rich-text mini-format.
-export * from './content/index.js';
-
-// Utilities the components share with their host apps.
-export { formatDate, yearOf } from './utils/dates.js';
-export { contactCategoryLabel } from './utils/contact.js';
-export { MILESTONE_CATEGORY_COLOR, milestoneCategoryLabel } from './utils/milestones.js';
+// Path utility shared with host apps.
 export { isPathUnder } from './utils/paths.js';
