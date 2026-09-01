@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { entityEdit, pageCopyEdit } from './helpers.js';
+import { chromeEdit, entityEdit, pageCopyEdit } from './helpers.js';
 import { localize } from './types.js';
 
 describe('localize', () => {
@@ -19,6 +19,14 @@ describe('descriptor helpers', () => {
 			ref: { kind: 'page-copy', page: 'home', sectionKey: 'hero_title' },
 			locale: 'ca',
 			label: 'Títol'
+		});
+	});
+
+	it('builds a chrome descriptor for one interface-wording key', () => {
+		expect(chromeEdit('footer_rights', 'es', { label: 'Drets' })).toEqual({
+			ref: { kind: 'chrome', key: 'footer_rights' },
+			locale: 'es',
+			label: 'Drets'
 		});
 	});
 

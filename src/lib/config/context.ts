@@ -41,7 +41,10 @@ export function setUiConfig(input: () => UiConfigInput): UiConfig {
 		},
 		get messages() {
 			return input().messages ?? defaultMessages;
-		}
+		},
+		// Undefined means inert: components render their message strings as
+		// plain text, which is every app but the CMS.
+		messageEdit: (key) => input().messageEdit?.(key)
 	};
 	return setContext(KEY, resolved);
 }

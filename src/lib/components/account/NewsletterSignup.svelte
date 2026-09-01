@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getUiConfig } from '../../config/context.js';
+	import Editable from '../../edit/Editable.svelte';
 	import { withNewsletterIntent } from '../../forms/transport.js';
 	import type { NewsletterToggleFormInstance } from './AccountPanel.svelte';
 	import Button from '../ui/Button.svelte';
@@ -27,19 +28,33 @@
 
 <section class="newsletter" aria-labelledby="newsletter-title">
 	<div class="inner band">
-		<h2 id="newsletter-title">{msg.newsletter_title()}</h2>
-		<p>{msg.newsletter_intro()}</p>
+		<Editable edit={config.messageEdit?.('newsletter_title')} value={msg.newsletter_title()}>
+			{#snippet children(text, attrs)}<h2 id="newsletter-title" {...attrs}>{text}</h2>{/snippet}
+		</Editable>
+		<Editable edit={config.messageEdit?.('newsletter_intro')} value={msg.newsletter_intro()}>
+			{#snippet children(text, attrs)}<p {...attrs}>{text}</p>{/snippet}
+		</Editable>
 
 		{#if account === null}
 			<p class="prompt">
-				{msg.newsletter_promptLoggedOut()}
+				<Editable
+					edit={config.messageEdit?.('newsletter_promptLoggedOut')}
+					value={msg.newsletter_promptLoggedOut()}
+				>
+					{#snippet children(text, attrs)}<span {...attrs}>{text}</span>{/snippet}
+				</Editable>
 				<Link href={withNewsletterIntent('/signup')}>{msg.comments_signupLink()}</Link>
 				·
 				<Link href={withNewsletterIntent('/login')}>{msg.comments_loginLink()}</Link>
 			</p>
 		{:else if account.newsletterSubscribed}
 			<p class="prompt">
-				{msg.newsletter_subscribedNote()}
+				<Editable
+					edit={config.messageEdit?.('newsletter_subscribedNote')}
+					value={msg.newsletter_subscribedNote()}
+				>
+					{#snippet children(text, attrs)}<span {...attrs}>{text}</span>{/snippet}
+				</Editable>
 				<Link href="/account">{msg.account_navLabel()}</Link>
 			</p>
 		{:else}

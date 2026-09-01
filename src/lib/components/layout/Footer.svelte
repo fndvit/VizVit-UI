@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { getUiConfig } from '../../config/context.js';
 	import type { SiteLink } from '../../config/types.js';
+	import Editable from '../../edit/Editable.svelte';
 	import Link from '../ui/Link.svelte';
 
 	/**
@@ -29,7 +30,15 @@
 				<li><Link href={link.href}>{link.label}</Link></li>
 			{/each}
 		</ul>
-		<p class="rights">© {year} {config.messages.footer_rights()}</p>
+		<p class="rights">
+			© {year}
+			<Editable
+				edit={config.messageEdit?.('footer_rights')}
+				value={config.messages.footer_rights()}
+			>
+				{#snippet children(text, attrs)}<span {...attrs}>{text}</span>{/snippet}
+			</Editable>
+		</p>
 	</div>
 </footer>
 

@@ -30,8 +30,12 @@
 </script>
 
 {#if jobs.length === 0}
-	<p class="empty">{msg.jobs_empty()}</p>
-	<p class="nudge">{msg.jobs_newsletterNudge()}</p>
+	<Editable edit={config.messageEdit?.('jobs_empty')} value={msg.jobs_empty()}>
+		{#snippet children(text, attrs)}<p class="empty" {...attrs}>{text}</p>{/snippet}
+	</Editable>
+	<Editable edit={config.messageEdit?.('jobs_newsletterNudge')} value={msg.jobs_newsletterNudge()}>
+		{#snippet children(text, attrs)}<p class="nudge" {...attrs}>{text}</p>{/snippet}
+	</Editable>
 {:else}
 	<ul>
 		{#each jobs as job (job.slug)}
@@ -49,7 +53,9 @@
 			</li>
 		{/each}
 	</ul>
-	<p class="nudge">{msg.jobs_newsletterNudge()}</p>
+	<Editable edit={config.messageEdit?.('jobs_newsletterNudge')} value={msg.jobs_newsletterNudge()}>
+		{#snippet children(text, attrs)}<p class="nudge" {...attrs}>{text}</p>{/snippet}
+	</Editable>
 {/if}
 
 <style>

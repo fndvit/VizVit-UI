@@ -24,12 +24,17 @@ export type EditableEntity =
 	'weeklies' | 'projects' | 'milestones' | 'team_members' | 'job_openings';
 
 /**
- * The identity of one editable string in the content model: either a page
- * copy block (`page_content` row) or one localized field of a domain entity.
+ * The identity of one editable string in the content model: a page copy
+ * block (`page_content` row), one localized field of a domain entity, or one
+ * interface-wording message (`chrome`) — a Paraglide catalog key. What a
+ * chrome save MEANS is the host's decision, like every other ref: the
+ * foundation CMS writes the website's `ui_messages` table, from which the
+ * catalogs are regenerated at deploy.
  */
 export type ContentRef =
 	| { kind: 'page-copy'; page: string; sectionKey: string }
-	| { kind: 'entity'; entity: EditableEntity; id: string | number; field: string };
+	| { kind: 'entity'; entity: EditableEntity; id: string | number; field: string }
+	| { kind: 'chrome'; key: string };
 
 /** What a component hands the adapter alongside the new value. */
 export interface EditDescriptor {
