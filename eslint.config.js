@@ -20,6 +20,7 @@ export default defineConfig(
 	...svelte.configs.recommended,
 	prettier,
 	...svelte.configs.prettier,
+	...storybook.configs['flat/recommended'],
 	{
 		languageOptions: {
 			globals: { ...globals.browser, ...globals.node }
@@ -27,7 +28,11 @@ export default defineConfig(
 		rules: {
 			// typescript-eslint strongly recommend that you do not use the no-undef lint rule on TypeScript projects.
 			// see: https://typescript-eslint.io/troubleshooting/faqs/eslint/#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
-			'no-undef': 'off'
+			'no-undef': 'off',
+			// The package has no router: hrefs are canonical app paths resolved
+			// by the consuming app through UiConfig.href, so SvelteKit's
+			// resolve() contract cannot apply here.
+			'svelte/no-navigation-without-resolve': 'off'
 		}
 	},
 	{

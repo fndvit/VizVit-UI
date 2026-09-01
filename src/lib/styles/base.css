@@ -1,0 +1,67 @@
+/* Utility classes the @vitfoundation/ui components rely on, plus the edit-mode
+ * affordance. Import once next to tokens.css:
+ *
+ *   import '@vitfoundation/ui/tokens.css';
+ *   import '@vitfoundation/ui/base.css';
+ *
+ * An app with its own global stylesheet that already defines these classes
+ * (the foundation website) can keep its copies and skip this file — the
+ * selectors and declarations here are the canonical spellings of the same
+ * rules. */
+
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* Centered page band: constrains content width with section padding.
+ * Layout (flex, alignment) stays with the component that adds the class. */
+.band {
+	max-width: var(--content-max);
+	margin: 0 auto;
+	padding: var(--space-5) var(--space-3);
+}
+
+/* Compact variant for bars (site header). */
+.band-bar {
+	max-width: var(--content-max);
+	margin: 0 auto;
+	padding: var(--space-3);
+}
+
+/* Form-control skin: one border token for every input, select, and textarea.
+ * Sizing (padding, widths) stays with the component that adds the class. */
+.control {
+	border: 1px solid var(--color-axis);
+	border-radius: var(--radius);
+	background: var(--color-surface);
+}
+
+/* Edit-mode affordance. Global on purpose: the editable element is rendered
+ * by the consuming component's own markup (Editable hands it attributes
+ * through a snippet), which scoped styles inside Editable can never reach. */
+[data-vit-editing] {
+	outline: 2px dashed var(--color-brand);
+	outline-offset: 3px;
+	border-radius: 2px;
+	cursor: text;
+}
+
+[data-vit-editing]:focus-visible {
+	outline-style: solid;
+}
+
+[data-vit-editing='saving'] {
+	opacity: 0.6;
+}
+
+[data-vit-editing='error'] {
+	outline-color: var(--series-8);
+}
