@@ -81,3 +81,37 @@ export interface JobOpeningData {
 	description: string | null;
 	postedOn: string;
 }
+
+/** The reactions a weekly or comment can carry, in display order. */
+export const REACTIONS = ['like', 'love', 'clap'] as const;
+export type Reaction = (typeof REACTIONS)[number];
+
+/** One reaction's tally as the bar renders it. */
+export interface ReactionSummary {
+	reaction: Reaction;
+	count: number;
+	/** Whether the signed-in reader is among the reactors. */
+	mine: boolean;
+}
+
+/** The weekly or comment a reaction bar belongs to. */
+export type ReactionTarget = { kind: 'weekly'; slug: string } | { kind: 'comment'; id: number };
+
+/** One comment as the section renders it. */
+export interface CommentData {
+	id: number;
+	displayName: string;
+	body: string;
+	/** ISO timestamp. */
+	createdAt: string;
+	reactions: ReactionSummary[];
+}
+
+/** A top-level comment with its flat reply list. */
+export interface CommentThreadData extends CommentData {
+	replies: CommentData[];
+}
+
+/** The contact form's reasons, in display order — the host schema derives its enum from this. */
+export const CONTACT_CATEGORIES = ['collaborate', 'event', 'press', 'brand', 'other'] as const;
+export type ContactCategory = (typeof CONTACT_CATEGORIES)[number];

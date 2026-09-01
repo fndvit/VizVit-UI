@@ -44,6 +44,47 @@
 	background: var(--color-surface);
 }
 
+/* Vertical form: fields stacked with the standard rhythm. Forms that lay out
+ * as a row or as contents don't take it. */
+.form-stack {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-3);
+}
+
+/* Submit row. Load-bearing, not decorative: .form-stack stretches its direct
+ * children, so a bare button would fill the column. */
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--space-2);
+}
+
+/* Labelled rule between alternatives ("o"), e.g. between login methods. */
+.divider {
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
+	color: var(--color-ink-muted);
+	font-size: var(--text-sm);
+	margin: 0;
+}
+
+.divider::before,
+.divider::after {
+	content: '';
+	flex: 1;
+	border-top: 1px solid var(--color-hairline);
+}
+
+/* The h2 that opens a band within a section — declared globally because
+ * scoped styles cannot cross a module edge. Spacing stays with the module. */
+.subsection-heading {
+	font-size: var(--text-lg);
+	margin-block: var(--space-4) var(--space-2);
+}
+
 /* Edit-mode affordance. Global on purpose: the editable element is rendered
  * by the consuming component's own markup (Editable hands it attributes
  * through a snippet), which scoped styles inside Editable can never reach. */
