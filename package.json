@@ -1,5 +1,5 @@
 {
-	"name": "@vitfoundation/ui",
+	"name": "@vit-foundation/ui",
 	"version": "0.1.0",
 	"scripts": {
 		"dev": "vite dev",

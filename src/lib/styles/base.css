@@ -1,8 +1,8 @@
-/* Utility classes the @vitfoundation/ui components rely on, plus the edit-mode
+/* Utility classes the @vit-foundation/ui components rely on, plus the edit-mode
  * affordance. Import once next to tokens.css:
  *
- *   import '@vitfoundation/ui/tokens.css';
- *   import '@vitfoundation/ui/base.css';
+ *   import '@vit-foundation/ui/tokens.css';
+ *   import '@vit-foundation/ui/base.css';
  *
  * An app with its own global stylesheet that already defines these classes
  * (the foundation website) can keep its copies and skip this file — the

@@ -2,7 +2,7 @@ import { getContext, setContext } from 'svelte';
 import { defaultMessages } from './messages.js';
 import { BASE_LOCALE, LOCALES, type UiConfig, type UiConfigInput } from './types.js';
 
-const KEY = Symbol.for('@vitfoundation/ui:config');
+const KEY = Symbol.for('@vit-foundation/ui:config');
 
 /**
  * The provider-less config: identity hrefs, Catalan, no router. Complete on

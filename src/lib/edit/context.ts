@@ -1,7 +1,7 @@
 import { getContext, setContext } from 'svelte';
 import type { EditAdapter } from './types.js';
 
-const KEY = Symbol.for('@vitfoundation/ui:edit-adapter');
+const KEY = Symbol.for('@vit-foundation/ui:edit-adapter');
 
 /**
  * Installs the app's persistence adapter for the subtree. An app that never

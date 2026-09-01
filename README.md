@@ -1,4 +1,4 @@
-# @vitfoundation/ui
+# @vit-foundation/ui
 
 Fundació VIT's shared Svelte 5 component library: the components behind
 [fundaciovit.org](https://fundaciovit.org), decoupled from any one app, with an
@@ -6,7 +6,7 @@ optional **edit mode** that lets a CMS-shaped consumer make the rendered
 content editable in place.
 
 ```sh
-npm install @vitfoundation/ui
+npm install @vit-foundation/ui
 ```
 
 Requires `svelte` ^5.0.0 as a peer.
@@ -15,9 +15,9 @@ Requires `svelte` ^5.0.0 as a peer.
 
 ```svelte
 <script>
-	import { WeeklieCard, PageShell } from '@vitfoundation/ui';
-	import '@vitfoundation/ui/tokens.css'; // design tokens (CSS custom properties)
-	import '@vitfoundation/ui/base.css'; // utility classes + edit affordance
+	import { WeeklieCard, PageShell } from '@vit-foundation/ui';
+	import '@vit-foundation/ui/tokens.css'; // design tokens (CSS custom properties)
+	import '@vit-foundation/ui/base.css'; // utility classes + edit affordance
 </script>
 
 <PageShell title="Weeklies">
@@ -27,7 +27,7 @@ Requires `svelte` ^5.0.0 as a peer.
 
 Every component renders standalone with Catalan copy and identity hrefs.
 Subpath imports are available when you want a narrower graph:
-`@vitfoundation/ui/ui`, `/layout`, `/weeklies`, `/projects`, `/team`,
+`@vit-foundation/ui/ui`, `/layout`, `/weeklies`, `/projects`, `/team`,
 `/timeline`, `/jobs`, `/edit`, `/config`.
 
 ## Wiring a host app: `UiProvider`
@@ -38,7 +38,7 @@ wires it to Paraglide and SvelteKit like this:
 
 ```svelte
 <script>
-	import { UiProvider } from '@vitfoundation/ui';
+	import { UiProvider } from '@vit-foundation/ui';
 	import { page } from '$app/state';
 	import { m } from '$lib/paraglide/messages';
 	import { getLocale, locales, deLocalizeUrl } from '$lib/paraglide/runtime';
@@ -75,7 +75,7 @@ the read-only one. **The package never talks to a database.**
 
 ```svelte
 <script>
-	import { setEditAdapter, entityEdit, WeeklieCard } from '@vitfoundation/ui';
+	import { setEditAdapter, entityEdit, WeeklieCard } from '@vit-foundation/ui';
 
 	let editing = $state(false);
 
