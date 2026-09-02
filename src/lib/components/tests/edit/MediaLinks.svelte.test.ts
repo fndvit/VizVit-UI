@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import type { SiteLink } from '../../../config/types.js';
-import { chromeEdit, entityProperty } from '../../../edit/helpers.js';
+import { chromeEdit, entityEdit, entityProperty } from '../../../edit/helpers.js';
 import type { EditAdapter } from '../../../edit/types.js';
 import CardMedia from '../../ui/CardMedia.svelte';
 import WeeklieCard from '../../weeklies/WeeklieCard.svelte';
@@ -97,6 +97,9 @@ function fullAdapter(overrides: Partial<EditAdapter> = {}): EditAdapter {
 	};
 }
 
+const linkLabel = (link: SiteLink) =>
+	link.id === undefined ? undefined : entityEdit('site_links', link.id, 'ca')('label');
+
 const linkMap = (link: SiteLink) =>
 	link.id === undefined
 		? undefined
@@ -111,13 +114,14 @@ const linkMap = (link: SiteLink) =>
 				})
 			};
 
-describe('nav/footer structural editing', () => {
+describe('nav/footer structural editing — one modal per entry', () => {
 	it('read-only renders byte-identically with or without the new props', () => {
 		const plain = render(MediaLinksProbe, { props: { show: 'nav', links } });
 		const wired = render(MediaLinksProbe, {
 			props: {
 				show: 'nav',
 				links,
+				editFor: linkLabel,
 				propertiesFor: linkMap,
 				collection: { entity: 'site_links' as const }
 			}
@@ -125,41 +129,95 @@ describe('nav/footer structural editing', () => {
 		expect(wired.container.innerHTML).toBe(plain.container.innerHTML);
 	});
 
-	it('the href row carries the link href and commits through saveProperty', async () => {
+	it('the modal carries text, adreça and ordre; Desa commits each changed half', async () => {
+		const save = vi.fn(async () => {});
 		const saveProperty = vi.fn(async () => {});
 		const { container } = render(MediaLinksProbe, {
 			props: {
 				show: 'footer',
 				links,
+				editFor: linkLabel,
 				propertiesFor: linkMap,
 				collection: { entity: 'site_links' as const },
-				adapter: fullAdapter({ saveProperty })
+				adapter: fullAdapter({ save, saveProperty })
 			}
 		});
-		container.querySelector<HTMLButtonElement>('.toolbar button')!.click();
+		const swap = [...container.querySelectorAll<HTMLButtonElement>('.link-swap')].find((el) =>
+			el.textContent?.includes('Què fem')
+		)!;
+		swap.click();
 		await settle();
-		const input = container.querySelector<HTMLInputElement>('[role="dialog"] input[type="url"]')!;
-		expect(input.value).toBe('/what-we-do');
-		input.value = '/que-fem';
-		input.dispatchEvent(new Event('input', { bubbles: true }));
-		input.dispatchEvent(new Event('change', { bubbles: true }));
+		const dialog = [...container.querySelectorAll<HTMLDialogElement>('dialog')].find(
+			(candidate) => candidate.open
+		)!;
+		const inputs = [...dialog.querySelectorAll('input')];
+		expect(inputs.map((input) => input.value)).toEqual(['Què fem', '/what-we-do', '0']);
+		inputs[1].value = '/que-fem';
+		inputs[1].dispatchEvent(new Event('input', { bubbles: true }));
+		inputs[2].value = '3';
+		inputs[2].dispatchEvent(new Event('input', { bubbles: true }));
+		[...dialog.querySelectorAll('button')]
+			.find((button) => button.textContent?.trim() === 'Desa')!
+			.click();
 		await settle();
+		expect(save).not.toHaveBeenCalled();
 		expect(saveProperty).toHaveBeenCalledWith(linkMap(links[0])!.href, '/que-fem');
+		expect(saveProperty).toHaveBeenCalledWith(linkMap(links[0])!.order, '3');
 	});
 
-	it('an add slot fires the collection create; a link without id gets no frame', async () => {
+	it("the modal's Elimina confirms, then fires the collection remove", async () => {
 		const applyOp = vi.fn(async () => {});
 		const { container } = render(MediaLinksProbe, {
 			props: {
 				show: 'nav',
 				links,
+				editFor: linkLabel,
 				propertiesFor: linkMap,
 				collection: { entity: 'site_links' as const },
 				adapter: fullAdapter({ applyOp })
 			}
 		});
-		// One frame for the identified link, none for the legacy one.
-		expect(container.querySelectorAll('.links .vit-edit-frame')).toHaveLength(1);
+		[...container.querySelectorAll<HTMLButtonElement>('.link-swap')]
+			.find((el) => el.textContent?.includes('Què fem'))!
+			.click();
+		await settle();
+		const dialog = [...container.querySelectorAll<HTMLDialogElement>('dialog')].find(
+			(candidate) => candidate.open
+		)!;
+		[...dialog.querySelectorAll('button')]
+			.find((button) => button.textContent?.trim() === 'Elimina')!
+			.click();
+		await settle();
+		const confirm = [...container.querySelectorAll<HTMLDialogElement>('dialog')]
+			.filter((candidate) => candidate.open)
+			.at(-1)!;
+		[...confirm.querySelectorAll('button')]
+			.find((button) => button.textContent?.trim() === 'Elimina')!
+			.click();
+		await settle();
+		expect(applyOp).toHaveBeenCalledWith({
+			kind: 'remove',
+			collection: { entity: 'site_links' },
+			id: 1
+		});
+	});
+
+	it('an add slot fires the collection create; a legacy link edits its label only', async () => {
+		const applyOp = vi.fn(async () => {});
+		const { container } = render(MediaLinksProbe, {
+			props: {
+				show: 'nav',
+				links,
+				editFor: linkLabel,
+				propertiesFor: linkMap,
+				collection: { entity: 'site_links' as const },
+				adapter: fullAdapter({ applyOp })
+			}
+		});
+		// The identified link swaps; the id-less legacy one has no label
+		// descriptor either, so it stays a live anchor.
+		expect(container.querySelectorAll('.links .link-swap')).toHaveLength(1);
+		expect(container.querySelector('.links a[href="/legacy"]')).not.toBeNull();
 		container.querySelector<HTMLButtonElement>('.links button.add')!.click();
 		await settle();
 		expect(applyOp).toHaveBeenCalledWith({

@@ -1,10 +1,8 @@
 <script lang="ts">
 	import { getUiConfig } from '../../config/context.js';
 	import type { SiteLink } from '../../config/types.js';
-	import ActionLabel from '../../edit/ActionLabel.svelte';
 	import AddSlot from '../../edit/chrome/AddSlot.svelte';
-	import EditFrame from '../../edit/chrome/EditFrame.svelte';
-	import EditPanel from '../../edit/chrome/EditPanel.svelte';
+	import LinkEdit from '../../edit/chrome/LinkEdit.svelte';
 	import { getEditAdapter } from '../../edit/context.js';
 	import type { CollectionRef, EditDescriptor } from '../../edit/types.js';
 	import { isPathUnder } from '../../utils/paths.js';
@@ -26,11 +24,12 @@
 		/**
 		 * Edit descriptors for the link LABELS — a function because the host
 		 * owns both the routes and the message keys behind them. While the
-		 * adapter is editing, a link with a descriptor renders as editable
-		 * text instead of an anchor (see ActionLabel).
+		 * adapter is editing, a link with a descriptor swaps for a button that
+		 * opens the LINK MODAL (see LinkEdit) — every half of the entry edits
+		 * in that one gesture.
 		 */
 		editFor?: (link: SiteLink) => EditDescriptor | undefined;
-		/** Panel rows (href, order) per link — the label edits via `editFor`. */
+		/** The modal's Adreça/Ordre rows and removal per link — see LinkEdit. */
 		propertiesFor?: (link: SiteLink) => SiteLinkEditMap | undefined;
 		/** Names the links' collection; with `applyOp`, turns on add/remove. */
 		collection?: CollectionRef;
@@ -59,12 +58,6 @@
 		return { ...map, removeOp: { kind: 'remove', collection, id: link.id } };
 	}
 
-	function rowsFor(link: SiteLink, map: SiteLinkEditMap | undefined) {
-		return [
-			map?.href && { descriptor: map.href, value: link.href },
-			map?.order && { descriptor: map.order, value: String(link.order ?? 0) }
-		].filter((row) => row !== undefined);
-	}
 	const msg = $derived(config.messages);
 
 	let isMenuOpen = $state(false);
@@ -121,29 +114,24 @@
 			<ul class="links">
 				{#each links as link (link.href)}
 					{@const map = editMapFor(link)}
-					{@const rows = rowsFor(link, map)}
 					<li>
-						<!-- Inside the li, so the row's layout never gains a child. -->
-						<EditFrame
-							spec={map && (rows.length > 0 || map.removeOp)
-								? {
-										label: map.label ?? link.label,
-										hasPanel: rows.length > 0,
-										removeOp: map.removeOp
-									}
+						<!-- One gesture: clicking the entry opens the modal that edits
+						     its text, destination, order and removal together. -->
+						<LinkEdit
+							text={{ edit: editFor?.(link), value: link.label }}
+							href={{ descriptor: map?.href, value: link.href }}
+							extras={map?.order
+								? [{ descriptor: map.order, value: String(link.order ?? 0) }]
 								: undefined}
+							removeOp={map?.removeOp}
+							label={map?.label ?? link.label}
 						>
-							{#snippet panel()}
-								<EditPanel {rows} />
+							{#snippet control()}
+								<Link href={link.href} aria-current={isCurrent(link.href) ? 'page' : undefined}>
+									{link.label}
+								</Link>
 							{/snippet}
-							<ActionLabel edit={editFor?.(link)} value={link.label}>
-								{#snippet control()}
-									<Link href={link.href} aria-current={isCurrent(link.href) ? 'page' : undefined}>
-										{link.label}
-									</Link>
-								{/snippet}
-							</ActionLabel>
-						</EditFrame>
+						</LinkEdit>
 					</li>
 				{/each}
 				{#if structural && collection}

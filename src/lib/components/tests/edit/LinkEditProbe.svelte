@@ -4,7 +4,12 @@
 	import type { UiMessages } from '../../../config/types.js';
 	import { setEditAdapter } from '../../../edit/context.js';
 	import LinkEdit from '../../../edit/chrome/LinkEdit.svelte';
-	import type { EditAdapter, EditDescriptor, PropertyDescriptor } from '../../../edit/types.js';
+	import type {
+		EditAdapter,
+		EditDescriptor,
+		EntityOp,
+		PropertyDescriptor
+	} from '../../../edit/types.js';
 	import { createRemoteFormMock } from '../../../testing/remote-form.js';
 	import type { NewsletterToggleFormInstance } from '../../account/AccountPanel.svelte';
 	import NewsletterSignup from '../../account/NewsletterSignup.svelte';
@@ -21,6 +26,8 @@
 		mode?: 'bare' | 'newsletter' | 'comments';
 		text?: { edit: EditDescriptor | undefined; value: string };
 		href?: { descriptor: PropertyDescriptor | undefined; value: string };
+		extras?: { descriptor: PropertyDescriptor; value: string | null }[];
+		removeOp?: EntityOp;
 		messageEdit?: (key: string) => EditDescriptor | undefined;
 		messages?: UiMessages;
 	}
@@ -30,6 +37,8 @@
 		mode = 'bare',
 		text = { edit: undefined, value: 'Enllaç' },
 		href = { descriptor: undefined, value: '/on' },
+		extras = undefined,
+		removeOp = undefined,
 		messageEdit = undefined,
 		messages = undefined
 	}: Props = $props();
@@ -42,7 +51,7 @@
 </script>
 
 {#if mode === 'bare'}
-	<LinkEdit {text} {href}>
+	<LinkEdit {text} {href} {extras} {removeOp}>
 		{#snippet control()}<a href={href.value}>{text.value}</a>{/snippet}
 	</LinkEdit>
 {:else if mode === 'newsletter'}

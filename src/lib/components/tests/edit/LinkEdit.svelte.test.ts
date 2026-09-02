@@ -2,8 +2,8 @@ import { describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import { defaultMessages } from '../../../config/messages.js';
 import type { UiMessages } from '../../../config/types.js';
-import { chromeEdit, chromeProperty } from '../../../edit/helpers.js';
-import type { EditAdapter } from '../../../edit/types.js';
+import { chromeEdit, chromeProperty, entityProperty } from '../../../edit/helpers.js';
+import type { EditAdapter, EntityOp } from '../../../edit/types.js';
 import LinkEditProbe from './LinkEditProbe.svelte';
 
 /**
@@ -18,7 +18,7 @@ const textEdit = chromeEdit('comments_signupLink', 'ca');
 const hrefDescriptor = chromeProperty('comments_signupLinkHref', { type: 'text', label: 'Adreça' });
 
 function adapterWith(
-	overrides: Partial<Pick<EditAdapter, 'save' | 'saveProperty'>> = {}
+	overrides: Partial<Pick<EditAdapter, 'save' | 'saveProperty' | 'applyOp'>> = {}
 ): EditAdapter {
 	return {
 		isEditing: true,
@@ -102,6 +102,79 @@ describe('LinkEdit', () => {
 		container.querySelector<HTMLButtonElement>('.link-swap')!.click();
 		await settle();
 		expect(container.querySelectorAll('dialog input')).toHaveLength(1);
+	});
+
+	it('without extras or removeOp the modal is unchanged: two fields, no Elimina', async () => {
+		const { container } = bare(adapterWith());
+		container.querySelector<HTMLButtonElement>('.link-swap')!.click();
+		await settle();
+		const dialog = container.querySelector<HTMLDialogElement>('dialog')!;
+		expect(dialog.querySelectorAll('input')).toHaveLength(2);
+		expect(
+			[...dialog.querySelectorAll('button')].some(
+				(button) => button.textContent?.trim() === 'Elimina'
+			)
+		).toBe(false);
+	});
+
+	it('an extras row renders labelled, and Desa commits it only when changed', async () => {
+		const order = entityProperty('site_links', 4)('sortOrder', { type: 'text', label: 'Ordre' });
+		const saveProperty = vi.fn(() => Promise.resolve());
+		const { container } = render(LinkEditProbe, {
+			props: {
+				adapter: adapterWith({ saveProperty }),
+				text: { edit: textEdit, value: 'Crea un compte' },
+				href: { descriptor: hrefDescriptor, value: '/signup' },
+				extras: [{ descriptor: order, value: '2' }]
+			}
+		});
+		container.querySelector<HTMLButtonElement>('.link-swap')!.click();
+		await settle();
+		const dialog = container.querySelector<HTMLDialogElement>('dialog')!;
+		expect([...dialog.querySelectorAll('label span')].map((el) => el.textContent)).toEqual([
+			'Text',
+			'Adreça',
+			'Ordre'
+		]);
+		const inputs = [...dialog.querySelectorAll('input')];
+		expect(inputs[2].value).toBe('2');
+		inputs[2].value = '5';
+		inputs[2].dispatchEvent(new Event('input', { bubbles: true }));
+		[...dialog.querySelectorAll('button')]
+			.find((button) => button.textContent?.trim() === 'Desa')!
+			.click();
+		await settle();
+		expect(saveProperty).toHaveBeenCalledTimes(1);
+		expect(saveProperty).toHaveBeenCalledWith(order, '5');
+	});
+
+	it('removeOp adds a confirmed Elimina that fires applyOp and closes', async () => {
+		const applyOp = vi.fn(() => Promise.resolve());
+		const removeOp: EntityOp = { kind: 'remove', collection: { entity: 'site_links' }, id: 4 };
+		const { container } = render(LinkEditProbe, {
+			props: {
+				adapter: adapterWith({ applyOp }),
+				text: { edit: textEdit, value: 'Crea un compte' },
+				href: { descriptor: hrefDescriptor, value: '/signup' },
+				removeOp
+			}
+		});
+		container.querySelector<HTMLButtonElement>('.link-swap')!.click();
+		await settle();
+		const dialog = container.querySelector<HTMLDialogElement>('dialog')!;
+		[...dialog.querySelectorAll('button')]
+			.find((button) => button.textContent?.trim() === 'Elimina')!
+			.click();
+		await settle();
+		const confirm = [...container.querySelectorAll<HTMLDialogElement>('dialog')]
+			.filter((candidate) => candidate.open)
+			.at(-1)!;
+		[...confirm.querySelectorAll('button')]
+			.find((button) => button.textContent?.trim() === 'Elimina')!
+			.click();
+		await settle();
+		expect(applyOp).toHaveBeenCalledWith(removeOp);
+		expect(container.querySelectorAll('dialog[open]')).toHaveLength(0);
 	});
 });
 
