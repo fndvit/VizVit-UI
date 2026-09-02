@@ -10,6 +10,7 @@
 
 <script lang="ts">
 	import { getUiConfig } from '../../config/context.js';
+	import ActionLabel from '../../edit/ActionLabel.svelte';
 	import type { ProjectCardData } from '../../content/types.js';
 	import { getEditAdapter } from '../../edit/context.js';
 	import Editable from '../../edit/Editable.svelte';
@@ -57,9 +58,16 @@
 			{#snippet children(text, attrs)}<p {...attrs}>{text}</p>{/snippet}
 		</Editable>
 		{#if project.hasStory}
-			<Link href={`/what-we-do/${project.slug}`} class="more">
-				{config.messages.common_readMore()}
-			</Link>
+			<ActionLabel
+				edit={config.messageEdit?.('common_readMore')}
+				value={config.messages.common_readMore()}
+			>
+				{#snippet control()}
+					<Link href={`/what-we-do/${project.slug}`} class="more">
+						{config.messages.common_readMore()}
+					</Link>
+				{/snippet}
+			</ActionLabel>
 		{/if}
 	</div>
 </article>

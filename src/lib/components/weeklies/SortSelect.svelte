@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { getUiConfig } from '../../config/context.js';
 	import type { SortDirection } from '../../content/types.js';
+	import ActionLabel from '../../edit/ActionLabel.svelte';
 
 	interface Props {
 		value: SortDirection;
@@ -18,13 +19,17 @@
 	}
 </script>
 
-<label>
-	<span>{msg.weeklies_sortLabel()}</span>
-	<select class="control" {value} onchange={handleChange}>
-		<option value="desc">{msg.weeklies_sortDesc()}</option>
-		<option value="asc">{msg.weeklies_sortAsc()}</option>
-	</select>
-</label>
+<ActionLabel edit={config.messageEdit?.('weeklies_sortLabel')} value={msg.weeklies_sortLabel()}>
+	{#snippet control()}
+		<label>
+			<span>{msg.weeklies_sortLabel()}</span>
+			<select class="control" {value} onchange={handleChange}>
+				<option value="desc">{msg.weeklies_sortDesc()}</option>
+				<option value="asc">{msg.weeklies_sortAsc()}</option>
+			</select>
+		</label>
+	{/snippet}
+</ActionLabel>
 
 <style>
 	label {
