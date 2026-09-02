@@ -70,12 +70,16 @@ export interface TeamMemberData {
 }
 
 export interface CollaboratorData {
+	/** Present only where the list is editable — remove ops need an identity. */
+	id?: string | number;
 	personName: string;
 	affiliation: string;
 	url: string | null;
 }
 
 export interface JobOpeningData {
+	/** Present only where the list is editable — remove ops need an identity. */
+	id?: string | number;
 	slug: string;
 	title: string;
 	description: string | null;
