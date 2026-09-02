@@ -189,13 +189,20 @@ The same shapes across the content components:
 | JobList          | title, description      | postedOn                                                    | add, remove (rows with id) |
 | SearchInput      | —                       | the placeholder (`placeholderEdit`)                         | —                          |
 | SortSelect       | its label (ActionLabel) | the option labels (`optionsEdit`)                           | —                          |
-| ContactForm      | labels, submit, copy    | category option labels (own chrome keys)                    | —                          |
+| ContactForm      | labels, submit, copy    | category option labels + post-submit feedback (own keys)    | —                          |
+| Nav / Footer     | link labels (`editFor`) | href, order (`propertiesFor`)                               | add, remove (links w/ id)  |
+| NewsletterSignup | copy + its links        | —                                                           | —                          |
+| CommentSection   | copy, links, «Respon»   | —                                                           | —                          |
+| CardMedia        | —                       | — (renders a placeholder when the src is missing or 404s)   | —                          |
 
-A collaborator or job row offers removal only when its data carries an `id` —
-a remove op needs an identity, and read-only hosts never pass one. Plain-text
-columns (a person's name, an affiliation) edit through panels, never inline:
-the per-locale inline contract does not apply to them. Nav/Footer link
-add/remove stays out until the site's links live in a table.
+A collaborator, job or nav-link row offers structural affordances only when
+its data carries an `id` — a remove op needs an identity, and read-only hosts
+never pass one. Plain-text columns (a person's name, an affiliation, an href)
+edit through panels, never inline: the per-locale inline contract does not
+apply to them. Cards whose data sets `draft: true` wear the «Esborrany» chip
+(`editMessages.edit_draftBadge`) — the flag is CMS-only, the public site
+never sets it. Still out: aria strings, and post-submit feedback outside
+ContactForm (Traduccions covers them).
 
 Every string the editor chrome shows (Desant…, Elimina, Afegeix…) comes from
 `config.editMessages` — a separate catalog from `messages`, because editor

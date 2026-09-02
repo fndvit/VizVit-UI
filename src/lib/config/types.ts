@@ -16,8 +16,12 @@ export const BASE_LOCALE: Locale = 'ca';
 
 /** One primary-navigation entry, rendered by Nav and repeated by Footer. */
 export interface SiteLink {
+	/** Present only where the nav is editable — structural ops need identity. */
+	id?: string | number;
 	href: string;
 	label: string;
+	/** The row's sort_order, for the CMS's order panel row. */
+	order?: number;
 }
 
 /**

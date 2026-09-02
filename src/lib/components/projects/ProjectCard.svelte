@@ -26,6 +26,7 @@
 	import EditFrame from '../../edit/chrome/EditFrame.svelte';
 	import EditPanel from '../../edit/chrome/EditPanel.svelte';
 	import CardMedia from '../ui/CardMedia.svelte';
+	import DraftBadge from '../../edit/chrome/DraftBadge.svelte';
 	import CardTitle from '../ui/CardTitle.svelte';
 	import DateText from '../ui/DateText.svelte';
 	import Link from '../ui/Link.svelte';
@@ -84,6 +85,7 @@
 		{/snippet}
 		<CardMedia src={project.imageUrl} alt="" ratio="16 / 9" width="1200" height="675" />
 		<div class="text">
+			{#if project.draft}<DraftBadge />{/if}
 			<DateText value={project.publishedOn} />
 			<CardTitle>
 				{#if titleEditing}

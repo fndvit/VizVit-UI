@@ -4,4 +4,5 @@
  */
 export { default as Footer } from './components/layout/Footer.svelte';
 export { default as Nav } from './components/layout/Nav.svelte';
+export type { SiteLinkEditMap } from './components/layout/site-link-edit.js';
 export { default as PageShell } from './components/layout/PageShell.svelte';

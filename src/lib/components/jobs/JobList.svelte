@@ -20,6 +20,7 @@
 	import { getUiConfig } from '../../config/context.js';
 	import type { JobOpeningData } from '../../content/types.js';
 	import AddSlot from '../../edit/chrome/AddSlot.svelte';
+	import DraftBadge from '../../edit/chrome/DraftBadge.svelte';
 	import EditFrame from '../../edit/chrome/EditFrame.svelte';
 	import EditPanel from '../../edit/chrome/EditPanel.svelte';
 	import { getEditAdapter } from '../../edit/context.js';
@@ -94,6 +95,7 @@
 					<Editable edit={edit?.title} value={job.title}>
 						{#snippet children(text, attrs)}<h3 {...attrs}>{text}</h3>{/snippet}
 					</Editable>
+					{#if job.draft}<DraftBadge />{/if}
 					<DateText value={job.postedOn} />
 					{#if job.description}
 						<Editable edit={edit?.description} value={job.description}>

@@ -23,6 +23,7 @@
 	import EditFrame from '../../edit/chrome/EditFrame.svelte';
 	import EditPanel from '../../edit/chrome/EditPanel.svelte';
 	import CardMedia from '../ui/CardMedia.svelte';
+	import DraftBadge from '../../edit/chrome/DraftBadge.svelte';
 	import CardTitle from '../ui/CardTitle.svelte';
 	import DateText from '../ui/DateText.svelte';
 	import Link from '../ui/Link.svelte';
@@ -62,6 +63,7 @@
 		{/snippet}
 		<header>
 			<span class="number">{config.messages.weeklie_number({ number: weekly.number })}</span>
+			{#if weekly.draft}<DraftBadge />{/if}
 			<DateText value={weekly.publishedOn} />
 		</header>
 		<CardMedia src={weekly.imageUrl} alt="" ratio="1 / 1" width="600" height="600" />

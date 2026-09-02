@@ -29,6 +29,7 @@
 	import Editable from '../../edit/Editable.svelte';
 	import { MILESTONE_CATEGORY_COLOR, milestoneCategoryLabel } from '../../utils/milestones.js';
 	import CardMedia from '../ui/CardMedia.svelte';
+	import DraftBadge from '../../edit/chrome/DraftBadge.svelte';
 	import DateText from '../ui/DateText.svelte';
 	import Link from '../ui/Link.svelte';
 
@@ -110,6 +111,7 @@
 			{#snippet children(text, attrs)}<p class="category" {...attrs}>{text}</p>{/snippet}
 		</Editable>
 		<DateText value={milestone.occurredOn} />
+		{#if milestone.draft}<DraftBadge />{/if}
 		<Editable edit={edit?.title} value={milestone.title}>
 			{#snippet children(text, attrs)}<h3 {...attrs}>{text}</h3>{/snippet}
 		</Editable>
@@ -119,7 +121,7 @@
 			</Editable>
 		{/if}
 		{#if milestone.imageUrls.length > 0}
-			<CardMedia src={milestone.imageUrls[0]} alt="" width="1200" height="675" />
+			<CardMedia src={milestone.imageUrls[0] ?? null} alt="" width="1200" height="675" />
 		{/if}
 		{#if milestone.linkUrl}
 			<p class="more">
