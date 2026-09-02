@@ -1,4 +1,8 @@
 <script lang="ts">
+	import EditFrame from '../../edit/chrome/EditFrame.svelte';
+	import EditPanel from '../../edit/chrome/EditPanel.svelte';
+	import type { PropertyDescriptor } from '../../edit/types.js';
+
 	interface Props {
 		/** Ties the label to the input; override when a page renders two. */
 		id?: string;
@@ -8,6 +12,12 @@
 		/** Called after the debounce delay with the trimmed query. */
 		onsearch: (query: string) => void;
 		debounceMs?: number;
+		/**
+		 * A placeholder cannot hold a caret, so it edits through the frame's
+		 * panel: one text row over whatever the host's descriptor names
+		 * (a chrome key on the foundation site). Inert without an adapter.
+		 */
+		placeholderEdit?: PropertyDescriptor;
 	}
 
 	const DEFAULT_DEBOUNCE_MS = 300;
@@ -18,8 +28,11 @@
 		placeholder,
 		label,
 		onsearch,
-		debounceMs = DEFAULT_DEBOUNCE_MS
+		debounceMs = DEFAULT_DEBOUNCE_MS,
+		placeholderEdit
 	}: Props = $props();
+
+	const frameSpec = $derived(placeholderEdit !== undefined ? { label, hasPanel: true } : undefined);
 
 	// svelte-ignore state_referenced_locally
 	let query = $state(value);
@@ -70,15 +83,23 @@
 </script>
 
 <form role="search" onsubmit={handleSubmit}>
-	<label class="visually-hidden" for={id}>{label}</label>
-	<input
-		{id}
-		class="control"
-		type="search"
-		{placeholder}
-		bind:value={query}
-		oninput={handleInput}
-	/>
+	<!-- Inside the form, so the host's toolbar layout never gains a child. -->
+	<EditFrame spec={frameSpec}>
+		{#snippet panel()}
+			{#if placeholderEdit}
+				<EditPanel rows={[{ descriptor: placeholderEdit, value: placeholder }]} />
+			{/if}
+		{/snippet}
+		<label class="visually-hidden" for={id}>{label}</label>
+		<input
+			{id}
+			class="control"
+			type="search"
+			{placeholder}
+			bind:value={query}
+			oninput={handleInput}
+		/>
+	</EditFrame>
 </form>
 
 <style>

@@ -20,6 +20,9 @@
 <script lang="ts">
 	import { getUiConfig } from '../../config/context.js';
 	import ActionLabel from '../../edit/ActionLabel.svelte';
+	import EditFrame from '../../edit/chrome/EditFrame.svelte';
+	import EditPanel from '../../edit/chrome/EditPanel.svelte';
+	import { chromeProperty } from '../../edit/helpers.js';
 	import { CONTACT_MESSAGE, CONTACT_NAME, EMAIL } from '../../forms/constraints.js';
 	import { CONTACT_CATEGORIES } from '../../content/types.js';
 	import { contactCategoryLabel } from '../../utils/contact.js';
@@ -49,27 +52,54 @@
 	// what order (the host schema derives its enum from CONTACT_CATEGORIES),
 	// and the messages own the copy for each.
 	const categories = CONTACT_CATEGORIES;
+
+	/**
+	 * An <option> cannot hold a caret, so the category labels edit through
+	 * the frame's panel — one text row per category, over the SAME chrome
+	 * keys the options render. Gated the way the form's other wording is:
+	 * only where the host exposes `messageEdit` (the CMS mirror); the frame
+	 * itself further requires an editing adapter with `saveProperty`.
+	 */
+	const categoryRows = $derived(
+		config.messageEdit
+			? categories.map((category) => ({
+					descriptor: chromeProperty(`contact_category_${category}`, {
+						type: 'text' as const,
+						label: contactCategoryLabel(category, msg)
+					}),
+					value: contactCategoryLabel(category, msg)
+				}))
+			: []
+	);
+	const categoryFrameSpec = $derived(
+		categoryRows.length > 0 ? { label: msg.contact_categoryLabel(), hasPanel: true } : undefined
+	);
 </script>
 
 {#if f.result?.ok}
 	<FormFeedback kind="success">{msg.contact_success()}</FormFeedback>
 {:else}
 	<form class="form-stack" {...f}>
-		<Field
-			id="contact-category"
-			label={msg.contact_categoryLabel()}
-			labelEdit={config.messageEdit?.('contact_categoryLabel')}
-			field={f.fields.category}
-			constraint={null}
-		>
-			{#snippet children(attrs)}
-				<select class="control" {...attrs} {...f.fields.category.as('select')}>
-					{#each categories as category (category)}
-						<option value={category}>{contactCategoryLabel(category, msg)}</option>
-					{/each}
-				</select>
+		<EditFrame spec={categoryFrameSpec}>
+			{#snippet panel()}
+				<EditPanel rows={categoryRows} />
 			{/snippet}
-		</Field>
+			<Field
+				id="contact-category"
+				label={msg.contact_categoryLabel()}
+				labelEdit={config.messageEdit?.('contact_categoryLabel')}
+				field={f.fields.category}
+				constraint={null}
+			>
+				{#snippet children(attrs)}
+					<select class="control" {...attrs} {...f.fields.category.as('select')}>
+						{#each categories as category (category)}
+							<option value={category}>{contactCategoryLabel(category, msg)}</option>
+						{/each}
+					</select>
+				{/snippet}
+			</Field>
+		</EditFrame>
 
 		<Field
 			id="contact-name"

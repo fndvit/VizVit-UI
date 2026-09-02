@@ -175,6 +175,28 @@ slots between and after the cards. It offers NO reorder: order derives from
 `occurredOn`, so editing the date IS the reorder. The category select fills
 its options from the same labels the category chip renders.
 
+### Coverage
+
+The same shapes across the content components:
+
+| Component        | Inline text             | Panel properties                                            | Collection ops             |
+| ---------------- | ----------------------- | ----------------------------------------------------------- | -------------------------- |
+| Timeline         | title, body, category   | occurredOn, category, linkUrl, image                        | add, remove                |
+| WeeklieCard      | title, excerpt          | image                                                       | — (own authoring flow)     |
+| ProjectCard      | title, excerpt          | kind (options auto-filled), publishedOn, externalUrl, image | — (host-level)             |
+| TeamMemberCard   | role, bio               | name (plain text), photo                                    | — (host-level)             |
+| CollaboratorList | —                       | personName, affiliation, url (all plain text)               | add, remove (rows with id) |
+| JobList          | title, description      | postedOn                                                    | add, remove (rows with id) |
+| SearchInput      | —                       | the placeholder (`placeholderEdit`)                         | —                          |
+| SortSelect       | its label (ActionLabel) | the option labels (`optionsEdit`)                           | —                          |
+| ContactForm      | labels, submit, copy    | category option labels (own chrome keys)                    | —                          |
+
+A collaborator or job row offers removal only when its data carries an `id` —
+a remove op needs an identity, and read-only hosts never pass one. Plain-text
+columns (a person's name, an affiliation) edit through panels, never inline:
+the per-locale inline contract does not apply to them. Nav/Footer link
+add/remove stays out until the site's links live in a table.
+
 Every string the editor chrome shows (Desant…, Elimina, Afegeix…) comes from
 `config.editMessages` — a separate catalog from `messages`, because editor
 copy belongs to the CMS host and must never leak into the site's wording

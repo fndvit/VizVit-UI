@@ -21,7 +21,15 @@ export function localize(value: LocalizedText, locale: Locale): string {
  * the content tables so an adapter can route a save without a mapping layer.
  */
 export type EditableEntity =
-	'weeklies' | 'projects' | 'milestones' | 'team_members' | 'job_openings' | 'themes';
+	| 'weeklies'
+	| 'projects'
+	| 'milestones'
+	| 'team_members'
+	| 'job_openings'
+	| 'themes'
+	// ⚠ widening this union is a coordinated break for hosts with exhaustive
+	// maps over it (the CMS's editable-fields whitelist) — note the changelog.
+	| 'collaborators';
 
 /**
  * The identity of one editable string in the content model: a page copy
