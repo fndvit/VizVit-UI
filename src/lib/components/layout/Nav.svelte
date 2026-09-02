@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { getUiConfig } from '../../config/context.js';
 	import type { SiteLink } from '../../config/types.js';
+	import ActionLabel from '../../edit/ActionLabel.svelte';
+	import type { EditDescriptor } from '../../edit/types.js';
 	import { isPathUnder } from '../../utils/paths.js';
 	import GhostButton from '../ui/GhostButton.svelte';
 	import Link from '../ui/Link.svelte';
@@ -16,9 +18,16 @@
 		account?: { displayName: string } | null;
 		/** The URL highlighting reads from. Only tests and stories pass one. */
 		url?: URL;
+		/**
+		 * Edit descriptors for the link LABELS — a function because the host
+		 * owns both the routes and the message keys behind them. While the
+		 * adapter is editing, a link with a descriptor renders as editable
+		 * text instead of an anchor (see ActionLabel).
+		 */
+		editFor?: (link: SiteLink) => EditDescriptor | undefined;
 	}
 
-	let { links, account = null, url = undefined }: Props = $props();
+	let { links, account = null, url = undefined, editFor = undefined }: Props = $props();
 
 	const config = getUiConfig();
 	const msg = $derived(config.messages);
@@ -77,9 +86,13 @@
 			<ul class="links">
 				{#each links as link (link.href)}
 					<li>
-						<Link href={link.href} aria-current={isCurrent(link.href) ? 'page' : undefined}>
-							{link.label}
-						</Link>
+						<ActionLabel edit={editFor?.(link)} value={link.label}>
+							{#snippet control()}
+								<Link href={link.href} aria-current={isCurrent(link.href) ? 'page' : undefined}>
+									{link.label}
+								</Link>
+							{/snippet}
+						</ActionLabel>
 					</li>
 				{/each}
 			</ul>

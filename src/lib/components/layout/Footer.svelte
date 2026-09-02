@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { getUiConfig } from '../../config/context.js';
 	import type { SiteLink } from '../../config/types.js';
+	import ActionLabel from '../../edit/ActionLabel.svelte';
 	import Editable from '../../edit/Editable.svelte';
+	import type { EditDescriptor } from '../../edit/types.js';
 	import Link from '../ui/Link.svelte';
 
 	/**
@@ -11,9 +13,11 @@
 	 */
 	interface Props {
 		links: SiteLink[];
+		/** Edit descriptors for the link labels — see Nav. */
+		editFor?: (link: SiteLink) => EditDescriptor | undefined;
 	}
 
-	let { links }: Props = $props();
+	let { links, editFor = undefined }: Props = $props();
 
 	const config = getUiConfig();
 
@@ -27,7 +31,11 @@
 		</span>
 		<ul>
 			{#each links as link (link.href)}
-				<li><Link href={link.href}>{link.label}</Link></li>
+				<li>
+					<ActionLabel edit={editFor?.(link)} value={link.label}>
+						{#snippet control()}<Link href={link.href}>{link.label}</Link>{/snippet}
+					</ActionLabel>
+				</li>
 			{/each}
 		</ul>
 		<p class="rights">

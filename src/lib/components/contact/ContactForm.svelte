@@ -19,6 +19,7 @@
 
 <script lang="ts">
 	import { getUiConfig } from '../../config/context.js';
+	import ActionLabel from '../../edit/ActionLabel.svelte';
 	import { CONTACT_MESSAGE, CONTACT_NAME, EMAIL } from '../../forms/constraints.js';
 	import { CONTACT_CATEGORIES } from '../../content/types.js';
 	import { contactCategoryLabel } from '../../utils/contact.js';
@@ -120,7 +121,11 @@
 		<Honeypot form={f.fields} id="contact-website" />
 
 		<div class="actions">
-			<Button type="submit" pending={f.pending}>{msg.contact_submit()}</Button>
+			<ActionLabel edit={config.messageEdit?.('contact_submit')} value={msg.contact_submit()}>
+				{#snippet control()}
+					<Button type="submit" pending={f.pending}>{msg.contact_submit()}</Button>
+				{/snippet}
+			</ActionLabel>
 		</div>
 
 		{#if f.result && !f.result.ok}
