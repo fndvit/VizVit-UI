@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { FieldConstraint } from '../../content/types.js';
+	import ActionLabel from '../../edit/ActionLabel.svelte';
+	import type { EditDescriptor } from '../../edit/types.js';
 
 	/** Attributes the control must spread (`{...attrs}`) to stay wired. */
 	interface ControlAttrs {
@@ -46,18 +48,37 @@
 		constraint: FieldConstraint | null;
 		/** Render the label visually hidden (surrounding context already labels it). */
 		hideLabel?: boolean;
+		/**
+		 * Edit descriptor for the LABEL's wording. While editing, only the
+		 * label swaps for editable text — an editable span is not a <label>,
+		 * so clicking it no longer focuses the control, and the control itself
+		 * stays rendered and live. Hidden labels are never offered.
+		 */
+		labelEdit?: EditDescriptor;
 		/** The input/textarea/select, spreading the given attrs. */
 		children: Snippet<[ControlAttrs]>;
 	}
 
-	let { id, label, field, constraint, hideLabel = false, children }: Props = $props();
+	let {
+		id,
+		label,
+		field,
+		constraint,
+		hideLabel = false,
+		labelEdit = undefined,
+		children
+	}: Props = $props();
 
 	const errorMessage = $derived(field.issues()?.[0]?.message);
 	const showError = $derived(errorMessage !== undefined);
 </script>
 
 <div class="field">
-	<label class:visually-hidden={hideLabel} for={id}>{label}</label>
+	<ActionLabel edit={hideLabel ? undefined : labelEdit} value={label}>
+		{#snippet control()}
+			<label class:visually-hidden={hideLabel} for={id}>{label}</label>
+		{/snippet}
+	</ActionLabel>
 	{@render children({
 		id,
 		'aria-describedby': showError ? `${id}-error` : undefined,

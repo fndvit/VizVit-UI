@@ -58,6 +58,7 @@
 		<Field
 			id="contact-category"
 			label={msg.contact_categoryLabel()}
+			labelEdit={config.messageEdit?.('contact_categoryLabel')}
 			field={f.fields.category}
 			constraint={null}
 		>
@@ -73,6 +74,7 @@
 		<Field
 			id="contact-name"
 			label={msg.contact_nameLabel()}
+			labelEdit={config.messageEdit?.('contact_nameLabel')}
 			field={f.fields.name}
 			constraint={CONTACT_NAME}
 		>
@@ -90,6 +92,7 @@
 		<Field
 			id="contact-email"
 			label={msg.contact_emailLabel()}
+			labelEdit={config.messageEdit?.('contact_emailLabel')}
 			field={f.fields.email}
 			constraint={EMAIL}
 		>
@@ -107,6 +110,7 @@
 		<Field
 			id="contact-message"
 			label={msg.contact_messageLabel()}
+			labelEdit={config.messageEdit?.('contact_messageLabel')}
 			field={f.fields.message}
 			constraint={CONTACT_MESSAGE}
 		>

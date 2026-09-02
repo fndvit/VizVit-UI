@@ -10,6 +10,7 @@
 
 <script lang="ts">
 	import { getUiConfig } from '../../config/context.js';
+	import ActionLabel from '../../edit/ActionLabel.svelte';
 	import type { MilestoneData } from '../../content/types.js';
 	import Editable from '../../edit/Editable.svelte';
 	import { MILESTONE_CATEGORY_COLOR, milestoneCategoryLabel } from '../../utils/milestones.js';
@@ -47,7 +48,12 @@
 
 <article style={`--milestone-color: ${color}`}>
 	<span class="dot" aria-hidden="true"></span>
-	<p class="category">{milestoneCategoryLabel(milestone.category, config.messages)}</p>
+	<Editable
+		edit={config.messageEdit?.(`category_${milestone.category}`)}
+		value={milestoneCategoryLabel(milestone.category, config.messages)}
+	>
+		{#snippet children(text, attrs)}<p class="category" {...attrs}>{text}</p>{/snippet}
+	</Editable>
 	<DateText value={milestone.occurredOn} />
 	<Editable edit={edit?.title} value={milestone.title}>
 		{#snippet children(text, attrs)}<h3 {...attrs}>{text}</h3>{/snippet}
@@ -62,11 +68,20 @@
 	{/if}
 	{#if milestone.linkUrl}
 		<p class="more">
-			{#if isExternal}
-				<a href={milestone.linkUrl} rel="external noopener">{config.messages.common_readMore()}</a>
-			{:else}
-				<Link href={milestone.linkUrl}>{config.messages.common_readMore()}</Link>
-			{/if}
+			<ActionLabel
+				edit={config.messageEdit?.('common_readMore')}
+				value={config.messages.common_readMore()}
+			>
+				{#snippet control()}
+					{#if isExternal}
+						<a href={milestone.linkUrl} rel="external noopener"
+							>{config.messages.common_readMore()}</a
+						>
+					{:else if milestone.linkUrl}
+						<Link href={milestone.linkUrl}>{config.messages.common_readMore()}</Link>
+					{/if}
+				{/snippet}
+			</ActionLabel>
 		</p>
 	{/if}
 </article>
