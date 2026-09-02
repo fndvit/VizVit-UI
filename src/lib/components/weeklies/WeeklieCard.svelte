@@ -10,6 +10,8 @@
 		title?: EditDescriptor;
 		excerpt?: EditDescriptor;
 		image?: PropertyDescriptor;
+		/** Editorial state row; value derives from `draft` ('false' when draft). */
+		status?: PropertyDescriptor;
 		/** Accessible name for the frame, e.g. "Weekly #12". */
 		label?: string;
 	}
@@ -45,9 +47,10 @@
 	const titleEditing = $derived(edit?.title !== undefined && (adapter?.isEditing ?? false));
 
 	const panelRows = $derived(
-		[edit?.image && { descriptor: edit.image, value: weekly.imageUrl }].filter(
-			(row) => row !== undefined
-		)
+		[
+			edit?.image && { descriptor: edit.image, value: weekly.imageUrl },
+			edit?.status && { descriptor: edit.status, value: weekly.draft ? 'false' : 'true' }
+		].filter((row) => row !== undefined)
 	);
 	const frameSpec = $derived(
 		edit && panelRows.length > 0 ? { label: edit.label ?? weekly.title, hasPanel: true } : undefined
