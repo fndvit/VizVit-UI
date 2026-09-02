@@ -113,5 +113,9 @@ export const defaultMessages: UiMessages = {
 	category_lab: () => 'Laboratori',
 	category_education: () => 'Educació',
 	category_collaboration: () => 'Col·laboració',
-	category_press: () => 'Premsa'
+	category_press: () => 'Premsa',
+	status_published: () => 'Publicat',
+	status_draft: () => 'Esborrany',
+	status_open: () => 'Oberta',
+	status_closed: () => 'Tancada'
 };

@@ -1,7 +1,12 @@
 <script lang="ts">
 	import { setEditAdapter } from '../../../edit/context.js';
 	import { collectionOf, entityEdit, entityProperty, pageCopyEdit } from '../../../edit/helpers.js';
-	import type { EditDescriptor, EntityOp, PropertyDescriptor } from '../../../edit/types.js';
+	import type {
+		EditDescriptor,
+		EntityOp,
+		PropertyDescriptor,
+		PropertyValue
+	} from '../../../edit/types.js';
 	import type { MilestoneData } from '../../../content/types.js';
 	import { sampleMember, sampleMilestones, sampleWeekly } from '../../../fixtures.js';
 	import CopyIntro from '../../ui/CopyIntro.svelte';
@@ -47,24 +52,34 @@
 			if (failing) throw new Error('demo failure');
 			log = [...log, `${nameOf(descriptor.ref)} [${descriptor.locale}] ← "${value}"`];
 		},
-		saveProperty: async (descriptor: PropertyDescriptor, value: string | null) => {
+		saveProperty: async (descriptor: PropertyDescriptor, value: PropertyValue) => {
 			await new Promise((resolve) => setTimeout(resolve, 400));
 			if (failing) throw new Error('demo failure');
 			const ref = descriptor.ref;
 			if (ref.kind === 'entity' && ref.entity === 'milestones') {
+				// The flag arrives as a boolean: on = published, so draft = !value.
 				const FIELDS = {
 					occurred_on: 'occurredOn',
 					category: 'category',
 					link_url: 'linkUrl'
 				} as const;
 				const field = FIELDS[ref.field as keyof typeof FIELDS];
-				if (field) {
+				const patch =
+					ref.field === 'is_published'
+						? { draft: value !== true }
+						: field
+							? { [field]: value }
+							: null;
+				if (patch) {
 					milestones = milestones
-						.map((m) => (m.id === ref.id ? { ...m, [field]: value } : m))
+						.map((m) => (m.id === ref.id ? { ...m, ...patch } : m))
 						.sort((a, b) => a.occurredOn.localeCompare(b.occurredOn));
 				}
 			}
-			log = [...log, `${nameOf(ref)} ← ${value === null ? 'null' : `"${value}"`}`];
+			log = [
+				...log,
+				`${nameOf(ref)} ← ${typeof value === 'string' ? `"${value}"` : String(value)}`
+			];
 		},
 		applyOp: async (op: EntityOp) => {
 			await new Promise((resolve) => setTimeout(resolve, 400));
@@ -112,7 +127,9 @@
 			occurredOn: property('occurred_on', { type: 'date' as const, label: 'Data' }),
 			category: property('category', { type: 'select' as const, label: 'Categoria' }),
 			linkUrl: property('link_url', { type: 'url' as const, label: 'Enllaç', nullable: true }),
-			image: property('image_url', { type: 'image' as const, label: 'Imatge' })
+			image: property('image_url', { type: 'image' as const, label: 'Imatge' }),
+			// A flag: the panel words it Publicat/Esborrany, the adapter gets a boolean.
+			status: property('is_published', { type: 'flag' as const, label: 'Estat' })
 		};
 	}
 

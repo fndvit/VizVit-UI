@@ -17,6 +17,21 @@ export type { MilestoneEditMap } from './components/timeline/TimelineMilestone.s
 export { default as WeeklieCard } from './components/weeklies/WeeklieCard.svelte';
 export type { WeeklyEditMap } from './components/weeklies/WeeklieCard.svelte';
 export * from './content/index.js';
-export { MILESTONE_CATEGORY_COLOR, milestoneCategoryLabel } from './utils/milestones.js';
+export {
+	MILESTONE_CATEGORY_COLOR,
+	matchesMilestoneFilter,
+	milestoneCategoryLabel
+} from './utils/milestones.js';
+// The two list rules: URL-mirrored filters, and the weeklies index over them.
+export { createUrlFilters } from './utils/url-filters.svelte.js';
+export type { UrlFilters, UrlFiltersConfig } from './utils/url-filters.svelte.js';
+export { createWeeklyList, WEEKLY_LIST_DEFAULTS } from './utils/weekly-list.svelte.js';
+export type {
+	WeeklyList,
+	WeeklyListConfig,
+	WeeklyListFilters,
+	WeeklyListPage,
+	WeeklyListServerData
+} from './utils/weekly-list.svelte.js';
 export { contactCategoryLabel } from './utils/contact.js';
 export { formatDate, yearOf } from './utils/dates.js';

@@ -3,7 +3,12 @@
 	import AddSlot from '../../../edit/chrome/AddSlot.svelte';
 	import EditFrame, { type EditFrameSpec } from '../../../edit/chrome/EditFrame.svelte';
 	import EditPanel from '../../../edit/chrome/EditPanel.svelte';
-	import type { EditAdapter, EntityOp, PropertyDescriptor } from '../../../edit/types.js';
+	import type {
+		EditAdapter,
+		EntityOp,
+		PropertyDescriptor,
+		PropertyValue
+	} from '../../../edit/types.js';
 
 	/**
 	 * The editor chrome under a test-owned adapter: an EditFrame around a
@@ -13,7 +18,7 @@
 	interface Props {
 		adapter?: EditAdapter | null;
 		spec?: EditFrameSpec;
-		rows?: { descriptor: PropertyDescriptor; value: string | null }[];
+		rows?: { descriptor: PropertyDescriptor; value: PropertyValue }[];
 		addOp?: Extract<EntityOp, { kind: 'create' }>;
 	}
 

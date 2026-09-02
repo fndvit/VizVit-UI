@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { ComponentProps } from 'svelte';
 	import { setUiConfig } from '../../../config/context.js';
+	import type { ParameterlessKey } from '../../../config/types.js';
 	import type { UiMessages } from '../../../config/types.js';
 	import { setEditAdapter } from '../../../edit/context.js';
 	import LinkEdit from '../../../edit/chrome/LinkEdit.svelte';
@@ -28,7 +29,7 @@
 		href?: { descriptor: PropertyDescriptor | undefined; value: string };
 		extras?: { descriptor: PropertyDescriptor; value: string | null }[];
 		removeOp?: EntityOp;
-		messageEdit?: (key: string) => EditDescriptor | undefined;
+		messageEdit?: (key: ParameterlessKey) => EditDescriptor | undefined;
 		messages?: UiMessages;
 	}
 

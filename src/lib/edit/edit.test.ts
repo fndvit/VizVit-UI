@@ -70,12 +70,42 @@ describe('property and collection helpers', () => {
 	});
 
 	it('builds a chrome property for wording that cannot hold a caret', () => {
+		// A key the package does not list is the site's own — the host vouches
+		// for it, and `NotParameterized` lets it through.
 		expect(
 			chromeProperty('weeklies_searchPlaceholder', { type: 'text', label: 'Placeholder' })
 		).toEqual({
 			ref: { kind: 'chrome', key: 'weeklies_searchPlaceholder' },
 			type: 'text',
 			label: 'Placeholder'
+		});
+	});
+
+	it("refuses the catalog's parameterized keys at the type level", () => {
+		// Editing the RENDERED text of a message with parameters would overwrite
+		// its template with one interpolation. The rule is the key type
+		// (ParameterlessKey / NotParameterized), so it fails to compile, not
+		// at runtime — the calls below still build descriptors.
+		// @ts-expect-error pagination_status interpolates {page} and {pages}
+		const inline = chromeEdit('pagination_status', 'ca');
+		// @ts-expect-error weeklie_number interpolates {number}
+		const panel = chromeProperty('weeklie_number', { type: 'text', label: 'Número' });
+
+		expect(inline.ref).toEqual({ kind: 'chrome', key: 'pagination_status' });
+		expect(panel.ref).toEqual({ kind: 'chrome', key: 'weeklie_number' });
+	});
+
+	it('names a flag property with its two state keys', () => {
+		const property = entityProperty('job_openings', 7);
+
+		expect(
+			property('is_open', { type: 'flag', label: 'Estat', on: 'status_open', off: 'status_closed' })
+		).toEqual({
+			ref: { kind: 'entity', entity: 'job_openings', id: 7, field: 'is_open' },
+			type: 'flag',
+			label: 'Estat',
+			on: 'status_open',
+			off: 'status_closed'
 		});
 	});
 

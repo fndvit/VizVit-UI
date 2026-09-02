@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { setEditAdapter } from '../../../edit/context.js';
 	import { setUiConfig } from '../../../config/context.js';
+	import type { ParameterlessKey } from '../../../config/types.js';
 	import type { CollectionRef, EditAdapter, EditDescriptor } from '../../../edit/types.js';
 	import type {
 		CollaboratorData,
@@ -45,7 +46,7 @@
 		placeholderEdit?: PropertyDescriptor;
 		optionsEdit?: (direction: SortDirection) => PropertyDescriptor | undefined;
 		/** For components resolving their own chrome keys. */
-		messageEdit?: (key: string) => EditDescriptor | undefined;
+		messageEdit?: (key: ParameterlessKey) => EditDescriptor | undefined;
 	}
 
 	let {

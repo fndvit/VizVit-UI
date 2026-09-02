@@ -12,7 +12,7 @@
 		publishedOn?: PropertyDescriptor;
 		externalUrl?: PropertyDescriptor;
 		image?: PropertyDescriptor;
-		/** Editorial state row; value derives from `draft` ('false' when draft). */
+		/** Editorial-state `flag` row; on while the project is not a draft. */
 		status?: PropertyDescriptor;
 		/** Accessible name for the frame, e.g. the project's title. */
 		label?: string;
@@ -70,7 +70,7 @@
 			edit?.publishedOn && { descriptor: edit.publishedOn, value: project.publishedOn },
 			edit?.externalUrl && { descriptor: edit.externalUrl, value: project.externalUrl },
 			edit?.image && { descriptor: edit.image, value: project.imageUrl },
-			edit?.status && { descriptor: edit.status, value: project.draft ? 'false' : 'true' }
+			edit?.status && { descriptor: edit.status, value: !project.draft }
 		].filter((row) => row !== undefined)
 	);
 	const frameSpec = $derived(

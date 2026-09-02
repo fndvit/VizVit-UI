@@ -140,7 +140,42 @@ export interface UiMessages {
 	category_education(): string;
 	category_collaboration(): string;
 	category_press(): string;
+	/**
+	 * Editorial state, as the panel's `flag` rows word it: a card's
+	 * published/draft pair, an opening's open/closed pair. Catalog keys rather
+	 * than editor strings because the CMS edits them per locale like any other
+	 * wording — and required, like every key but the *Href pair, because
+	 * `messages` is all-or-nothing (see ./messages.js).
+	 */
+	status_published(): string;
+	status_draft(): string;
+	status_open(): string;
+	status_closed(): string;
 }
+
+/**
+ * The catalog keys whose message takes NO parameters — the only ones edit
+ * mode may offer as text, inline or in a panel: editing the RENDERED text of
+ * a parameterized message (`pagination_status`, `weeklie_number`) would
+ * overwrite its template with one interpolation. Derived from the message
+ * signatures, so the rule is checked where a key is named; the optional
+ * *Href pair qualifies like any other zero-argument message.
+ */
+export type ParameterlessKey = {
+	[K in keyof UiMessages]-?: NonNullable<UiMessages[K]> extends () => string ? K : never;
+}[keyof UiMessages];
+
+/** The complement: keys whose message interpolates something. */
+export type ParameterizedKey = Exclude<keyof UiMessages, ParameterlessKey>;
+
+/**
+ * A key a chrome PROPERTY may name: any string but one of the package's own
+ * parameterized keys. Wider than `ParameterlessKey` on purpose — the site's
+ * catalog has wording the components never render themselves (a search
+ * placeholder is the host's), and that key the host vouches for; the
+ * package refuses only what it can check.
+ */
+export type NotParameterized<K extends string> = K extends ParameterizedKey ? never : K;
 
 /**
  * Everything the components read from their host app, resolved. Apps provide
@@ -176,10 +211,10 @@ export interface UiConfig {
 	 * Edit descriptor for one of THIS config's message strings, by catalog
 	 * key — the interface-wording half of edit mode. Optional and undefined by
 	 * default, so a read-only app (and every story/test) renders the messages
-	 * as plain text. A CMS-shaped host supplies it alongside an EditAdapter;
-	 * components offer only their parameterless, plain-text message sites.
+	 * as plain text. A CMS-shaped host supplies it alongside an EditAdapter.
+	 * The key type is the rule: only a `ParameterlessKey` may edit as text.
 	 */
-	messageEdit?: (key: string) => EditDescriptor | undefined;
+	messageEdit?: (key: ParameterlessKey) => EditDescriptor | undefined;
 }
 
 /** What an app hands UiProvider: any subset; the rest keeps package defaults. */

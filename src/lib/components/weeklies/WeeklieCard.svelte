@@ -10,7 +10,7 @@
 		title?: EditDescriptor;
 		excerpt?: EditDescriptor;
 		image?: PropertyDescriptor;
-		/** Editorial state row; value derives from `draft` ('false' when draft). */
+		/** Editorial-state `flag` row; on while the weekly is not a draft. */
 		status?: PropertyDescriptor;
 		/** Accessible name for the frame, e.g. "Weekly #12". */
 		label?: string;
@@ -49,7 +49,7 @@
 	const panelRows = $derived(
 		[
 			edit?.image && { descriptor: edit.image, value: weekly.imageUrl },
-			edit?.status && { descriptor: edit.status, value: weekly.draft ? 'false' : 'true' }
+			edit?.status && { descriptor: edit.status, value: !weekly.draft }
 		].filter((row) => row !== undefined)
 	);
 	const frameSpec = $derived(

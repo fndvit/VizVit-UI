@@ -162,6 +162,67 @@ describe('card panels hand the adapter their own values', () => {
 	});
 });
 
+describe("editorial-state flags read the row's draft", () => {
+	it('WeeklieCard: a draft reads off, worded Publicat/Esborrany by default', async () => {
+		const status = entityProperty('weeklies', weekly.id)('is_published', {
+			type: 'flag',
+			label: 'Estat'
+		});
+		const saveProperty = vi.fn(async () => {});
+		const { container } = render(RolloutProbe, {
+			props: {
+				adapter: fullAdapter({ saveProperty }),
+				show: 'weekly',
+				weekly: { ...weekly, draft: true },
+				weeklyEdit: { status }
+			}
+		});
+		openPanel(container);
+		await settle();
+
+		const select = container.querySelector<HTMLSelectElement>('[role="dialog"] select')!;
+		expect(select.value).toBe('false');
+		expect([...select.options].map((option) => option.textContent)).toEqual([
+			'Publicat',
+			'Esborrany'
+		]);
+
+		select.value = 'true';
+		select.dispatchEvent(new Event('change', { bubbles: true }));
+		await settle();
+		expect(saveProperty).toHaveBeenCalledWith(status, true);
+	});
+
+	it('JobList: the host names the pair (Oberta/Tancada); a live opening reads on', async () => {
+		const status = entityProperty('job_openings', 7)('is_open', {
+			type: 'flag',
+			label: 'Estat',
+			on: 'status_open',
+			off: 'status_closed'
+		});
+		const saveProperty = vi.fn(async () => {});
+		const { container } = render(RolloutProbe, {
+			props: {
+				adapter: fullAdapter({ saveProperty }),
+				show: 'jobs',
+				jobs,
+				jobsEditFor: () => ({ status })
+			}
+		});
+		openPanel(container);
+		await settle();
+
+		const select = container.querySelector<HTMLSelectElement>('[role="dialog"] select')!;
+		expect(select.value).toBe('true');
+		expect([...select.options].map((option) => option.textContent)).toEqual(['Oberta', 'Tancada']);
+
+		select.value = 'false';
+		select.dispatchEvent(new Event('change', { bubbles: true }));
+		await settle();
+		expect(saveProperty).toHaveBeenCalledWith(status, false);
+	});
+});
+
 describe('list collection ops gate like Timeline', () => {
 	const collection = { entity: 'collaborators' } as const;
 

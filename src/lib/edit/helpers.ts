@@ -1,4 +1,4 @@
-import type { Locale } from '../config/types.js';
+import type { Locale, NotParameterized, ParameterlessKey } from '../config/types.js';
 import type { CollectionRef, EditableEntity, EditDescriptor, PropertyDescriptor } from './types.js';
 
 /** Everything a property descriptor carries beyond its ref. */
@@ -6,11 +6,10 @@ type PropertySpec = Omit<PropertyDescriptor, 'ref'>;
 
 /**
  * Descriptor for one interface-wording message (a Paraglide catalog key).
- * Only parameterless messages are sensibly editable in place — editing the
- * RENDERED text of a parameterized one would overwrite its template.
+ * The key type carries the rule — see `ParameterlessKey` in ../config/types.js.
  */
 export function chromeEdit(
-	key: string,
+	key: ParameterlessKey,
 	locale: Locale,
 	options?: { format?: EditDescriptor['format']; label?: string }
 ): EditDescriptor {
@@ -62,8 +61,12 @@ export function entityProperty(
 /**
  * A panel property over one interface-wording message — how strings that can
  * never hold a caret (an `<option>` label, an input placeholder) still edit.
+ * Accepts the site's own keys too; see `NotParameterized` in ../config/types.js.
  */
-export function chromeProperty(key: string, spec: PropertySpec): PropertyDescriptor {
+export function chromeProperty<K extends string>(
+	key: NotParameterized<K>,
+	spec: PropertySpec
+): PropertyDescriptor {
 	return { ref: { kind: 'chrome', key }, ...spec };
 }
 

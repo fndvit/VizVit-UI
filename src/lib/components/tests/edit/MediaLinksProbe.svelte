@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { setUiConfig } from '../../../config/context.js';
-	import type { SiteLink } from '../../../config/types.js';
+	import type { ParameterlessKey, SiteLink } from '../../../config/types.js';
 	import { setEditAdapter } from '../../../edit/context.js';
 	import type { CollectionRef, EditAdapter, EditDescriptor } from '../../../edit/types.js';
 	import { createRemoteFormMock } from '../../../testing/remote-form.js';
@@ -23,7 +23,7 @@
 		propertiesFor?: (link: SiteLink) => SiteLinkEditMap | undefined;
 		collection?: CollectionRef;
 		/** For components resolving their own chrome keys. */
-		messageEdit?: (key: string) => EditDescriptor | undefined;
+		messageEdit?: (key: ParameterlessKey) => EditDescriptor | undefined;
 	}
 
 	let {

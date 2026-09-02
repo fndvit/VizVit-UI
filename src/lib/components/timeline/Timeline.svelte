@@ -3,7 +3,7 @@
 	import type { MilestoneData } from '../../content/types.js';
 	import type { MilestoneEditMap } from './TimelineMilestone.svelte';
 	import AddSlot from '../../edit/chrome/AddSlot.svelte';
-	import { getEditAdapter } from '../../edit/context.js';
+	import { collectionEditing } from '../../edit/collection.svelte.js';
 	import type { CollectionRef } from '../../edit/types.js';
 	import { yearOf } from '../../utils/dates.js';
 	import TimelineMilestone from './TimelineMilestone.svelte';
@@ -26,18 +26,10 @@
 	let { milestones, variant = 'compact', editFor, collection }: Props = $props();
 
 	const config = getUiConfig();
-	const adapter = getEditAdapter();
 
-	const structural = $derived(
-		collection !== undefined && (adapter?.isEditing ?? false) && adapter?.applyOp !== undefined
-	);
-
-	/** The map the host gave, plus removal — the list owns identity and order. */
-	function editMapFor(milestone: MilestoneData): MilestoneEditMap | undefined {
-		const map = editFor?.(milestone);
-		if (!structural || !collection) return map;
-		return { ...map, removeOp: { kind: 'remove', collection, id: milestone.id } };
-	}
+	// The structural half (add slots, per-card removal); the list owns
+	// identity and order — see collectionEditing.
+	const list = collectionEditing<MilestoneData, MilestoneEditMap>(() => ({ collection, editFor }));
 
 	interface TimelineEntry {
 		milestone: MilestoneData;
@@ -68,27 +60,22 @@
 >
 	<ol>
 		{#each entries as entry (entry.milestone.id)}
-			{#if structural && collection}
+			{@const before = list.addBefore(entry.milestone.id)}
+			{#if before}
 				<li class="add-slot">
-					<AddSlot
-						op={{
-							kind: 'create',
-							collection,
-							anchor: { id: entry.milestone.id, placement: 'before' }
-						}}
-					/>
+					<AddSlot op={before} />
 				</li>
 			{/if}
 			<li>
 				{#if entry.yearMarker}
 					<span class="year">{entry.yearMarker}</span>
 				{/if}
-				<TimelineMilestone milestone={entry.milestone} edit={editMapFor(entry.milestone)} />
+				<TimelineMilestone milestone={entry.milestone} edit={list.mapFor(entry.milestone)} />
 			</li>
 		{/each}
-		{#if structural && collection}
+		{#if list.add}
 			<li class="add-slot">
-				<AddSlot op={{ kind: 'create', collection }} />
+				<AddSlot op={list.add} />
 			</li>
 		{/if}
 	</ol>

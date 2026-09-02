@@ -26,6 +26,14 @@ const selectDescriptor: PropertyDescriptor = {
 	]
 };
 
+const flagDescriptor: PropertyDescriptor = {
+	ref: { kind: 'entity', entity: 'job_openings', id: 7, field: 'is_open' },
+	type: 'flag',
+	label: 'Estat',
+	on: 'status_open',
+	off: 'status_closed'
+};
+
 const removeOp: Extract<EntityOp, { kind: 'remove' }> = {
 	kind: 'remove',
 	collection: { entity: 'milestones' },
@@ -181,6 +189,48 @@ describe('EditPanel rows', () => {
 		await settle();
 
 		expect(saveProperty).toHaveBeenCalledWith(selectDescriptor, 'press');
+	});
+
+	it('a flag row words its two states from the catalog and saves a boolean', async () => {
+		const saveProperty = vi.fn(async () => {});
+		const { container } = render(ChromeProbe, {
+			props: {
+				adapter: fullAdapter({ saveProperty }),
+				spec: { label: 'Oferta', hasPanel: true },
+				rows: [
+					{ descriptor: flagDescriptor, value: true },
+					// Default wording: the published/draft pair (its own field — the
+					// panel keys rows by ref + label).
+					{
+						descriptor: {
+							ref: { kind: 'entity', entity: 'job_openings', id: 7, field: 'is_published' },
+							type: 'flag',
+							label: 'Publicació'
+						},
+						value: false
+					}
+				]
+			}
+		});
+		openPanel(container);
+		await settle();
+
+		const [open, published] = [...container.querySelectorAll<HTMLSelectElement>('select')];
+		expect([...open.options].map((option) => option.textContent)).toEqual(['Oberta', 'Tancada']);
+		expect(open.value).toBe('true');
+		expect([...published.options].map((option) => option.textContent)).toEqual([
+			'Publicat',
+			'Esborrany'
+		]);
+		expect(published.value).toBe('false');
+
+		open.value = 'false';
+		open.dispatchEvent(new Event('change', { bubbles: true }));
+		await settle();
+
+		// The adapter receives the boolean, never the select's 'false' string.
+		expect(saveProperty).toHaveBeenCalledWith(flagDescriptor, false);
+		expect(open.getAttribute('data-vit-editing')).toBe('idle');
 	});
 
 	it('a failed save keeps the draft in the control, in the error state', async () => {

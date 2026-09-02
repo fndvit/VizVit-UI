@@ -35,9 +35,9 @@ setEditAdapter({
 	get isEditing() { … },
 	save, // inline localized text — the original contract, unchanged
 
-	// Panel properties: dates, urls, enum members, image paths. The value
-	// stays a string on the wire; null clears a `nullable` property.
-	saveProperty: async (descriptor, value /* string | null */) => { … },
+	// Panel properties: dates, urls, enum members, image paths — strings on
+	// the wire; a `flag` row hands a boolean; null clears a `nullable` one.
+	saveProperty: async (descriptor, value /* PropertyValue */) => { … },
 
 	// Structural collection ops: create (optionally anchored), remove,
 	// reorder. Field values NEVER travel here — one save path per value.
@@ -88,8 +88,29 @@ chromeProperty('weeklies_searchPlaceholder', { type: 'text', label: 'Placeholder
 collectionOf('milestones');
 ```
 
-Property types: `text`, `url`, `date`, `select` (pass `options`), `image`.
-A `nullable` property gets a clear affordance and saves `null` when emptied.
+Property types: `text`, `url`, `date`, `select` (pass `options`), `image`,
+`flag`. A `nullable` property gets a clear affordance and saves `null` when
+emptied. A `flag` is the two-state row — editorial state, mostly: its value is
+a BOOLEAN (`PropertyValue = string | boolean | null`), the panel renders a
+select worded from the catalog keys `on` / `off` (default `status_published`
+/ `status_draft`; an opening passes `status_open` / `status_closed`), and the
+adapter receives `true`/`false`. The cards derive it from their data —
+`value: !draft` — so no host spells a `'true'`/`'false'` select and no card
+stringifies a boolean:
+
+```ts
+status: property('is_published', { type: 'flag', label: 'Estat' });
+status: property('is_open', {
+	type: 'flag',
+	label: 'Estat',
+	on: 'status_open',
+	off: 'status_closed'
+});
+```
+
+The four wording keys (`status_published` «Publicat», `status_draft`
+«Esborrany», `status_open` «Oberta», `status_closed` «Tancada») are REQUIRED
+`UiMessages` keys — a host passing its catalog wholesale adds them.
 
 Labels of INTERACTIVE controls — nav links, submit buttons, pagination,
 filter chips, form-field labels, the sort label — edit through `ActionLabel`:
@@ -121,11 +142,18 @@ and removal — `editFor` supplies the text half, `propertiesFor` the rest.
 Interface wording is offered by the components themselves: pass
 `messageEdit: (key) => chromeEdit(key, locale)` in the `UiProvider` config and
 each component wraps its own parameterless, plain-text message sites in
-`Editable`. Parameterized messages and strings in interactive or attribute
-positions (buttons, `<option>`s, placeholders, aria labels) are deliberately
-not offered — editing rendered text would corrupt a template — and stay with
-the host's own wording editor. Without `messageEdit` (every app but a CMS)
-those strings render as plain text.
+`Editable`. The rule that a parameterized message must never be edited as
+text — its rendered form is one interpolation, not the template — is a TYPE:
+`ParameterlessKey` (the `UiMessages` keys whose message takes no arguments,
+derived from the signatures) is what `messageEdit` and `chromeEdit` accept,
+so `chromeEdit('pagination_status', …)` fails to compile. `chromeProperty`
+takes `NotParameterized<K>` instead: any key but the package's own
+parameterized ones, because a panel row may name wording the components
+never render themselves (the site's search placeholder) and only the host
+can vouch for those. Strings in interactive or attribute positions (buttons,
+`<option>`s, placeholders, aria labels) are not offered inline either and
+stay with the host's own wording editor. Without `messageEdit` (every app
+but a CMS) those strings render as plain text.
 
 `format` decides the editing behaviour: `'text'` (default) commits on Enter
 and forbids newlines, `'multiline'` commits on Cmd/Ctrl+Enter, `'richtext'`
@@ -188,25 +216,34 @@ slots between and after the cards. It offers NO reorder: order derives from
 `occurredOn`, so editing the date IS the reorder. The category select fills
 its options from the same labels the category chip renders.
 
+Every list with a `collection` prop — Timeline, CollaboratorList, JobList,
+Nav, Footer — reads its structural half through one helper,
+`collectionEditing(() => ({ collection, editFor }))` (exported from `/edit`
+for a host's own lists): `add` is the create op for the trailing add slot,
+`addBefore(id)` the anchored one, and `mapFor(row)` returns the host's edit
+map with the remove op injected — for rows carrying an `id`, and only while
+the collection is named, the adapter is editing AND `applyOp` exists. Both
+answer `undefined` otherwise, so a template's `{#if}` is the whole gate.
+
 ### Coverage
 
 The same shapes across the content components:
 
-| Component        | Inline text                                                                                | Panel properties                                            | Collection ops             |
-| ---------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------- | -------------------------- |
-| Timeline         | title, body, category                                                                      | occurredOn, category, linkUrl, image                        | add, remove                |
-| WeeklieCard      | title, excerpt                                                                             | image                                                       | — (own authoring flow)     |
-| ProjectCard      | title, excerpt                                                                             | kind (options auto-filled), publishedOn, externalUrl, image | — (host-level)             |
-| TeamMemberCard   | role, bio                                                                                  | name (plain text), photo                                    | — (host-level)             |
-| CollaboratorList | —                                                                                          | personName, affiliation, url (all plain text)               | add, remove (rows with id) |
-| JobList          | title, description                                                                         | postedOn                                                    | add, remove (rows with id) |
-| SearchInput      | —                                                                                          | the placeholder (`placeholderEdit`)                         | —                          |
-| SortSelect       | its label (ActionLabel)                                                                    | the option labels (`optionsEdit`)                           | —                          |
-| ContactForm      | labels, submit, copy                                                                       | category option labels + post-submit feedback (own keys)    | —                          |
-| Nav / Footer     | one `LinkEdit` modal per entry: text (`editFor`) + href, order (`propertiesFor`) + Elimina | —                                                           | add (`collection`)         |
-| NewsletterSignup | copy; links via `LinkEdit` (text + href modal)                                             | —                                                           | —                          |
-| CommentSection   | copy, «Respon»; links via `LinkEdit` (text + href modal)                                   | —                                                           | —                          |
-| CardMedia        | —                                                                                          | — (renders a placeholder when the src is missing or 404s)   | —                          |
+| Component        | Inline text                                                                                | Panel properties                                                           | Collection ops             |
+| ---------------- | ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------- | -------------------------- |
+| Timeline         | title, body, category                                                                      | occurredOn, category, linkUrl, image, status (`flag`, `!draft`)            | add, remove                |
+| WeeklieCard      | title, excerpt                                                                             | image, status (`flag`, `!draft`)                                           | — (own authoring flow)     |
+| ProjectCard      | title, excerpt                                                                             | kind (options auto-filled), publishedOn, externalUrl, image, status (flag) | — (host-level)             |
+| TeamMemberCard   | role, bio                                                                                  | name (plain text), photo                                                   | — (host-level)             |
+| CollaboratorList | —                                                                                          | personName, affiliation, url (all plain text)                              | add, remove (rows with id) |
+| JobList          | title, description                                                                         | postedOn, status (`flag`, `!draft`; word it `status_open`/`status_closed`) | add, remove (rows with id) |
+| SearchInput      | —                                                                                          | the placeholder (`placeholderEdit`)                                        | —                          |
+| SortSelect       | its label (ActionLabel)                                                                    | the option labels (`optionsEdit`)                                          | —                          |
+| ContactForm      | labels, submit, copy                                                                       | category option labels + post-submit feedback (own keys)                   | —                          |
+| Nav / Footer     | one `LinkEdit` modal per entry: text (`editFor`) + href, order (`propertiesFor`) + Elimina | —                                                                          | add (`collection`)         |
+| NewsletterSignup | copy; links via `LinkEdit` (text + href modal)                                             | —                                                                          | —                          |
+| CommentSection   | copy, «Respon»; links via `LinkEdit` (text + href modal)                                   | —                                                                          | —                          |
+| CardMedia        | —                                                                                          | — (renders a placeholder when the src is missing or 404s)                  | —                          |
 
 A collaborator, job or nav-link row offers structural affordances only when
 its data carries an `id` — a remove op needs an identity, and read-only hosts

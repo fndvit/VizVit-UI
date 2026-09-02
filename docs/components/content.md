@@ -64,5 +64,28 @@ Props: `value: SortDirection`, `onchange(value)`.
 ## Helpers exported here
 
 `renderBody` (the rich-text block parser), `formatDate` / `yearOf`,
-`MILESTONE_CATEGORY_COLOR` / `milestoneCategoryLabel(category, messages)`,
-`contactCategoryLabel(category, messages)`, `REACTIONS`, `CONTACT_CATEGORIES`.
+`MILESTONE_CATEGORY_COLOR` / `milestoneCategoryLabel(category, messages)` /
+`matchesMilestoneFilter(milestone, { q, category })` (the transparency page's
+client-side predicate), `contactCategoryLabel(category, messages)`,
+`REACTIONS`, `CONTACT_CATEGORIES`.
+
+## The two list rules
+
+Rune modules a listing page mounts in its script — the state that used to
+sit in the site's route files, where nothing could test it.
+
+`createUrlFilters({ path, initial, toQuery, onChange?, replaceUrl })` — filter
+state that lives in the URL both ways: seeded from the server-rendered values
+(`initial` is a thunk, read in an effect, so a same-route navigation re-seeds
+it), mirrored back through `replaceUrl` on every `update(patch)`. `replaceUrl`
+is REQUIRED: shallow routing belongs to the host's router, the package has
+none. Returns `{ values, query, update }`.
+
+`createWeeklyList({ server, fetchPage, locale, replaceUrl })` — the weeklies
+index over those filters: `items`, `total` and `page` read the server data
+until a filter change refetches page one through `fetchPage` (the host's
+remote query) and takes over; a navigation drops the override and clears a
+failed refetch; `hrefFor(page)` builds paging links that carry the filters
+and omit defaults. `WEEKLY_LIST_DEFAULTS` (`{ sort: 'desc', page: 1 }`) is
+exported so the host's query schema supplies the same values this module
+omits.
