@@ -225,7 +225,10 @@ describe('editMessages', () => {
 					edit_uploadImage: () => 'x',
 					edit_draftBadge: () => 'Esborrany (proves)',
 					edit_clearValue: () => 'x',
-					edit_emptyRequired: () => 'x'
+					edit_emptyRequired: () => 'x',
+					edit_editLink: () => 'x',
+					edit_linkText: () => 'x',
+					edit_linkUrl: () => 'x'
 				}
 			}
 		});

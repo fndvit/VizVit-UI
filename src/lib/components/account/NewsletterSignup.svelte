@@ -2,6 +2,8 @@
 	import { getUiConfig } from '../../config/context.js';
 	import ActionLabel from '../../edit/ActionLabel.svelte';
 	import Editable from '../../edit/Editable.svelte';
+	import LinkEdit from '../../edit/chrome/LinkEdit.svelte';
+	import { chromeProperty } from '../../edit/helpers.js';
 	import { withNewsletterIntent } from '../../forms/transport.js';
 	import type { NewsletterToggleFormInstance } from './AccountPanel.svelte';
 	import Button from '../ui/Button.svelte';
@@ -25,6 +27,19 @@
 	// verified — no app mail needed). Logged out, the band routes to the auth
 	// pages carrying the intent as ?newsletter=1 (never an email in a URL).
 	const f = $derived(newsletterToggleForm);
+
+	// The destinations are OPTIONAL catalog keys added after these components
+	// first shipped; a host without them keeps the built-in paths, and the
+	// intent query rides on whatever the key resolves to.
+	const signupHref = $derived(msg.comments_signupLinkHref?.() ?? '/signup');
+	const loginHref = $derived(msg.comments_loginLinkHref?.() ?? '/login');
+	// Gated like the form wording: descriptors exist only where the host
+	// exposes messageEdit; LinkEdit further requires saveProperty for the
+	// Adreça field.
+	const hrefProperty = (key: string) =>
+		config.messageEdit
+			? chromeProperty(key, { type: 'text', label: config.editMessages.edit_linkUrl() })
+			: undefined;
 </script>
 
 <section class="newsletter" aria-labelledby="newsletter-title">
@@ -44,23 +59,29 @@
 				>
 					{#snippet children(text, attrs)}<span {...attrs}>{text}</span>{/snippet}
 				</Editable>
-				<ActionLabel
-					edit={config.messageEdit?.('comments_signupLink')}
-					value={msg.comments_signupLink()}
+				<LinkEdit
+					text={{
+						edit: config.messageEdit?.('comments_signupLink'),
+						value: msg.comments_signupLink()
+					}}
+					href={{ descriptor: hrefProperty('comments_signupLinkHref'), value: signupHref }}
 				>
-					{#snippet control()}<Link href={withNewsletterIntent('/signup')}
+					{#snippet control()}<Link href={withNewsletterIntent(signupHref)}
 							>{msg.comments_signupLink()}</Link
 						>{/snippet}
-				</ActionLabel>
+				</LinkEdit>
 				·
-				<ActionLabel
-					edit={config.messageEdit?.('comments_loginLink')}
-					value={msg.comments_loginLink()}
+				<LinkEdit
+					text={{
+						edit: config.messageEdit?.('comments_loginLink'),
+						value: msg.comments_loginLink()
+					}}
+					href={{ descriptor: hrefProperty('comments_loginLinkHref'), value: loginHref }}
 				>
-					{#snippet control()}<Link href={withNewsletterIntent('/login')}
+					{#snippet control()}<Link href={withNewsletterIntent(loginHref)}
 							>{msg.comments_loginLink()}</Link
 						>{/snippet}
-				</ActionLabel>
+				</LinkEdit>
 			</p>
 		{:else if account.newsletterSubscribed}
 			<p class="prompt">

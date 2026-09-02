@@ -105,6 +105,17 @@ keys through `config.messageEdit`. Wording that cannot hold a caret at all —
 `chromeProperty` descriptor instead; only aria strings and parameterized
 messages stay exclusively with the host's wording editor.
 
+LINKS whose destination is also editable use `LinkEdit` instead: one MODAL
+edits the text and the address together, because a link's two halves belong
+to one gesture. While editing, the control swaps for a button wearing the
+label plus a pencil hint; clicking it opens the dialog (Text + Adreça),
+and Desa commits only the halves that changed — the text through
+`adapter.save`, the address through `adapter.saveProperty`. The signup/login
+links in `NewsletterSignup` and `CommentSection` route through it over the
+OPTIONAL catalog keys `comments_signupLinkHref` / `comments_loginLinkHref`;
+a host whose catalog lacks them keeps the built-in `/signup` and `/login`
+paths byte-identically.
+
 Interface wording is offered by the components themselves: pass
 `messageEdit: (key) => chromeEdit(key, locale)` in the `UiProvider` config and
 each component wraps its own parameterless, plain-text message sites in
@@ -179,21 +190,21 @@ its options from the same labels the category chip renders.
 
 The same shapes across the content components:
 
-| Component        | Inline text             | Panel properties                                            | Collection ops             |
-| ---------------- | ----------------------- | ----------------------------------------------------------- | -------------------------- |
-| Timeline         | title, body, category   | occurredOn, category, linkUrl, image                        | add, remove                |
-| WeeklieCard      | title, excerpt          | image                                                       | — (own authoring flow)     |
-| ProjectCard      | title, excerpt          | kind (options auto-filled), publishedOn, externalUrl, image | — (host-level)             |
-| TeamMemberCard   | role, bio               | name (plain text), photo                                    | — (host-level)             |
-| CollaboratorList | —                       | personName, affiliation, url (all plain text)               | add, remove (rows with id) |
-| JobList          | title, description      | postedOn                                                    | add, remove (rows with id) |
-| SearchInput      | —                       | the placeholder (`placeholderEdit`)                         | —                          |
-| SortSelect       | its label (ActionLabel) | the option labels (`optionsEdit`)                           | —                          |
-| ContactForm      | labels, submit, copy    | category option labels + post-submit feedback (own keys)    | —                          |
-| Nav / Footer     | link labels (`editFor`) | href, order (`propertiesFor`)                               | add, remove (links w/ id)  |
-| NewsletterSignup | copy + its links        | —                                                           | —                          |
-| CommentSection   | copy, links, «Respon»   | —                                                           | —                          |
-| CardMedia        | —                       | — (renders a placeholder when the src is missing or 404s)   | —                          |
+| Component        | Inline text                                              | Panel properties                                            | Collection ops             |
+| ---------------- | -------------------------------------------------------- | ----------------------------------------------------------- | -------------------------- |
+| Timeline         | title, body, category                                    | occurredOn, category, linkUrl, image                        | add, remove                |
+| WeeklieCard      | title, excerpt                                           | image                                                       | — (own authoring flow)     |
+| ProjectCard      | title, excerpt                                           | kind (options auto-filled), publishedOn, externalUrl, image | — (host-level)             |
+| TeamMemberCard   | role, bio                                                | name (plain text), photo                                    | — (host-level)             |
+| CollaboratorList | —                                                        | personName, affiliation, url (all plain text)               | add, remove (rows with id) |
+| JobList          | title, description                                       | postedOn                                                    | add, remove (rows with id) |
+| SearchInput      | —                                                        | the placeholder (`placeholderEdit`)                         | —                          |
+| SortSelect       | its label (ActionLabel)                                  | the option labels (`optionsEdit`)                           | —                          |
+| ContactForm      | labels, submit, copy                                     | category option labels + post-submit feedback (own keys)    | —                          |
+| Nav / Footer     | link labels (`editFor`)                                  | href, order (`propertiesFor`)                               | add, remove (links w/ id)  |
+| NewsletterSignup | copy; links via `LinkEdit` (text + href modal)           | —                                                           | —                          |
+| CommentSection   | copy, «Respon»; links via `LinkEdit` (text + href modal) | —                                                           | —                          |
+| CardMedia        | —                                                        | — (renders a placeholder when the src is missing or 404s)   | —                          |
 
 A collaborator, job or nav-link row offers structural affordances only when
 its data carries an `id` — a remove op needs an identity, and read-only hosts
