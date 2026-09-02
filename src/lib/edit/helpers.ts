@@ -1,5 +1,8 @@
 import type { Locale } from '../config/types.js';
-import type { EditableEntity, EditDescriptor } from './types.js';
+import type { CollectionRef, EditableEntity, EditDescriptor, PropertyDescriptor } from './types.js';
+
+/** Everything a property descriptor carries beyond its ref. */
+type PropertySpec = Omit<PropertyDescriptor, 'ref'>;
 
 /**
  * Descriptor for one interface-wording message (a Paraglide catalog key).
@@ -40,4 +43,31 @@ export function entityEdit(
 	options?: { format?: EditDescriptor['format']; label?: string }
 ) => EditDescriptor {
 	return (field, options) => ({ ref: { kind: 'entity', entity, id, field }, locale, ...options });
+}
+
+/**
+ * Property-descriptor factory for one entity's scalar fields — the panel
+ * sibling of `entityEdit`, naming the row once:
+ *
+ *   const property = entityProperty('milestones', milestone.id);
+ *   occurredOn: property('occurred_on', { type: 'date', label: 'Data' })
+ */
+export function entityProperty(
+	entity: EditableEntity,
+	id: string | number
+): (field: string, spec: PropertySpec) => PropertyDescriptor {
+	return (field, spec) => ({ ref: { kind: 'entity', entity, id, field }, ...spec });
+}
+
+/**
+ * A panel property over one interface-wording message — how strings that can
+ * never hold a caret (an `<option>` label, an input placeholder) still edit.
+ */
+export function chromeProperty(key: string, spec: PropertySpec): PropertyDescriptor {
+	return { ref: { kind: 'chrome', key }, ...spec };
+}
+
+/** Names one entity collection at one render site. */
+export function collectionOf(entity: EditableEntity, scope?: string): CollectionRef {
+	return scope === undefined ? { entity } : { entity, scope };
 }

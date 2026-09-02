@@ -1,4 +1,5 @@
 import { getContext, setContext } from 'svelte';
+import { defaultEditMessages } from './edit-messages.js';
 import { defaultMessages } from './messages.js';
 import { BASE_LOCALE, LOCALES, type UiConfig, type UiConfigInput } from './types.js';
 
@@ -16,7 +17,8 @@ export const DEFAULT_UI_CONFIG: UiConfig = {
 	url: () => undefined,
 	canonicalPathname: (url) => url.pathname,
 	siteName: 'ViT',
-	messages: defaultMessages
+	messages: defaultMessages,
+	editMessages: defaultEditMessages
 };
 
 /**
@@ -41,6 +43,9 @@ export function setUiConfig(input: () => UiConfigInput): UiConfig {
 		},
 		get messages() {
 			return input().messages ?? defaultMessages;
+		},
+		get editMessages() {
+			return input().editMessages ?? defaultEditMessages;
 		},
 		// Undefined means inert: components render their message strings as
 		// plain text, which is every app but the CMS.

@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { setEditAdapter } from '../../../edit/context.js';
-	import { entityEdit, pageCopyEdit } from '../../../edit/helpers.js';
-	import type { EditDescriptor } from '../../../edit/types.js';
-	import { sampleMember, sampleWeekly } from '../../../fixtures.js';
+	import { collectionOf, entityEdit, entityProperty, pageCopyEdit } from '../../../edit/helpers.js';
+	import type { EditDescriptor, EntityOp, PropertyDescriptor } from '../../../edit/types.js';
+	import type { MilestoneData } from '../../../content/types.js';
+	import { sampleMember, sampleMilestones, sampleWeekly } from '../../../fixtures.js';
 	import CopyIntro from '../../ui/CopyIntro.svelte';
 	import RichText from '../../ui/RichText.svelte';
 	import TeamMemberCard from '../../team/TeamMemberCard.svelte';
+	import Timeline from '../../timeline/Timeline.svelte';
 	import WeeklieCard from '../../weeklies/WeeklieCard.svelte';
 
 	/**
@@ -22,7 +24,20 @@
 
 	let isEditing = $state(true);
 	let log = $state<string[]>([]);
+	// The timeline's rows live in demo state so applyOp visibly mutates them.
+	let milestones = $state<MilestoneData[]>([...sampleMilestones]);
+	let nextId = $state(1000);
 
+	function nameOf(ref: EditDescriptor['ref']): string {
+		return ref.kind === 'page-copy'
+			? `${ref.page}.${ref.sectionKey}`
+			: ref.kind === 'chrome'
+				? `chrome.${ref.key}`
+				: `${ref.entity}#${ref.id}.${ref.field}`;
+	}
+
+	// The living spec of the full adapter: text saves, panel properties,
+	// structural ops and image upload, all in memory.
 	setEditAdapter({
 		get isEditing() {
 			return isEditing;
@@ -30,16 +45,76 @@
 		save: async (descriptor: EditDescriptor, value: string) => {
 			await new Promise((resolve) => setTimeout(resolve, 400));
 			if (failing) throw new Error('demo failure');
+			log = [...log, `${nameOf(descriptor.ref)} [${descriptor.locale}] ← "${value}"`];
+		},
+		saveProperty: async (descriptor: PropertyDescriptor, value: string | null) => {
+			await new Promise((resolve) => setTimeout(resolve, 400));
+			if (failing) throw new Error('demo failure');
 			const ref = descriptor.ref;
-			const target =
-				ref.kind === 'page-copy'
-					? `${ref.page}.${ref.sectionKey}`
-					: ref.kind === 'chrome'
-						? `chrome.${ref.key}`
-						: `${ref.entity}#${ref.id}.${ref.field}`;
-			log = [...log, `${target} [${descriptor.locale}] ← "${value}"`];
+			if (ref.kind === 'entity' && ref.entity === 'milestones') {
+				const FIELDS = {
+					occurred_on: 'occurredOn',
+					category: 'category',
+					link_url: 'linkUrl'
+				} as const;
+				const field = FIELDS[ref.field as keyof typeof FIELDS];
+				if (field) {
+					milestones = milestones
+						.map((m) => (m.id === ref.id ? { ...m, [field]: value } : m))
+						.sort((a, b) => a.occurredOn.localeCompare(b.occurredOn));
+				}
+			}
+			log = [...log, `${nameOf(ref)} ← ${value === null ? 'null' : `"${value}"`}`];
+		},
+		applyOp: async (op: EntityOp) => {
+			await new Promise((resolve) => setTimeout(resolve, 400));
+			if (failing) throw new Error('demo failure');
+			if (op.kind === 'create') {
+				const anchorIndex = op.anchor
+					? milestones.findIndex((m) => m.id === op.anchor?.id)
+					: milestones.length;
+				const created: MilestoneData = {
+					id: (nextId += 1),
+					occurredOn: milestones[anchorIndex]?.occurredOn ?? '2026-01-01',
+					category: 'foundation',
+					title: 'Nova fita',
+					body: null,
+					imageUrls: [],
+					linkUrl: null
+				};
+				milestones = milestones.toSpliced(
+					anchorIndex === -1 ? milestones.length : anchorIndex,
+					0,
+					created
+				);
+				log = [...log, `+ ${op.collection.entity}#${created.id}`];
+				return { id: created.id };
+			}
+			if (op.kind === 'remove') {
+				milestones = milestones.filter((m) => m.id !== op.id);
+				log = [...log, `− ${op.collection.entity}#${op.id}`];
+			}
+		},
+		uploadImage: async (_descriptor: PropertyDescriptor, file: File) => {
+			await new Promise((resolve) => setTimeout(resolve, 400));
+			if (failing) throw new Error('demo failure');
+			return URL.createObjectURL(file);
 		}
 	});
+
+	function milestoneEditMap(milestone: MilestoneData) {
+		const property = entityProperty('milestones', milestone.id);
+		const edit = entityEdit('milestones', milestone.id, 'ca');
+		return {
+			title: edit('title', { label: 'Títol de la fita' }),
+			body: edit('body', { format: 'multiline', label: 'Cos de la fita' }),
+			label: `Fita: ${milestone.title}`,
+			occurredOn: property('occurred_on', { type: 'date' as const, label: 'Data' }),
+			category: property('category', { type: 'select' as const, label: 'Categoria' }),
+			linkUrl: property('link_url', { type: 'url' as const, label: 'Enllaç', nullable: true }),
+			image: property('image_url', { type: 'image' as const, label: 'Imatge' })
+		};
+	}
 
 	const richBody = '## Sobre el projecte\n\nUn paràgraf editable amb el format de blocs.';
 
@@ -78,6 +153,13 @@
 	<RichText
 		body={richBody}
 		edit={weeklyEdit('body', { format: 'richtext', label: 'Cos del weekly' })}
+	/>
+
+	<Timeline
+		{milestones}
+		variant="full"
+		collection={collectionOf('milestones')}
+		editFor={milestoneEditMap}
 	/>
 
 	{#if log.length > 0}

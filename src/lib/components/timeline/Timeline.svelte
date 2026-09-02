@@ -2,6 +2,9 @@
 	import { getUiConfig } from '../../config/context.js';
 	import type { MilestoneData } from '../../content/types.js';
 	import type { MilestoneEditMap } from './TimelineMilestone.svelte';
+	import AddSlot from '../../edit/chrome/AddSlot.svelte';
+	import { getEditAdapter } from '../../edit/context.js';
+	import type { CollectionRef } from '../../edit/types.js';
 	import { yearOf } from '../../utils/dates.js';
 	import TimelineMilestone from './TimelineMilestone.svelte';
 
@@ -11,11 +14,30 @@
 		variant?: 'compact' | 'full';
 		/** Edit descriptors for one milestone's fields; see TimelineMilestone. */
 		editFor?: (milestone: MilestoneData) => MilestoneEditMap | undefined;
+		/**
+		 * Names the collection these milestones are rows of. Set alongside an
+		 * adapter with `applyOp`, it turns on the add slots and each frame's
+		 * remove. NO reorder: order derives from `occurredOn` — editing the
+		 * date IS the reorder.
+		 */
+		collection?: CollectionRef;
 	}
 
-	let { milestones, variant = 'compact', editFor }: Props = $props();
+	let { milestones, variant = 'compact', editFor, collection }: Props = $props();
 
 	const config = getUiConfig();
+	const adapter = getEditAdapter();
+
+	const structural = $derived(
+		collection !== undefined && (adapter?.isEditing ?? false) && adapter?.applyOp !== undefined
+	);
+
+	/** The map the host gave, plus removal — the list owns identity and order. */
+	function editMapFor(milestone: MilestoneData): MilestoneEditMap | undefined {
+		const map = editFor?.(milestone);
+		if (!structural || !collection) return map;
+		return { ...map, removeOp: { kind: 'remove', collection, id: milestone.id } };
+	}
 
 	interface TimelineEntry {
 		milestone: MilestoneData;
@@ -46,13 +68,29 @@
 >
 	<ol>
 		{#each entries as entry (entry.milestone.id)}
+			{#if structural && collection}
+				<li class="add-slot">
+					<AddSlot
+						op={{
+							kind: 'create',
+							collection,
+							anchor: { id: entry.milestone.id, placement: 'before' }
+						}}
+					/>
+				</li>
+			{/if}
 			<li>
 				{#if entry.yearMarker}
 					<span class="year">{entry.yearMarker}</span>
 				{/if}
-				<TimelineMilestone milestone={entry.milestone} edit={editFor?.(entry.milestone)} />
+				<TimelineMilestone milestone={entry.milestone} edit={editMapFor(entry.milestone)} />
 			</li>
 		{/each}
+		{#if structural && collection}
+			<li class="add-slot">
+				<AddSlot op={{ kind: 'create', collection }} />
+			</li>
+		{/if}
 	</ol>
 </div>
 
@@ -90,6 +128,13 @@
 
 	.full li {
 		flex-basis: 18rem;
+	}
+
+	/* The add affordances sit between the cards without taking a card's slot. */
+	li.add-slot,
+	.full li.add-slot {
+		flex: 0 0 auto;
+		align-self: center;
 	}
 
 	.year {

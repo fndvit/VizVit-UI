@@ -199,3 +199,41 @@ describe('Editable', () => {
 		expect(calls).toEqual([]);
 	});
 });
+
+describe('editMessages', () => {
+	it('announcements come from config.editMessages, not hardcoded copy', async () => {
+		const { container } = render(EditableProbe, {
+			props: {
+				value: 'Hola',
+				edit: descriptor,
+				adapter: adapterWith(() => Promise.resolve()),
+				editMessages: {
+					edit_saving: () => 'SAVING…',
+					edit_saved: () => 'SAVED',
+					edit_saveError: () => 'FAILED',
+					edit_save: () => 'x',
+					edit_cancel: () => 'x',
+					edit_edit: () => 'x',
+					edit_preview: () => 'x',
+					edit_editBody: () => 'x',
+					edit_properties: () => 'x',
+					edit_remove: () => 'x',
+					edit_removeConfirm: () => 'x',
+					edit_close: () => 'x',
+					edit_add: () => 'x',
+					edit_addFailed: () => 'x',
+					edit_uploadImage: () => 'x',
+					edit_clearValue: () => 'x',
+					edit_emptyRequired: () => 'x'
+				}
+			}
+		});
+
+		const element = target(container);
+		type(element, 'Adeu');
+		element.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+		await new Promise((resolve) => setTimeout(resolve, 20));
+
+		expect(container.querySelector('[role="status"]')?.textContent).toBe('SAVED');
+	});
+});
