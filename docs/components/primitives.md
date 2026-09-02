@@ -5,22 +5,53 @@ domain-free. All of them also re-export from the package root.
 
 ## Button
 
-Submit button in the brand style.
+Button (or anchor styled as one) in the brand style. Two prop branches that
+cannot mix: a form button carries `pending`, an anchor carries `href`.
 
-| Prop        | Type                   | Notes                                                                                                                                                                       |
-| ----------- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `pending`   | `number \| null`       | **required** — the remote form's submitting count (`form.pending`), or `null` for a control with genuinely no pending state. `> 0` disables the button and sets `aria-busy` |
-| `disabled?` | `boolean`              | unavailability of the button's own, independent of pending                                                                                                                  |
-| …rest       | `HTMLButtonAttributes` | spread onto the element; `type` defaults to `'button'`                                                                                                                      |
+| Prop        | Type                             | Notes                                                                                                                                                                           |
+| ----------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `variant?`  | `'primary' \| 'navy' \| 'ghost'` | closed set; `primary` is the pre-variant look and the default                                                                                                                   |
+| `size?`     | `'md' \| 'sm'`                   | default `md`                                                                                                                                                                    |
+| `pending`   | `number \| null`                 | button branch, **required** — the remote form's submitting count (`form.pending`), or `null` for a control with genuinely no pending state. `> 0` disables and sets `aria-busy` |
+| `disabled?` | `boolean`                        | button branch: unavailability of the button's own, independent of pending                                                                                                       |
+| `href`      | `string`                         | anchor branch — renders `<a class="button">`; no `pending`, no `disabled`                                                                                                       |
+| `download?` | `boolean`                        | anchor branch                                                                                                                                                                   |
+| …rest       | element attributes of the branch | spread onto the element; `type` defaults to `'button'`                                                                                                                          |
 
 ```svelte
 <Button type="submit" pending={form.pending}>Envia</Button>
+<Button href="/export.csv" download variant="navy">Descarrega</Button>
 ```
+
+Shapes follow `--radius`; a theme wanting pill buttons overrides the token,
+not the component (see [tokens.md](../tokens.md)).
 
 ## GhostButton
 
 Transparent (`variant="ghost"`) or grey-pill (`variant="chip"`) button; chips
 style their `aria-pressed` state. Spreads rest props.
+
+## Icon
+
+Stroke-based 24×24 icon from a closed named set (`IconName`); decorative
+(`aria-hidden`) — pair it with a labelled control. Props: `name`, `size?` (20).
+
+## IconButton
+
+Icon-only button that must say what it does.
+Props: `icon: IconName`, `label` (becomes `aria-label` + `title`),
+`disabled?`, `onclick?`.
+
+## Logo
+
+The foundation's brain-head mark, optionally with the "Brain VIT" wordmark
+(`--font-serif`). Props: `size?` (32), `withWordmark?`.
+
+## Modal
+
+Native `<dialog>` modal: `showModal()` focus trap, backdrop click and Escape
+both report through `onclose`. The host owns `open`.
+Props: `open`, `title`, `onclose`, `closeLabel?` (`'Tanca'`), `children`.
 
 ## Link
 

@@ -72,6 +72,11 @@
 			"svelte": "./dist/config/index.js",
 			"default": "./dist/config/index.js"
 		},
+		"./admin": {
+			"types": "./dist/admin.d.ts",
+			"svelte": "./dist/admin.js",
+			"default": "./dist/admin.js"
+		},
 		"./testing": {
 			"types": "./dist/testing/remote-form.d.ts",
 			"svelte": "./dist/testing/remote-form.js",

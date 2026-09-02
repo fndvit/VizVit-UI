@@ -5,6 +5,7 @@ export { default as FormResultSlot } from '../components/ui/FormResultSlot.svelt
 export { default as Honeypot } from '../components/ui/Honeypot.svelte';
 export { default as LocaleField } from '../components/ui/LocaleField.svelte';
 export { default as NewsletterIntentField } from '../components/ui/NewsletterIntentField.svelte';
+export { default as TextField } from '../components/ui/TextField.svelte';
 export {
 	COMMENT_BODY,
 	CONTACT_MESSAGE,

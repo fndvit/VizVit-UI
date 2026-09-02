@@ -74,3 +74,18 @@ For composing your own forms in the same visual language:
 | `Honeypot`              | the spam trap (pass `form={f.fields}` and a page-unique `id`)                                                                                                                                                                                                         |
 | `LocaleField`           | hidden `locale` input carrying the config locale through no-JS posts                                                                                                                                                                                                  |
 | `NewsletterIntentField` | hidden input carrying newsletter intent through a form post                                                                                                                                                                                                           |
+
+## TextField
+
+The admin apps' underlined input (label + input + error in one module) —
+`Field`'s sibling for forms that are not remote-form driven, or that bind
+values directly.
+
+| Prop                                                  | Type                          | Notes                                                                       |
+| ----------------------------------------------------- | ----------------------------- | --------------------------------------------------------------------------- |
+| `id`, `label`                                         | `string`                      | label shows in the `field` variant, screen-reader-only otherwise            |
+| `variant?`                                            | `'field' \| 'cell' \| 'bare'` | labelled form field / table cell / placeholder-carried                      |
+| `value?`                                              | `string` (bindable)           | ignored when `attributes` is given                                          |
+| `attributes?`                                         | `HTMLInputAttributes`         | a remote field's `.as(…)` spread — the form owns value, name, and type      |
+| `error?`                                              | `string \| null`              | rendered and wired through `aria-invalid`/`aria-describedby` (`--series-8`) |
+| `type?`, `required?`, `autocomplete?`, `placeholder?` |                               | input passthroughs                                                          |

@@ -30,6 +30,7 @@
 
 	/* Typography */
 	--font-sans: system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+	--font-serif: Georgia, 'Times New Roman', serif;
 	--text-sm: 0.875rem;
 	--text-base: 1rem;
 	--text-lg: 1.25rem;
@@ -51,6 +52,12 @@
 	--radius: 8px;
 	--radius-lg: 16px;
 	--content-max: 1200px;
+
+	/* Elevation & layering */
+	--shadow-1: 0 2px 10px rgb(16 20 24 / 10%);
+	--shadow-2: 0 12px 40px rgb(16 20 24 / 20%);
+	--z-raised: 10;
+	--z-overlay: 100;
 
 	/* Motion */
 	--transition-fast: 150ms ease;

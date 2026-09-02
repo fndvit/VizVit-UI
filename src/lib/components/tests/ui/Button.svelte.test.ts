@@ -55,4 +55,47 @@ describe('Button', () => {
 		// not doing anything, and aria-busy="false" on every idle control is noise.
 		expect(document.querySelector('button')?.hasAttribute('aria-busy')).toBe(false);
 	});
+
+	it('defaults to the pre-variant look: primary md on a button element', async () => {
+		// The variant work must not repaint old call sites — the default classes
+		// pin that the single look the website shipped with is still the default.
+		render(ButtonProbe, {});
+
+		const button = document.querySelector('button');
+		expect(button?.classList.contains('primary')).toBe(true);
+		expect(button?.classList.contains('md')).toBe(true);
+	});
+
+	it('carries every variant and size as a class the stylesheet keys on', async () => {
+		for (const variant of ['primary', 'navy', 'ghost'] as const) {
+			for (const size of ['md', 'sm'] as const) {
+				document.body.innerHTML = '';
+				render(ButtonProbe, { variant, size });
+
+				const button = document.querySelector('button');
+				expect(button?.classList.contains(variant), `${variant} ${size}`).toBe(true);
+				expect(button?.classList.contains(size), `${variant} ${size}`).toBe(true);
+			}
+		}
+	});
+
+	it('renders an anchor when given an href, styled through the same classes', async () => {
+		render(ButtonProbe, { href: '/export.csv', variant: 'navy' });
+
+		const anchor = document.querySelector('a.button');
+		expect(anchor?.getAttribute('href')).toBe('/export.csv');
+		expect(anchor?.classList.contains('navy')).toBe(true);
+		// No form behind an anchor: nothing to be busy or disabled about.
+		expect(document.querySelector('button')).toBeNull();
+	});
+
+	it('marks the anchor as a download only when asked', async () => {
+		render(ButtonProbe, { href: '/export.csv', download: true });
+		expect(document.querySelector('a.button')?.hasAttribute('download')).toBe(true);
+
+		document.body.innerHTML = '';
+
+		render(ButtonProbe, { href: '/tools' });
+		expect(document.querySelector('a.button')?.hasAttribute('download')).toBe(false);
+	});
 });
