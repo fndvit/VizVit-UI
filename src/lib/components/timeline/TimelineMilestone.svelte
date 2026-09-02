@@ -1,17 +1,31 @@
 <script module lang="ts">
-	import type { EditDescriptor } from '../../edit/types.js';
+	import type { EditDescriptor, EntityOp, PropertyDescriptor } from '../../edit/types.js';
 
-	/** Which of the milestone's localized fields are editable at this render site. */
+	/**
+	 * Which of the milestone's fields are editable at this render site:
+	 * localized text inline (EditDescriptor), scalars through the frame's
+	 * property panel (PropertyDescriptor), and removal from the collection.
+	 */
 	export interface MilestoneEditMap {
 		title?: EditDescriptor;
 		body?: EditDescriptor;
+		occurredOn?: PropertyDescriptor;
+		category?: PropertyDescriptor;
+		linkUrl?: PropertyDescriptor;
+		image?: PropertyDescriptor;
+		/** Accessible name for the frame, e.g. "Fita: Neix la fundació". */
+		label?: string;
+		/** Set by Timeline from its `collection` — removal of this milestone. */
+		removeOp?: Extract<EntityOp, { kind: 'remove' }>;
 	}
 </script>
 
 <script lang="ts">
 	import { getUiConfig } from '../../config/context.js';
 	import ActionLabel from '../../edit/ActionLabel.svelte';
-	import type { MilestoneData } from '../../content/types.js';
+	import type { MilestoneCategory, MilestoneData } from '../../content/types.js';
+	import EditFrame from '../../edit/chrome/EditFrame.svelte';
+	import EditPanel from '../../edit/chrome/EditPanel.svelte';
 	import Editable from '../../edit/Editable.svelte';
 	import { MILESTONE_CATEGORY_COLOR, milestoneCategoryLabel } from '../../utils/milestones.js';
 	import CardMedia from '../ui/CardMedia.svelte';
@@ -27,6 +41,41 @@
 	let { milestone, edit }: Props = $props();
 
 	const config = getUiConfig();
+
+	const CATEGORIES = Object.keys(MILESTONE_CATEGORY_COLOR) as MilestoneCategory[];
+
+	/**
+	 * The panel rows, zipped from the map's descriptors and this milestone's
+	 * values. The category select's options come from the same labels the chip
+	 * renders — filled here so the host never re-derives them.
+	 */
+	const panelRows = $derived(
+		[
+			edit?.occurredOn && { descriptor: edit.occurredOn, value: milestone.occurredOn },
+			edit?.category && {
+				descriptor: {
+					options: CATEGORIES.map((category) => ({
+						value: category,
+						label: milestoneCategoryLabel(category, config.messages)
+					})),
+					...edit.category
+				},
+				value: milestone.category
+			},
+			edit?.linkUrl && { descriptor: edit.linkUrl, value: milestone.linkUrl },
+			edit?.image && { descriptor: edit.image, value: milestone.imageUrls[0] ?? null }
+		].filter((row) => row !== undefined)
+	);
+
+	const frameSpec = $derived(
+		edit && (panelRows.length > 0 || edit.removeOp)
+			? {
+					label: edit.label ?? milestone.title,
+					hasPanel: panelRows.length > 0,
+					removeOp: edit.removeOp
+				}
+			: undefined
+	);
 
 	const color = $derived(MILESTONE_CATEGORY_COLOR[milestone.category]);
 	/**
@@ -48,42 +97,49 @@
 
 <article style={`--milestone-color: ${color}`}>
 	<span class="dot" aria-hidden="true"></span>
-	<Editable
-		edit={config.messageEdit?.(`category_${milestone.category}`)}
-		value={milestoneCategoryLabel(milestone.category, config.messages)}
-	>
-		{#snippet children(text, attrs)}<p class="category" {...attrs}>{text}</p>{/snippet}
-	</Editable>
-	<DateText value={milestone.occurredOn} />
-	<Editable edit={edit?.title} value={milestone.title}>
-		{#snippet children(text, attrs)}<h3 {...attrs}>{text}</h3>{/snippet}
-	</Editable>
-	{#if milestone.body}
-		<Editable edit={edit?.body} value={milestone.body}>
-			{#snippet children(text, attrs)}<p class="body" {...attrs}>{text}</p>{/snippet}
+	<!-- The frame sits INSIDE the article so the timeline's flex row never
+	     gains an unexpected child; inactive it renders the content alone. -->
+	<EditFrame spec={frameSpec}>
+		{#snippet panel()}
+			<EditPanel rows={panelRows} />
+		{/snippet}
+		<Editable
+			edit={config.messageEdit?.(`category_${milestone.category}`)}
+			value={milestoneCategoryLabel(milestone.category, config.messages)}
+		>
+			{#snippet children(text, attrs)}<p class="category" {...attrs}>{text}</p>{/snippet}
 		</Editable>
-	{/if}
-	{#if milestone.imageUrls.length > 0}
-		<CardMedia src={milestone.imageUrls[0]} alt="" width="1200" height="675" />
-	{/if}
-	{#if milestone.linkUrl}
-		<p class="more">
-			<ActionLabel
-				edit={config.messageEdit?.('common_readMore')}
-				value={config.messages.common_readMore()}
-			>
-				{#snippet control()}
-					{#if isExternal}
-						<a href={milestone.linkUrl} rel="external noopener"
-							>{config.messages.common_readMore()}</a
-						>
-					{:else if milestone.linkUrl}
-						<Link href={milestone.linkUrl}>{config.messages.common_readMore()}</Link>
-					{/if}
-				{/snippet}
-			</ActionLabel>
-		</p>
-	{/if}
+		<DateText value={milestone.occurredOn} />
+		<Editable edit={edit?.title} value={milestone.title}>
+			{#snippet children(text, attrs)}<h3 {...attrs}>{text}</h3>{/snippet}
+		</Editable>
+		{#if milestone.body}
+			<Editable edit={edit?.body} value={milestone.body}>
+				{#snippet children(text, attrs)}<p class="body" {...attrs}>{text}</p>{/snippet}
+			</Editable>
+		{/if}
+		{#if milestone.imageUrls.length > 0}
+			<CardMedia src={milestone.imageUrls[0]} alt="" width="1200" height="675" />
+		{/if}
+		{#if milestone.linkUrl}
+			<p class="more">
+				<ActionLabel
+					edit={config.messageEdit?.('common_readMore')}
+					value={config.messages.common_readMore()}
+				>
+					{#snippet control()}
+						{#if isExternal}
+							<a href={milestone.linkUrl} rel="external noopener"
+								>{config.messages.common_readMore()}</a
+							>
+						{:else if milestone.linkUrl}
+							<Link href={milestone.linkUrl}>{config.messages.common_readMore()}</Link>
+						{/if}
+					{/snippet}
+				</ActionLabel>
+			</p>
+		{/if}
+	</EditFrame>
 </article>
 
 <style>

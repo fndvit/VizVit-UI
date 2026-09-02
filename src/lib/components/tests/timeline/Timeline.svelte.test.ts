@@ -1,7 +1,9 @@
 import { page } from 'vitest/browser';
 import { describe, expect, it } from 'vitest';
 import { render } from 'vitest-browser-svelte';
+import { vi } from 'vitest';
 import Timeline from '../../timeline/Timeline.svelte';
+import TimelineCollectionProbe from './TimelineCollectionProbe.svelte';
 import type { MilestoneData as Milestone } from '../../../content/types.js';
 
 const milestones: Milestone[] = [
@@ -113,5 +115,54 @@ describe('milestone link_url', () => {
 
 		expect(anchor().getAttribute('href')).toBe('//diari.example/article');
 		expect(anchor().getAttribute('rel')).toBe('external noopener');
+	});
+});
+
+describe('Timeline collection ops', () => {
+	const collection = { entity: 'milestones' } as const;
+
+	it('renders no add slot without a collection, or without applyOp', () => {
+		const noCollection = render(TimelineCollectionProbe, {
+			props: {
+				milestones,
+				adapter: { isEditing: true, save: vi.fn(async () => {}), applyOp: vi.fn(async () => {}) }
+			}
+		});
+		expect(noCollection.container.querySelector('button.add')).toBeNull();
+
+		const noOp = render(TimelineCollectionProbe, {
+			props: {
+				milestones,
+				collection,
+				adapter: { isEditing: true, save: vi.fn(async () => {}) }
+			}
+		});
+		expect(noOp.container.querySelector('button.add')).toBeNull();
+	});
+
+	it('renders one anchored slot per milestone plus one at the end, and fires create', async () => {
+		const applyOp = vi.fn(async () => {});
+		const { container } = render(TimelineCollectionProbe, {
+			props: {
+				milestones,
+				collection,
+				adapter: { isEditing: true, save: vi.fn(async () => {}), applyOp }
+			}
+		});
+
+		const slots = container.querySelectorAll<HTMLButtonElement>('button.add');
+		expect(slots).toHaveLength(milestones.length + 1);
+
+		slots[0].click();
+		await new Promise((resolve) => setTimeout(resolve, 20));
+		expect(applyOp).toHaveBeenCalledWith({
+			kind: 'create',
+			collection,
+			anchor: { id: milestones[0].id, placement: 'before' }
+		});
+
+		slots[slots.length - 1].click();
+		await new Promise((resolve) => setTimeout(resolve, 20));
+		expect(applyOp).toHaveBeenCalledWith({ kind: 'create', collection });
 	});
 });
