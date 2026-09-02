@@ -9,6 +9,8 @@
 		title?: EditDescriptor;
 		description?: EditDescriptor;
 		postedOn?: PropertyDescriptor;
+		/** Editorial state row; value derives from `draft` ('false' when draft). */
+		status?: PropertyDescriptor;
 		/** Accessible name for the frame — usually the opening's title. */
 		label?: string;
 		/** Set by the list from its `collection` — removal of this opening. */
@@ -75,9 +77,10 @@
 	<ul>
 		{#each jobs as job (job.slug)}
 			{@const edit = editMapFor(job)}
-			{@const rows = [edit?.postedOn && { descriptor: edit.postedOn, value: job.postedOn }].filter(
-				(row) => row !== undefined
-			)}
+			{@const rows = [
+				edit?.postedOn && { descriptor: edit.postedOn, value: job.postedOn },
+				edit?.status && { descriptor: edit.status, value: job.draft ? 'false' : 'true' }
+			].filter((row) => row !== undefined)}
 			<li>
 				<!-- Inside the li — see CollaboratorList. -->
 				<EditFrame

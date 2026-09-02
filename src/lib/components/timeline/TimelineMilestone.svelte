@@ -13,6 +13,8 @@
 		category?: PropertyDescriptor;
 		linkUrl?: PropertyDescriptor;
 		image?: PropertyDescriptor;
+		/** Editorial state row; value derives from `draft` ('false' when draft). */
+		status?: PropertyDescriptor;
 		/** Accessible name for the frame, e.g. "Fita: Neix la fundació". */
 		label?: string;
 		/** Set by Timeline from its `collection` — removal of this milestone. */
@@ -64,7 +66,8 @@
 				value: milestone.category
 			},
 			edit?.linkUrl && { descriptor: edit.linkUrl, value: milestone.linkUrl },
-			edit?.image && { descriptor: edit.image, value: milestone.imageUrls[0] ?? null }
+			edit?.image && { descriptor: edit.image, value: milestone.imageUrls[0] ?? null },
+			edit?.status && { descriptor: edit.status, value: milestone.draft ? 'false' : 'true' }
 		].filter((row) => row !== undefined)
 	);
 
