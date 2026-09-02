@@ -46,7 +46,7 @@
 	dialog {
 		margin: auto;
 		border: none;
-		border-radius: var(--radius);
+		border-radius: var(--radius-lg);
 		padding: 0;
 		background: var(--color-surface);
 		box-shadow: var(--shadow-2);
