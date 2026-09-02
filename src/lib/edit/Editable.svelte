@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { getUiConfig } from '../config/context.js';
 	import { getEditAdapter } from './context.js';
 	import type { EditDescriptor } from './types.js';
 
@@ -55,6 +56,7 @@
 	let { edit, value, children }: Props = $props();
 
 	const adapter = getEditAdapter();
+	const config = getUiConfig();
 
 	let status = $state<'idle' | 'dirty' | 'saving' | 'error'>('idle');
 	/** Last persisted value: what Escape restores and blur diffs against. */
@@ -121,16 +123,16 @@
 			return;
 		}
 		status = 'saving';
-		announcement = 'Desant…';
+		announcement = config.editMessages.edit_saving();
 		try {
 			await adapter.save(edit, draft);
 			savedValue = draft;
 			status = 'idle';
-			announcement = 'Desat';
+			announcement = config.editMessages.edit_saved();
 		} catch {
 			// Draft stays in the DOM; the reader decides whether to retry.
 			status = 'error';
-			announcement = 'Error en desar';
+			announcement = config.editMessages.edit_saveError();
 		}
 	}
 

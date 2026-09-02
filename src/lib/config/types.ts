@@ -1,6 +1,7 @@
 // Type-only and erased at compile time, so the config ↔ edit type cycle is
 // harmless — edit/types.js imports Locale from here the same way.
 import type { EditDescriptor } from '../edit/types.js';
+import type { EditMessages } from './edit-messages.js';
 
 /**
  * The site's locales and their canonical member. Fixed rather than generic:
@@ -155,6 +156,12 @@ export interface UiConfig {
 	siteName: string;
 	messages: UiMessages;
 	/**
+	 * The editor chrome's own strings (status announcements, panel wording) —
+	 * resolved, Catalan by default. NOT part of `messages`: see
+	 * `./edit-messages.js` for why the two catalogs must not mix.
+	 */
+	editMessages: EditMessages;
+	/**
 	 * Edit descriptor for one of THIS config's message strings, by catalog
 	 * key — the interface-wording half of edit mode. Optional and undefined by
 	 * default, so a read-only app (and every story/test) renders the messages
@@ -173,5 +180,6 @@ export interface UiConfigInput {
 	canonicalPathname?: UiConfig['canonicalPathname'];
 	siteName?: string;
 	messages?: UiMessages;
+	editMessages?: EditMessages;
 	messageEdit?: UiConfig['messageEdit'];
 }

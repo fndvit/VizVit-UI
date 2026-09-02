@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { getUiConfig } from '../../config/context.js';
 	import { renderBody } from '../../content/richtext.js';
 	import { getEditAdapter } from '../../edit/context.js';
 	import type { EditDescriptor } from '../../edit/types.js';
@@ -23,6 +24,7 @@
 	let { body, edit }: Props = $props();
 
 	const adapter = getEditAdapter();
+	const config = getUiConfig();
 	const canEdit = $derived(edit !== undefined && (adapter?.isEditing ?? false));
 
 	/** Last persisted body: what renders, and what Cancel·la returns to. */
@@ -79,16 +81,18 @@
 			class="control"
 			bind:value={draft}
 			rows={Math.max(6, draft.split('\n').length + 1)}
-			aria-label={edit?.label ?? 'Edita el contingut'}
+			aria-label={edit?.label ?? config.editMessages.edit_editBody()}
 		></textarea>
 		<div class="actions">
-			<Button pending={status === 'saving' ? 1 : 0} onclick={() => void save()}>Desa</Button>
-			<GhostButton onclick={cancel}>Cancel·la</GhostButton>
+			<Button pending={status === 'saving' ? 1 : 0} onclick={() => void save()}>
+				{config.editMessages.edit_save()}
+			</Button>
+			<GhostButton onclick={cancel}>{config.editMessages.edit_cancel()}</GhostButton>
 			{#if status === 'error'}
-				<p class="error" role="alert">Error en desar. Torna-ho a provar.</p>
+				<p class="error" role="alert">{config.editMessages.edit_saveError()}. Torna-ho a provar.</p>
 			{/if}
 		</div>
-		<div class="richtext preview" aria-label="Vista prèvia">
+		<div class="richtext preview" aria-label={config.editMessages.edit_preview()}>
 			{#each preview as block, index (index)}
 				{#if block.type === 'h2'}
 					<h2>{block.text}</h2>
@@ -108,7 +112,9 @@
 			{/if}
 		{/each}
 		{#if canEdit}
-			<p class="edit-row"><GhostButton onclick={open}>Edita</GhostButton></p>
+			<p class="edit-row">
+				<GhostButton onclick={open}>{config.editMessages.edit_edit()}</GhostButton>
+			</p>
 		{/if}
 	</div>
 {/if}
