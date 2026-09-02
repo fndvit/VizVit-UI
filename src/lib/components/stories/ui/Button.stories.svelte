@@ -28,3 +28,24 @@
 		<Button pending={1}>Enviant…</Button>
 	{/snippet}
 </Story>
+
+<!-- The closed variant × size set. primary md is the pre-variant look. -->
+<Story name="Variants">
+	{#snippet template()}
+		<div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+			<Button pending={null}>Primary</Button>
+			<Button pending={null} variant="navy">Navy</Button>
+			<Button pending={null} variant="ghost">Ghost</Button>
+			<Button pending={null} size="sm">Primary sm</Button>
+			<Button pending={null} variant="navy" size="sm">Navy sm</Button>
+			<Button pending={null} variant="ghost" size="sm">Ghost sm</Button>
+		</div>
+	{/snippet}
+</Story>
+
+<!-- An anchor styled as a button: downloads, external tools. No pending. -->
+<Story name="Anchor">
+	{#snippet template()}
+		<Button href="/export.csv" download variant="navy">Descarrega CSV</Button>
+	{/snippet}
+</Story>
