@@ -1,10 +1,8 @@
 <script lang="ts">
 	import { getUiConfig } from '../../config/context.js';
 	import type { SiteLink } from '../../config/types.js';
-	import ActionLabel from '../../edit/ActionLabel.svelte';
 	import AddSlot from '../../edit/chrome/AddSlot.svelte';
-	import EditFrame from '../../edit/chrome/EditFrame.svelte';
-	import EditPanel from '../../edit/chrome/EditPanel.svelte';
+	import LinkEdit from '../../edit/chrome/LinkEdit.svelte';
 	import { getEditAdapter } from '../../edit/context.js';
 	import Editable from '../../edit/Editable.svelte';
 	import type { CollectionRef, EditDescriptor } from '../../edit/types.js';
@@ -20,7 +18,7 @@
 		links: SiteLink[];
 		/** Edit descriptors for the link labels — see Nav. */
 		editFor?: (link: SiteLink) => EditDescriptor | undefined;
-		/** Panel rows (href, order) per link — see Nav. */
+		/** The modal's Adreça/Ordre rows and removal per link — see LinkEdit. */
 		propertiesFor?: (link: SiteLink) => SiteLinkEditMap | undefined;
 		/** Names the links' collection; with `applyOp`, turns on add/remove. */
 		collection?: CollectionRef;
@@ -42,13 +40,6 @@
 		return { ...map, removeOp: { kind: 'remove', collection, id: link.id } };
 	}
 
-	function rowsFor(link: SiteLink, map: SiteLinkEditMap | undefined) {
-		return [
-			map?.href && { descriptor: map.href, value: link.href },
-			map?.order && { descriptor: map.order, value: String(link.order ?? 0) }
-		].filter((row) => row !== undefined);
-	}
-
 	const year = new Date().getFullYear();
 </script>
 
@@ -60,25 +51,19 @@
 		<ul>
 			{#each links as link (link.href)}
 				{@const map = editMapFor(link)}
-				{@const rows = rowsFor(link, map)}
 				<li>
-					<!-- Inside the li, so the list's flex layout never gains a child. -->
-					<EditFrame
-						spec={map && (rows.length > 0 || map.removeOp)
-							? {
-									label: map.label ?? link.label,
-									hasPanel: rows.length > 0,
-									removeOp: map.removeOp
-								}
+					<!-- One gesture: the modal edits text, destination, order, removal. -->
+					<LinkEdit
+						text={{ edit: editFor?.(link), value: link.label }}
+						href={{ descriptor: map?.href, value: link.href }}
+						extras={map?.order
+							? [{ descriptor: map.order, value: String(link.order ?? 0) }]
 							: undefined}
+						removeOp={map?.removeOp}
+						label={map?.label ?? link.label}
 					>
-						{#snippet panel()}
-							<EditPanel {rows} />
-						{/snippet}
-						<ActionLabel edit={editFor?.(link)} value={link.label}>
-							{#snippet control()}<Link href={link.href}>{link.label}</Link>{/snippet}
-						</ActionLabel>
-					</EditFrame>
+						{#snippet control()}<Link href={link.href}>{link.label}</Link>{/snippet}
+					</LinkEdit>
 				</li>
 			{/each}
 			{#if structural && collection}

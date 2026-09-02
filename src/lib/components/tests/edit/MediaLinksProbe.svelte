@@ -19,6 +19,7 @@
 		adapter?: EditAdapter | null;
 		show: 'nav' | 'footer' | 'newsletter';
 		links?: SiteLink[];
+		editFor?: (link: SiteLink) => EditDescriptor | undefined;
 		propertiesFor?: (link: SiteLink) => SiteLinkEditMap | undefined;
 		collection?: CollectionRef;
 		/** For components resolving their own chrome keys. */
@@ -29,6 +30,7 @@
 		adapter = null,
 		show,
 		links = [],
+		editFor = undefined,
 		propertiesFor = undefined,
 		collection = undefined,
 		messageEdit = undefined
@@ -40,9 +42,9 @@
 </script>
 
 {#if show === 'nav'}
-	<Nav {links} {propertiesFor} {collection} />
+	<Nav {links} {editFor} {propertiesFor} {collection} />
 {:else if show === 'footer'}
-	<Footer {links} {propertiesFor} {collection} />
+	<Footer {links} {editFor} {propertiesFor} {collection} />
 {:else}
 	<NewsletterSignup
 		account={null}
