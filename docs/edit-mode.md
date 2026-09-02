@@ -35,7 +35,7 @@ That is the foundation website's whole guarantee: it never calls
 **2. The descriptors** — say what a string is:
 
 ```ts
-import { pageCopyEdit, entityEdit } from '@vit-foundation/ui';
+import { pageCopyEdit, entityEdit, chromeEdit } from '@vit-foundation/ui';
 
 // One page_content block:
 pageCopyEdit('home', 'hero_title', 'ca', { label: 'Títol de portada' });
@@ -45,7 +45,19 @@ const edit = entityEdit('weeklies', weekly.id, locale);
 edit('title', { label: 'Títol' });
 edit('excerpt', { format: 'multiline' });
 edit('body', { format: 'richtext' });
+
+// One interface-wording message (a UiMessages catalog key):
+chromeEdit('footer_rights', locale);
 ```
+
+Interface wording is offered by the components themselves: pass
+`messageEdit: (key) => chromeEdit(key, locale)` in the `UiProvider` config and
+each component wraps its own parameterless, plain-text message sites in
+`Editable`. Parameterized messages and strings in interactive or attribute
+positions (buttons, `<option>`s, placeholders, aria labels) are deliberately
+not offered — editing rendered text would corrupt a template — and stay with
+the host's own wording editor. Without `messageEdit` (every app but a CMS)
+those strings render as plain text.
 
 `format` decides the editing behaviour: `'text'` (default) commits on Enter
 and forbids newlines, `'multiline'` commits on Cmd/Ctrl+Enter, `'richtext'`

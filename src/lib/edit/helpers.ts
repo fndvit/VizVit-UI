@@ -1,6 +1,19 @@
 import type { Locale } from '../config/types.js';
 import type { EditableEntity, EditDescriptor } from './types.js';
 
+/**
+ * Descriptor for one interface-wording message (a Paraglide catalog key).
+ * Only parameterless messages are sensibly editable in place — editing the
+ * RENDERED text of a parameterized one would overwrite its template.
+ */
+export function chromeEdit(
+	key: string,
+	locale: Locale,
+	options?: { format?: EditDescriptor['format']; label?: string }
+): EditDescriptor {
+	return { ref: { kind: 'chrome', key }, locale, ...options };
+}
+
 /** Descriptor for one page-copy block (`page_content` row). */
 export function pageCopyEdit(
 	page: string,

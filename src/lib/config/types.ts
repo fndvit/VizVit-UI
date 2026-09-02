@@ -1,3 +1,7 @@
+// Type-only and erased at compile time, so the config ↔ edit type cycle is
+// harmless — edit/types.js imports Locale from here the same way.
+import type { EditDescriptor } from '../edit/types.js';
+
 /**
  * The site's locales and their canonical member. Fixed rather than generic:
  * `ca` is load-bearing — it is the required key of every localized column
@@ -150,6 +154,14 @@ export interface UiConfig {
 	/** Appended to document titles and shown as the wordmark. */
 	siteName: string;
 	messages: UiMessages;
+	/**
+	 * Edit descriptor for one of THIS config's message strings, by catalog
+	 * key — the interface-wording half of edit mode. Optional and undefined by
+	 * default, so a read-only app (and every story/test) renders the messages
+	 * as plain text. A CMS-shaped host supplies it alongside an EditAdapter;
+	 * components offer only their parameterless, plain-text message sites.
+	 */
+	messageEdit?: (key: string) => EditDescriptor | undefined;
 }
 
 /** What an app hands UiProvider: any subset; the rest keeps package defaults. */
@@ -161,4 +173,5 @@ export interface UiConfigInput {
 	canonicalPathname?: UiConfig['canonicalPathname'];
 	siteName?: string;
 	messages?: UiMessages;
+	messageEdit?: UiConfig['messageEdit'];
 }

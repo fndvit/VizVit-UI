@@ -34,7 +34,9 @@
 			const target =
 				ref.kind === 'page-copy'
 					? `${ref.page}.${ref.sectionKey}`
-					: `${ref.entity}#${ref.id}.${ref.field}`;
+					: ref.kind === 'chrome'
+						? `chrome.${ref.key}`
+						: `${ref.entity}#${ref.id}.${ref.field}`;
 			log = [...log, `${target} [${descriptor.locale}] ← "${value}"`];
 		}
 	});

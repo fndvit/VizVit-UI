@@ -10,6 +10,7 @@
 
 <script lang="ts">
 	import { getUiConfig } from '../../config/context.js';
+	import Editable from '../../edit/Editable.svelte';
 	import { COMMENT_BODY } from '../../forms/constraints.js';
 	import type { CommentData, CommentThreadData } from '../../content/types.js';
 	import Button from '../ui/Button.svelte';
@@ -67,10 +68,16 @@
 {/snippet}
 
 <section aria-labelledby="comments-heading">
-	<h2 class="subsection-heading" id="comments-heading">{msg.comments_title()}</h2>
+	<Editable edit={config.messageEdit?.('comments_title')} value={msg.comments_title()}>
+		{#snippet children(text, attrs)}
+			<h2 class="subsection-heading" id="comments-heading" {...attrs}>{text}</h2>
+		{/snippet}
+	</Editable>
 
 	{#if comments.length === 0}
-		<p class="empty">{msg.comments_empty()}</p>
+		<Editable edit={config.messageEdit?.('comments_empty')} value={msg.comments_empty()}>
+			{#snippet children(text, attrs)}<p class="empty" {...attrs}>{text}</p>{/snippet}
+		</Editable>
 	{:else}
 		<ul class="list">
 			{#each comments as thread (thread.id)}
@@ -148,7 +155,12 @@
 		</form>
 	{:else}
 		<p class="login-prompt">
-			{msg.comments_loginPrompt()}
+			<Editable
+				edit={config.messageEdit?.('comments_loginPrompt')}
+				value={msg.comments_loginPrompt()}
+			>
+				{#snippet children(text, attrs)}<span {...attrs}>{text}</span>{/snippet}
+			</Editable>
 			<Link href="/login">{msg.comments_loginLink()}</Link>
 			·
 			<Link href="/signup">{msg.comments_signupLink()}</Link>
