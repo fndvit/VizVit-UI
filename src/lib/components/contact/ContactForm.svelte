@@ -62,13 +62,31 @@
 	 */
 	const categoryRows = $derived(
 		config.messageEdit
-			? categories.map((category) => ({
-					descriptor: chromeProperty(`contact_category_${category}`, {
-						type: 'text' as const,
-						label: contactCategoryLabel(category, msg)
-					}),
-					value: contactCategoryLabel(category, msg)
-				}))
+			? [
+					...categories.map((category) => ({
+						descriptor: chromeProperty(`contact_category_${category}`, {
+							type: 'text' as const,
+							label: contactCategoryLabel(category, msg)
+						}),
+						value: contactCategoryLabel(category, msg)
+					})),
+					// Post-submit feedback never shows while editing (the mirror's
+					// forms are inert), so these two edit here or nowhere in place.
+					{
+						descriptor: chromeProperty('contact_success', {
+							type: 'text' as const,
+							label: msg.contact_success()
+						}),
+						value: msg.contact_success()
+					},
+					{
+						descriptor: chromeProperty('contact_invalid', {
+							type: 'text' as const,
+							label: msg.contact_invalid()
+						}),
+						value: msg.contact_invalid()
+					}
+				]
 			: []
 	);
 	const categoryFrameSpec = $derived(

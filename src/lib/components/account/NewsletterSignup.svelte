@@ -44,9 +44,23 @@
 				>
 					{#snippet children(text, attrs)}<span {...attrs}>{text}</span>{/snippet}
 				</Editable>
-				<Link href={withNewsletterIntent('/signup')}>{msg.comments_signupLink()}</Link>
+				<ActionLabel
+					edit={config.messageEdit?.('comments_signupLink')}
+					value={msg.comments_signupLink()}
+				>
+					{#snippet control()}<Link href={withNewsletterIntent('/signup')}
+							>{msg.comments_signupLink()}</Link
+						>{/snippet}
+				</ActionLabel>
 				·
-				<Link href={withNewsletterIntent('/login')}>{msg.comments_loginLink()}</Link>
+				<ActionLabel
+					edit={config.messageEdit?.('comments_loginLink')}
+					value={msg.comments_loginLink()}
+				>
+					{#snippet control()}<Link href={withNewsletterIntent('/login')}
+							>{msg.comments_loginLink()}</Link
+						>{/snippet}
+				</ActionLabel>
 			</p>
 		{:else if account.newsletterSubscribed}
 			<p class="prompt">
@@ -56,7 +70,9 @@
 				>
 					{#snippet children(text, attrs)}<span {...attrs}>{text}</span>{/snippet}
 				</Editable>
-				<Link href="/account">{msg.account_navLabel()}</Link>
+				<ActionLabel edit={config.messageEdit?.('account_navLabel')} value={msg.account_navLabel()}>
+					{#snippet control()}<Link href="/account">{msg.account_navLabel()}</Link>{/snippet}
+				</ActionLabel>
 			</p>
 		{:else}
 			<form {...f}>

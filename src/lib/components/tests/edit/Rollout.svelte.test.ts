@@ -283,7 +283,8 @@ describe('caretless strings edit through panels', () => {
 		openPanel(frame!);
 		await settle();
 		const inputs = withEdit.container.querySelectorAll<HTMLInputElement>('[role="dialog"] input');
-		expect(inputs).toHaveLength(5);
+		// Five category labels plus the two post-submit feedback strings.
+		expect(inputs).toHaveLength(7);
 		expect(inputs[0].value).toBe('Vull col·laborar');
 		await commitText(inputs[0], 'Col·laborem?');
 		expect(saveProperty).toHaveBeenCalledWith(

@@ -29,7 +29,8 @@ export type EditableEntity =
 	| 'themes'
 	// ⚠ widening this union is a coordinated break for hosts with exhaustive
 	// maps over it (the CMS's editable-fields whitelist) — note the changelog.
-	| 'collaborators';
+	| 'collaborators'
+	| 'site_links';
 
 /**
  * The identity of one editable string in the content model: a page copy

@@ -223,6 +223,7 @@ describe('editMessages', () => {
 					edit_add: () => 'x',
 					edit_addFailed: () => 'x',
 					edit_uploadImage: () => 'x',
+					edit_draftBadge: () => 'Esborrany (proves)',
 					edit_clearValue: () => 'x',
 					edit_emptyRequired: () => 'x'
 				}

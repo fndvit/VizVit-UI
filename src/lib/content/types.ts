@@ -23,6 +23,8 @@ export type SortDirection = 'asc' | 'desc';
 /** A weekly as its listing card shows it. */
 export interface WeeklyCardData {
 	id: number;
+	/** CMS-only: true renders the «Esborrany» badge. The public site never sets it. */
+	draft?: boolean;
 	number: number;
 	slug: string;
 	/** ISO date (2026-08-30). */
@@ -37,6 +39,8 @@ export type ProjectKind = 'collaboration' | 'passion';
 /** A project as its card shows it. */
 export interface ProjectCardData {
 	id: number;
+	/** CMS-only: true renders the «Esborrany» badge. The public site never sets it. */
+	draft?: boolean;
 	slug: string;
 	kind: ProjectKind;
 	publishedOn: string;
@@ -52,6 +56,8 @@ export type MilestoneCategory = 'education' | 'lab' | 'foundation' | 'collaborat
 /** One timeline milestone. */
 export interface MilestoneData {
 	id: number;
+	/** CMS-only: true renders the «Esborrany» badge. The public site never sets it. */
+	draft?: boolean;
 	occurredOn: string;
 	category: MilestoneCategory;
 	title: string;
@@ -80,6 +86,8 @@ export interface CollaboratorData {
 export interface JobOpeningData {
 	/** Present only where the list is editable — remove ops need an identity. */
 	id?: string | number;
+	/** CMS-only: true renders the «Esborrany» badge. The public site never sets it. */
+	draft?: boolean;
 	slug: string;
 	title: string;
 	description: string | null;

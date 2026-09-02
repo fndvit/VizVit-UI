@@ -2,10 +2,15 @@
 	import { getUiConfig } from '../../config/context.js';
 	import type { SiteLink } from '../../config/types.js';
 	import ActionLabel from '../../edit/ActionLabel.svelte';
-	import type { EditDescriptor } from '../../edit/types.js';
+	import AddSlot from '../../edit/chrome/AddSlot.svelte';
+	import EditFrame from '../../edit/chrome/EditFrame.svelte';
+	import EditPanel from '../../edit/chrome/EditPanel.svelte';
+	import { getEditAdapter } from '../../edit/context.js';
+	import type { CollectionRef, EditDescriptor } from '../../edit/types.js';
 	import { isPathUnder } from '../../utils/paths.js';
 	import GhostButton from '../ui/GhostButton.svelte';
 	import Link from '../ui/Link.svelte';
+	import type { SiteLinkEditMap } from './site-link-edit.js';
 
 	interface Props {
 		/**
@@ -25,11 +30,41 @@
 		 * text instead of an anchor (see ActionLabel).
 		 */
 		editFor?: (link: SiteLink) => EditDescriptor | undefined;
+		/** Panel rows (href, order) per link — the label edits via `editFor`. */
+		propertiesFor?: (link: SiteLink) => SiteLinkEditMap | undefined;
+		/** Names the links' collection; with `applyOp`, turns on add/remove. */
+		collection?: CollectionRef;
 	}
 
-	let { links, account = null, url = undefined, editFor = undefined }: Props = $props();
+	let {
+		links,
+		account = null,
+		url = undefined,
+		editFor = undefined,
+		propertiesFor = undefined,
+		collection
+	}: Props = $props();
 
 	const config = getUiConfig();
+	const adapter = getEditAdapter();
+
+	const structural = $derived(
+		collection !== undefined && (adapter?.isEditing ?? false) && adapter?.applyOp !== undefined
+	);
+
+	/** The map the host gave, plus removal — the list owns identity. */
+	function editMapFor(link: SiteLink): SiteLinkEditMap | undefined {
+		const map = propertiesFor?.(link);
+		if (!structural || !collection || link.id === undefined) return map;
+		return { ...map, removeOp: { kind: 'remove', collection, id: link.id } };
+	}
+
+	function rowsFor(link: SiteLink, map: SiteLinkEditMap | undefined) {
+		return [
+			map?.href && { descriptor: map.href, value: link.href },
+			map?.order && { descriptor: map.order, value: String(link.order ?? 0) }
+		].filter((row) => row !== undefined);
+	}
 	const msg = $derived(config.messages);
 
 	let isMenuOpen = $state(false);
@@ -85,16 +120,37 @@
 		<div class="menu" id="site-menu" class:open={isMenuOpen}>
 			<ul class="links">
 				{#each links as link (link.href)}
+					{@const map = editMapFor(link)}
+					{@const rows = rowsFor(link, map)}
 					<li>
-						<ActionLabel edit={editFor?.(link)} value={link.label}>
-							{#snippet control()}
-								<Link href={link.href} aria-current={isCurrent(link.href) ? 'page' : undefined}>
-									{link.label}
-								</Link>
+						<!-- Inside the li, so the row's layout never gains a child. -->
+						<EditFrame
+							spec={map && (rows.length > 0 || map.removeOp)
+								? {
+										label: map.label ?? link.label,
+										hasPanel: rows.length > 0,
+										removeOp: map.removeOp
+									}
+								: undefined}
+						>
+							{#snippet panel()}
+								<EditPanel {rows} />
 							{/snippet}
-						</ActionLabel>
+							<ActionLabel edit={editFor?.(link)} value={link.label}>
+								{#snippet control()}
+									<Link href={link.href} aria-current={isCurrent(link.href) ? 'page' : undefined}>
+										{link.label}
+									</Link>
+								{/snippet}
+							</ActionLabel>
+						</EditFrame>
 					</li>
 				{/each}
+				{#if structural && collection}
+					<li>
+						<AddSlot op={{ kind: 'create', collection }} />
+					</li>
+				{/if}
 			</ul>
 
 			{#if account}

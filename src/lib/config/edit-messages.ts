@@ -30,6 +30,8 @@ export interface EditMessages {
 	edit_addFailed(): string;
 	/** Property rows. */
 	edit_uploadImage(): string;
+	/** The chip a card wears while its row is unpublished. */
+	edit_draftBadge(): string;
 	edit_clearValue(): string;
 	edit_emptyRequired(): string;
 }
@@ -56,6 +58,7 @@ export const defaultEditMessages: EditMessages = {
 	edit_add: ({ label }) => `Afegeix ${label}`,
 	edit_addFailed: () => 'No s’ha pogut afegir',
 	edit_uploadImage: () => 'Puja una imatge',
+	edit_draftBadge: () => 'Esborrany',
 	edit_clearValue: () => 'Buida el valor',
 	edit_emptyRequired: () => 'Aquest camp no pot quedar buit'
 };

@@ -97,7 +97,14 @@
 						{@const reply = replyFormFor(String(thread.id))}
 						<!-- Native disclosure: the reply form opens without JS. -->
 						<details class="reply">
-							<summary>{msg.comments_replyLabel()}</summary>
+							<summary>
+								<ActionLabel
+									edit={config.messageEdit?.('comments_replyLabel')}
+									value={msg.comments_replyLabel()}
+								>
+									{#snippet control()}{msg.comments_replyLabel()}{/snippet}
+								</ActionLabel>
+							</summary>
 							<form class="form-stack" {...reply}>
 								<Field
 									id="reply-body-{thread.id}"
@@ -173,9 +180,19 @@
 			>
 				{#snippet children(text, attrs)}<span {...attrs}>{text}</span>{/snippet}
 			</Editable>
-			<Link href="/login">{msg.comments_loginLink()}</Link>
+			<ActionLabel
+				edit={config.messageEdit?.('comments_loginLink')}
+				value={msg.comments_loginLink()}
+			>
+				{#snippet control()}<Link href="/login">{msg.comments_loginLink()}</Link>{/snippet}
+			</ActionLabel>
 			·
-			<Link href="/signup">{msg.comments_signupLink()}</Link>
+			<ActionLabel
+				edit={config.messageEdit?.('comments_signupLink')}
+				value={msg.comments_signupLink()}
+			>
+				{#snippet control()}<Link href="/signup">{msg.comments_signupLink()}</Link>{/snippet}
+			</ActionLabel>
 		</p>
 	{/if}
 </section>
