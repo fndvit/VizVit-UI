@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import { defaultMessages } from '../../../config/messages.js';
-import type { UiMessages } from '../../../config/types.js';
+import type { ParameterlessKey, UiMessages } from '../../../config/types.js';
 import { chromeEdit, chromeProperty, entityProperty } from '../../../edit/helpers.js';
 import type { EditAdapter, EntityOp } from '../../../edit/types.js';
 import LinkEditProbe from './LinkEditProbe.svelte';
@@ -181,7 +181,7 @@ describe('LinkEdit', () => {
 describe('the components that resolve their own keys', () => {
 	const editingSetup = {
 		adapter: adapterWith(),
-		messageEdit: (key: string) => chromeEdit(key, 'ca')
+		messageEdit: (key: ParameterlessKey) => chromeEdit(key, 'ca')
 	};
 
 	it('NewsletterSignup offers both links as modals with the catalog destinations', async () => {

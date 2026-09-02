@@ -3,7 +3,7 @@
 	import type { SiteLink } from '../../config/types.js';
 	import AddSlot from '../../edit/chrome/AddSlot.svelte';
 	import LinkEdit from '../../edit/chrome/LinkEdit.svelte';
-	import { getEditAdapter } from '../../edit/context.js';
+	import { collectionEditing } from '../../edit/collection.svelte.js';
 	import Editable from '../../edit/Editable.svelte';
 	import type { CollectionRef, EditDescriptor } from '../../edit/types.js';
 	import Link from '../ui/Link.svelte';
@@ -27,18 +27,12 @@
 	let { links, editFor = undefined, propertiesFor = undefined, collection }: Props = $props();
 
 	const config = getUiConfig();
-	const adapter = getEditAdapter();
 
-	const structural = $derived(
-		collection !== undefined && (adapter?.isEditing ?? false) && adapter?.applyOp !== undefined
-	);
-
-	/** The map the host gave, plus removal — the list owns identity. */
-	function editMapFor(link: SiteLink): SiteLinkEditMap | undefined {
-		const map = propertiesFor?.(link);
-		if (!structural || !collection || link.id === undefined) return map;
-		return { ...map, removeOp: { kind: 'remove', collection, id: link.id } };
-	}
+	// Same structural half as Nav — see collectionEditing.
+	const list = collectionEditing<SiteLink, SiteLinkEditMap>(() => ({
+		collection,
+		editFor: propertiesFor
+	}));
 
 	const year = new Date().getFullYear();
 </script>
@@ -50,7 +44,7 @@
 		</span>
 		<ul>
 			{#each links as link (link.href)}
-				{@const map = editMapFor(link)}
+				{@const map = list.mapFor(link)}
 				<li>
 					<!-- One gesture: the modal edits text, destination, order, removal. -->
 					<LinkEdit
@@ -66,9 +60,9 @@
 					</LinkEdit>
 				</li>
 			{/each}
-			{#if structural && collection}
+			{#if list.add}
 				<li>
-					<AddSlot op={{ kind: 'create', collection }} />
+					<AddSlot op={list.add} />
 				</li>
 			{/if}
 		</ul>

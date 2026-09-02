@@ -1,4 +1,4 @@
-import type { Locale } from '../config/types.js';
+import type { Locale, ParameterlessKey } from '../config/types.js';
 
 /**
  * The stored shape of one localized text column (`jsonb` keyed by locale).
@@ -61,12 +61,20 @@ export interface EditDescriptor {
 }
 
 /**
- * The value kinds a property panel can edit. Everything in this content model
- * serializes to a string on the wire — an ISO date, a URL, an enum member, a
- * storage path — so there is no typed value union: the ADAPTER parses, and
- * the host's schemas stay the sole validators.
+ * The value kinds a property panel can edit. All but one serialize to a
+ * string on the wire — an ISO date, a URL, an enum member, a storage path —
+ * so the ADAPTER parses and the host's schemas stay the sole validators. The
+ * exception is `flag`: a two-state row whose value IS a boolean (published or
+ * not, open or not), so no host has to spell a 'true'/'false' select and no
+ * card has to derive one from its data.
  */
-export type PropertyType = 'text' | 'url' | 'date' | 'select' | 'image';
+export type PropertyType = 'text' | 'url' | 'date' | 'select' | 'image' | 'flag';
+
+/**
+ * What a property row hands the adapter: a string for every type but `flag`,
+ * a boolean for a flag, `null` when a `nullable` property is cleared.
+ */
+export type PropertyValue = string | boolean | null;
 
 /** One choice of a `select` property. */
 export interface PropertyOption {
@@ -88,6 +96,13 @@ export interface PropertyDescriptor {
 	label: string;
 	/** Required when `type` is 'select'. */
 	options?: readonly PropertyOption[];
+	/**
+	 * 'flag' only: the catalog keys wording each state, so the same row reads
+	 * «Publicat / Esborrany» on a card and «Oberta / Tancada» on an opening.
+	 * Default `status_published` / `status_draft`.
+	 */
+	on?: ParameterlessKey;
+	off?: ParameterlessKey;
 	placeholder?: string;
 	/** Clearing the field saves null (linkUrl, externalUrl). */
 	nullable?: boolean;
@@ -142,10 +157,11 @@ export interface EditAdapter {
 	readonly isEditing: boolean;
 	save(descriptor: EditDescriptor, value: string): Promise<void>;
 	/**
-	 * Panel property save. The value stays a string on the wire (ISO date,
-	 * url, enum member, image path); `null` clears a `nullable` property.
+	 * Panel property save. A string on the wire for every type but `flag`
+	 * (ISO date, url, enum member, image path), a boolean for a flag; `null`
+	 * clears a `nullable` property.
 	 */
-	saveProperty?(descriptor: PropertyDescriptor, value: string | null): Promise<void>;
+	saveProperty?(descriptor: PropertyDescriptor, value: PropertyValue): Promise<void>;
 	/**
 	 * Structural collection ops. `create` may resolve the new row's id so the
 	 * UI can point at it after the host's refresh.

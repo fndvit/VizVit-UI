@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { PropertyDescriptor } from '../types.js';
+	import type { PropertyDescriptor, PropertyValue } from '../types.js';
 	import PropertyRow from './PropertyRow.svelte';
 
 	/**
@@ -8,7 +8,7 @@
 	 * knows nothing about the entity — the descriptors say everything.
 	 */
 	interface Props {
-		rows: { descriptor: PropertyDescriptor; value: string | null }[];
+		rows: { descriptor: PropertyDescriptor; value: PropertyValue }[];
 	}
 
 	let { rows }: Props = $props();

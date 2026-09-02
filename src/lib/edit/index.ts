@@ -1,4 +1,6 @@
 export { getEditAdapter, setEditAdapter } from './context.js';
+export { collectionEditing } from './collection.svelte.js';
+export type { CollectionEditing, RemovableMap } from './collection.svelte.js';
 export { default as ActionLabel } from './ActionLabel.svelte';
 export { default as Editable } from './Editable.svelte';
 export { default as AddSlot } from './chrome/AddSlot.svelte';
@@ -27,5 +29,8 @@ export type {
 	LocalizedText,
 	PropertyDescriptor,
 	PropertyOption,
-	PropertyType
+	PropertyType,
+	PropertyValue
 } from './types.js';
+// The rule behind chromeEdit's key parameter, next to the helper that enforces it.
+export type { NotParameterized, ParameterlessKey } from '../config/types.js';

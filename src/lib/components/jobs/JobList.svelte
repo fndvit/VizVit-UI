@@ -9,7 +9,7 @@
 		title?: EditDescriptor;
 		description?: EditDescriptor;
 		postedOn?: PropertyDescriptor;
-		/** Editorial state row; value derives from `draft` ('false' when draft). */
+		/** Editorial-state `flag` row; on while the opening is not a draft. */
 		status?: PropertyDescriptor;
 		/** Accessible name for the frame — usually the opening's title. */
 		label?: string;
@@ -25,7 +25,7 @@
 	import DraftBadge from '../../edit/chrome/DraftBadge.svelte';
 	import EditFrame from '../../edit/chrome/EditFrame.svelte';
 	import EditPanel from '../../edit/chrome/EditPanel.svelte';
-	import { getEditAdapter } from '../../edit/context.js';
+	import { collectionEditing } from '../../edit/collection.svelte.js';
 	import Editable from '../../edit/Editable.svelte';
 	import type { CollectionRef } from '../../edit/types.js';
 	import DateText from '../ui/DateText.svelte';
@@ -48,27 +48,19 @@
 	let { jobs, editFor, collection }: Props = $props();
 
 	const config = getUiConfig();
-	const adapter = getEditAdapter();
 	const msg = $derived(config.messages);
 
-	const structural = $derived(
-		collection !== undefined && (adapter?.isEditing ?? false) && adapter?.applyOp !== undefined
-	);
-
-	/** The map the host gave, plus removal — the list owns identity. */
-	function editMapFor(job: JobOpeningData): JobEditMap | undefined {
-		const map = editFor?.(job);
-		if (!structural || !collection || job.id === undefined) return map;
-		return { ...map, removeOp: { kind: 'remove', collection, id: job.id } };
-	}
+	// The structural half (add slot, removal for rows with an id) — see
+	// collectionEditing.
+	const list = collectionEditing<JobOpeningData, JobEditMap>(() => ({ collection, editFor }));
 </script>
 
 {#if jobs.length === 0}
 	<Editable edit={config.messageEdit?.('jobs_empty')} value={msg.jobs_empty()}>
 		{#snippet children(text, attrs)}<p class="empty" {...attrs}>{text}</p>{/snippet}
 	</Editable>
-	{#if structural && collection}
-		<AddSlot op={{ kind: 'create', collection }} />
+	{#if list.add}
+		<AddSlot op={list.add} />
 	{/if}
 	<Editable edit={config.messageEdit?.('jobs_newsletterNudge')} value={msg.jobs_newsletterNudge()}>
 		{#snippet children(text, attrs)}<p class="nudge" {...attrs}>{text}</p>{/snippet}
@@ -76,10 +68,10 @@
 {:else}
 	<ul>
 		{#each jobs as job (job.slug)}
-			{@const edit = editMapFor(job)}
+			{@const edit = list.mapFor(job)}
 			{@const rows = [
 				edit?.postedOn && { descriptor: edit.postedOn, value: job.postedOn },
-				edit?.status && { descriptor: edit.status, value: job.draft ? 'false' : 'true' }
+				edit?.status && { descriptor: edit.status, value: !job.draft }
 			].filter((row) => row !== undefined)}
 			<li>
 				<!-- Inside the li — see CollaboratorList. -->
@@ -108,9 +100,9 @@
 				</EditFrame>
 			</li>
 		{/each}
-		{#if structural && collection}
+		{#if list.add}
 			<li class="add-slot">
-				<AddSlot op={{ kind: 'create', collection }} />
+				<AddSlot op={list.add} />
 			</li>
 		{/if}
 	</ul>

@@ -15,5 +15,5 @@ export * from './forms/index.js';
 export * from './config/index.js';
 export * from './edit/index.js';
 
-// Path utility shared with host apps.
-export { isPathUnder } from './utils/paths.js';
+// Path utilities shared with host apps.
+export { buildQueryString, isPathUnder } from './utils/paths.js';

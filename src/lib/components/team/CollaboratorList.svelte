@@ -22,7 +22,7 @@
 	import AddSlot from '../../edit/chrome/AddSlot.svelte';
 	import EditFrame from '../../edit/chrome/EditFrame.svelte';
 	import EditPanel from '../../edit/chrome/EditPanel.svelte';
-	import { getEditAdapter } from '../../edit/context.js';
+	import { collectionEditing } from '../../edit/collection.svelte.js';
 	import type { CollectionRef } from '../../edit/types.js';
 
 	interface Props {
@@ -39,18 +39,12 @@
 
 	let { collaborators, editFor, collection }: Props = $props();
 
-	const adapter = getEditAdapter();
-
-	const structural = $derived(
-		collection !== undefined && (adapter?.isEditing ?? false) && adapter?.applyOp !== undefined
-	);
-
-	/** The map the host gave, plus removal — the list owns identity. */
-	function editMapFor(collaborator: CollaboratorData): CollaboratorEditMap | undefined {
-		const map = editFor?.(collaborator);
-		if (!structural || !collection || collaborator.id === undefined) return map;
-		return { ...map, removeOp: { kind: 'remove', collection, id: collaborator.id } };
-	}
+	// The structural half (add slot, removal for rows with an id) — see
+	// collectionEditing.
+	const list = collectionEditing<CollaboratorData, CollaboratorEditMap>(() => ({
+		collection,
+		editFor
+	}));
 
 	function rowsFor(collaborator: CollaboratorData, map: CollaboratorEditMap | undefined) {
 		return [
@@ -63,7 +57,7 @@
 
 <ul>
 	{#each collaborators as collaborator (collaborator.id ?? collaborator.personName + collaborator.affiliation)}
-		{@const map = editMapFor(collaborator)}
+		{@const map = list.mapFor(collaborator)}
 		{@const rows = rowsFor(collaborator, map)}
 		<li>
 			<!-- Inside the li, so the list's own layout never gains a child. -->
@@ -89,9 +83,9 @@
 			</EditFrame>
 		</li>
 	{/each}
-	{#if structural && collection}
+	{#if list.add}
 		<li class="add-slot">
-			<AddSlot op={{ kind: 'create', collection }} />
+			<AddSlot op={list.add} />
 		</li>
 	{/if}
 </ul>

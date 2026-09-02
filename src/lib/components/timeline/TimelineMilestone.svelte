@@ -13,7 +13,7 @@
 		category?: PropertyDescriptor;
 		linkUrl?: PropertyDescriptor;
 		image?: PropertyDescriptor;
-		/** Editorial state row; value derives from `draft` ('false' when draft). */
+		/** Editorial-state `flag` row; on while the milestone is not a draft. */
 		status?: PropertyDescriptor;
 		/** Accessible name for the frame, e.g. "Fita: Neix la fundació". */
 		label?: string;
@@ -67,7 +67,7 @@
 			},
 			edit?.linkUrl && { descriptor: edit.linkUrl, value: milestone.linkUrl },
 			edit?.image && { descriptor: edit.image, value: milestone.imageUrls[0] ?? null },
-			edit?.status && { descriptor: edit.status, value: milestone.draft ? 'false' : 'true' }
+			edit?.status && { descriptor: edit.status, value: !milestone.draft }
 		].filter((row) => row !== undefined)
 	);
 
