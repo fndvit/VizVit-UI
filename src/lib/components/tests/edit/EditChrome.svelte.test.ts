@@ -203,7 +203,7 @@ describe('EditPanel rows', () => {
 					// panel keys rows by ref + label).
 					{
 						descriptor: {
-							ref: { ...flagDescriptor.ref, field: 'is_published' },
+							ref: { kind: 'entity', entity: 'job_openings', id: 7, field: 'is_published' },
 							type: 'flag',
 							label: 'Publicació'
 						},
