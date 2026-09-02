@@ -112,6 +112,13 @@ export interface UiMessages {
 	comments_loginPrompt(): string;
 	comments_loginLink(): string;
 	comments_signupLink(): string;
+	/**
+	 * OPTIONAL — the login/signup destinations, added after the catalogs these
+	 * components first shipped with. A host without the keys keeps the
+	 * built-in /login and /signup paths, byte-identically.
+	 */
+	comments_loginLinkHref?(): string;
+	comments_signupLinkHref?(): string;
 	reaction_like(): string;
 	reaction_love(): string;
 	reaction_clap(): string;

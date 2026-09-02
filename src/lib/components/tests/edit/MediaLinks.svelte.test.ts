@@ -170,7 +170,7 @@ describe('nav/footer structural editing', () => {
 });
 
 describe('newsletter links join edit mode', () => {
-	it('the signup/login links swap for editable labels while editing', () => {
+	it('the signup/login links swap for the link modal while editing', () => {
 		const { container } = render(MediaLinksProbe, {
 			props: {
 				show: 'newsletter',
@@ -178,10 +178,10 @@ describe('newsletter links join edit mode', () => {
 				messageEdit: (key) => chromeEdit(key, 'ca')
 			}
 		});
-		const editables = [...container.querySelectorAll('.action-label')].map((el) =>
-			el.textContent?.trim()
-		);
-		expect(editables.length).toBeGreaterThanOrEqual(2);
+		// LinkEdit's swap replaced the plain label swap: one modal edits the
+		// link's text AND destination (LinkEdit.svelte.test.ts owns the modal).
+		const swaps = [...container.querySelectorAll('.link-swap')].map((el) => el.textContent?.trim());
+		expect(swaps.length).toBeGreaterThanOrEqual(2);
 		expect(container.querySelector('a[href*="/signup"]')).toBeNull();
 	});
 });

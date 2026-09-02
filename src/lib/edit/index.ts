@@ -7,6 +7,7 @@ export { default as EditFrame } from './chrome/EditFrame.svelte';
 export type { EditFrameSpec } from './chrome/EditFrame.svelte';
 export { default as EditPanel } from './chrome/EditPanel.svelte';
 export { default as EditPopover } from './chrome/EditPopover.svelte';
+export { default as LinkEdit } from './chrome/LinkEdit.svelte';
 export {
 	chromeEdit,
 	chromeProperty,
