@@ -50,6 +50,16 @@ edit('body', { format: 'richtext' });
 chromeEdit('footer_rights', locale);
 ```
 
+Labels of INTERACTIVE controls — nav links, submit buttons, pagination —
+edit through `ActionLabel`: while the adapter is editing, the control is
+replaced by its label as editable text (a caret inside a live control would
+activate it) and comes back when editing turns off. `Nav` and `Footer` take
+an `editFor(link)` prop because the host owns the keys behind its links; the
+form buttons and Pagination resolve their own keys through
+`config.messageEdit`. Still not editable in place: `<select>` options and
+`<option>`/placeholder/aria strings — those stay with the host's wording
+editor.
+
 Interface wording is offered by the components themselves: pass
 `messageEdit: (key) => chromeEdit(key, locale)` in the `UiProvider` config and
 each component wraps its own parameterless, plain-text message sites in

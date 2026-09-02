@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getUiConfig } from '../../config/context.js';
+	import ActionLabel from '../../edit/ActionLabel.svelte';
 	import Link from './Link.svelte';
 
 	/**
@@ -37,21 +38,32 @@
 
 {#if pages > 1 || isOutOfRange}
 	<nav class="pagination" aria-label={msg.pagination_label()}>
-		{#if hasPrevious}
-			<Link href={href(previousPage)} rel="prev">{msg.pagination_previous()}</Link>
-		{:else}
-			<span class="disabled">{msg.pagination_previous()}</span>
-		{/if}
+		<ActionLabel
+			edit={config.messageEdit?.('pagination_previous')}
+			value={msg.pagination_previous()}
+		>
+			{#snippet control()}
+				{#if hasPrevious}
+					<Link href={href(previousPage)} rel="prev">{msg.pagination_previous()}</Link>
+				{:else}
+					<span class="disabled">{msg.pagination_previous()}</span>
+				{/if}
+			{/snippet}
+		</ActionLabel>
 
 		<p class="status" aria-live="polite">
 			{msg.pagination_status({ page, pages })}
 		</p>
 
-		{#if hasNext}
-			<Link href={href(page + 1)} rel="next">{msg.pagination_next()}</Link>
-		{:else}
-			<span class="disabled">{msg.pagination_next()}</span>
-		{/if}
+		<ActionLabel edit={config.messageEdit?.('pagination_next')} value={msg.pagination_next()}>
+			{#snippet control()}
+				{#if hasNext}
+					<Link href={href(page + 1)} rel="next">{msg.pagination_next()}</Link>
+				{:else}
+					<span class="disabled">{msg.pagination_next()}</span>
+				{/if}
+			{/snippet}
+		</ActionLabel>
 	</nav>
 {/if}
 

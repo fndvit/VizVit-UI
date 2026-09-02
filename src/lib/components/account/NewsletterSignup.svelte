@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getUiConfig } from '../../config/context.js';
+	import ActionLabel from '../../edit/ActionLabel.svelte';
 	import Editable from '../../edit/Editable.svelte';
 	import { withNewsletterIntent } from '../../forms/transport.js';
 	import type { NewsletterToggleFormInstance } from './AccountPanel.svelte';
@@ -61,9 +62,16 @@
 			<form {...f}>
 				<input {...f.fields.action.as('hidden', 'subscribe')} />
 				<LocaleField field={f.fields.locale} />
-				<Button type="submit" pending={f.pending}>
-					{msg.account_newsletterSubscribe()}
-				</Button>
+				<ActionLabel
+					edit={config.messageEdit?.('account_newsletterSubscribe')}
+					value={msg.account_newsletterSubscribe()}
+				>
+					{#snippet control()}
+						<Button type="submit" pending={f.pending}>
+							{msg.account_newsletterSubscribe()}
+						</Button>
+					{/snippet}
+				</ActionLabel>
 			</form>
 			{#if f.result}
 				<div class="feedback-slot">

@@ -1,4 +1,5 @@
 export { getEditAdapter, setEditAdapter } from './context.js';
+export { default as ActionLabel } from './ActionLabel.svelte';
 export { default as Editable } from './Editable.svelte';
 export { chromeEdit, entityEdit, pageCopyEdit } from './helpers.js';
 export { localize } from './types.js';

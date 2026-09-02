@@ -10,6 +10,7 @@
 
 <script lang="ts">
 	import { getUiConfig } from '../../config/context.js';
+	import ActionLabel from '../../edit/ActionLabel.svelte';
 	import Editable from '../../edit/Editable.svelte';
 	import { COMMENT_BODY } from '../../forms/constraints.js';
 	import type { CommentData, CommentThreadData } from '../../content/types.js';
@@ -118,9 +119,16 @@
 								<input {...reply.fields.weeklySlug.as('hidden', weeklySlug)} />
 								<input {...reply.fields.parentId.as('hidden', String(thread.id))} />
 								<div class="actions">
-									<Button type="submit" pending={reply.pending}>
-										{msg.comments_replySubmit()}
-									</Button>
+									<ActionLabel
+										edit={config.messageEdit?.('comments_replySubmit')}
+										value={msg.comments_replySubmit()}
+									>
+										{#snippet control()}
+											<Button type="submit" pending={reply.pending}>
+												{msg.comments_replySubmit()}
+											</Button>
+										{/snippet}
+									</ActionLabel>
 								</div>
 								<FormErrorFeedback result={reply.result} messages={errorMessages} />
 							</form>
@@ -148,7 +156,11 @@
 			<input {...main.fields.weeklySlug.as('hidden', weeklySlug)} />
 
 			<div class="actions">
-				<Button type="submit" pending={main.pending}>{msg.comments_submit()}</Button>
+				<ActionLabel edit={config.messageEdit?.('comments_submit')} value={msg.comments_submit()}>
+					{#snippet control()}
+						<Button type="submit" pending={main.pending}>{msg.comments_submit()}</Button>
+					{/snippet}
+				</ActionLabel>
 			</div>
 
 			<FormErrorFeedback result={main.result} messages={errorMessages} />
