@@ -52,8 +52,72 @@ export interface EditDescriptor {
 }
 
 /**
+ * The value kinds a property panel can edit. Everything in this content model
+ * serializes to a string on the wire — an ISO date, a URL, an enum member, a
+ * storage path — so there is no typed value union: the ADAPTER parses, and
+ * the host's schemas stay the sole validators.
+ */
+export type PropertyType = 'text' | 'url' | 'date' | 'select' | 'image';
+
+/** One choice of a `select` property. */
+export interface PropertyOption {
+	value: string;
+	label: string;
+}
+
+/**
+ * Identity + shape of one panel-edited property. Unlike `EditDescriptor`,
+ * `locale` is optional: dates, urls, enum members and image paths are not
+ * localized, and its absence says so to the adapter.
+ */
+export interface PropertyDescriptor {
+	ref: ContentRef;
+	/** Present only for localized text properties. */
+	locale?: Locale;
+	type: PropertyType;
+	/** Panel row label — required, the panel renders it. */
+	label: string;
+	/** Required when `type` is 'select'. */
+	options?: readonly PropertyOption[];
+	placeholder?: string;
+	/** Clearing the field saves null (linkUrl, externalUrl). */
+	nullable?: boolean;
+}
+
+/**
+ * Names one entity collection at one render site. `scope` disambiguates when
+ * the same entity renders in several lists (a board grid vs. a full roster).
+ */
+export interface CollectionRef {
+	entity: EditableEntity;
+	scope?: string;
+}
+
+/**
+ * A structural collection operation. Deliberately WITHOUT an `update` verb:
+ * field values always travel through `save`/`saveProperty` — one save path
+ * per value — and ops stay purely about existence and order.
+ */
+export type EntityOp =
+	| {
+			kind: 'create';
+			collection: CollectionRef;
+			anchor?: { id: string | number; placement: 'before' | 'after' };
+	  }
+	| { kind: 'remove'; collection: CollectionRef; id: string | number }
+	| {
+			kind: 'reorder';
+			collection: CollectionRef;
+			id: string | number;
+			anchor: { id: string | number; placement: 'before' | 'after' };
+	  };
+
+/**
  * What a consuming app plugs in to make the components writable. The package
- * never talks to a database: `save` is the whole persistence contract.
+ * never talks to a database: `save` is the whole persistence contract for
+ * inline text, and the three OPTIONAL members below are the property-panel
+ * and structural halves — leave them off and the components render no panel
+ * or collection affordance at all, byte-identical to a read-only build.
  *
  * Implementations must:
  * - back `isEditing` with reactive state (`$state`) — it gates every edit
@@ -68,4 +132,16 @@ export interface EditDescriptor {
 export interface EditAdapter {
 	readonly isEditing: boolean;
 	save(descriptor: EditDescriptor, value: string): Promise<void>;
+	/**
+	 * Panel property save. The value stays a string on the wire (ISO date,
+	 * url, enum member, image path); `null` clears a `nullable` property.
+	 */
+	saveProperty?(descriptor: PropertyDescriptor, value: string | null): Promise<void>;
+	/**
+	 * Structural collection ops. `create` may resolve the new row's id so the
+	 * UI can point at it after the host's refresh.
+	 */
+	applyOp?(op: EntityOp): Promise<{ id?: string | number } | void>;
+	/** Image upload; resolves to the stored path an `image` property saves. */
+	uploadImage?(descriptor: PropertyDescriptor, file: File): Promise<string>;
 }
