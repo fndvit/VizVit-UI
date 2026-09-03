@@ -116,6 +116,23 @@ describe('milestone link_url', () => {
 		expect(anchor().getAttribute('href')).toBe('//diari.example/article');
 		expect(anchor().getAttribute('rel')).toBe('external noopener');
 	});
+
+	/**
+	 * The case the old classifier got backwards. It asked for '//' after an
+	 * optional scheme, so a scheme with none read as INTERNAL, went to Link,
+	 * and came back out of the locale resolver unchanged — a stored
+	 * 'javascript:' destination reached the rendered anchor intact.
+	 */
+	it('emits no destination for a scheme that is neither a path nor http(s)', () => {
+		for (const hostile of ['javascript:alert(1)', 'data:text/html,<script>', 'https:evil']) {
+			document.body.innerHTML = '';
+			render(Timeline, { milestones: withLink(hostile), variant: 'full' });
+
+			// The label still renders; what it does NOT do is navigate.
+			expect(anchor().hasAttribute('href'), hostile).toBe(false);
+			expect(document.body.innerHTML, hostile).not.toContain(hostile);
+		}
+	});
 });
 
 describe('Timeline collection ops', () => {

@@ -30,6 +30,7 @@
 	import EditPanel from '../../edit/chrome/EditPanel.svelte';
 	import Editable from '../../edit/Editable.svelte';
 	import { MILESTONE_CATEGORY_COLOR, milestoneCategoryLabel } from '../../utils/milestones.js';
+	import { isExternalUrl } from '../../utils/paths.js';
 	import CardMedia from '../ui/CardMedia.svelte';
 	import DraftBadge from '../../edit/chrome/DraftBadge.svelte';
 	import DateText from '../ui/DateText.svelte';
@@ -96,7 +97,13 @@
 	 * predicate — they never route the value through Link, so nothing splices a
 	 * locale into it.
 	 */
-	const isExternal = $derived(/^(?:[a-z][a-z0-9+.-]*:)?\/\//i.test(milestone.linkUrl ?? ''));
+	// An ALLOW-LIST, not "does it look absolute". The predicate here used to be
+	// /^(?:[a-z][a-z0-9+.-]*:)?\/\//i — it asks for '//', so any scheme
+	// without one ('javascript:alert(1)') read as INTERNAL and went to Link,
+	// which handed it to the locale resolver and got it back unchanged. A
+	// destination that is neither a path nor an http(s) URL now renders no
+	// link at all rather than choosing between two wrong branches.
+	const isExternal = $derived(isExternalUrl(milestone.linkUrl ?? ''));
 </script>
 
 <article style={`--milestone-color: ${color}`}>

@@ -7,6 +7,8 @@
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
 		"prepack": "svelte-kit sync && svelte-package && publint",
+		"_comment:prepublishOnly": "Publishing is MANUAL (the release workflow has no NPM_TOKEN and fails on every tag), so the gate belongs on the command that actually publishes. npm runs this before prepack.",
+		"prepublishOnly": "npm run lint && npm run check && npm run test:unit -- --run",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"format": "prettier --write .",
