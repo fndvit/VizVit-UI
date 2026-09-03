@@ -16,4 +16,4 @@ export * from './config/index.js';
 export * from './edit/index.js';
 
 // Path utilities shared with host apps.
-export { buildQueryString, isPathUnder } from './utils/paths.js';
+export { buildQueryString, isExternalUrl, isInternalPath, isPathUnder } from './utils/paths.js';
