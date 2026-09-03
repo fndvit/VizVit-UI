@@ -2,13 +2,16 @@
 	import { getUiConfig } from '../../config/context.js';
 	import type { ParameterlessKey } from '../../config/types.js';
 	import { getEditAdapter } from '../context.js';
+	import { commitState, propertyValue } from '../commit.svelte.js';
 	import type { PropertyDescriptor, PropertyValue } from '../types.js';
 
 	/**
 	 * One property of an EditPanel: label, a control by `descriptor.type`, and
-	 * its own commit lifecycle — Editable's state machine, panel-shaped. Each
-	 * row commits on change/blur independently; a failed save keeps the draft
-	 * in the control so nothing typed is lost.
+	 * its own commit lifecycle — literally Editable's now, through
+	 * `../commit.svelte.js`, where it used to be a second copy of the same
+	 * four states, the same follow-the-prop effect and the same three
+	 * announcements. Each row commits on change/blur independently; a failed
+	 * save keeps the draft in the control so nothing typed is lost.
 	 *
 	 * The row assumes an adapter with `saveProperty` exists — EditPanel only
 	 * renders when the frame's triple gate already established both.
@@ -34,61 +37,40 @@
 	/** A flag state's wording, from the same catalog the site renders. */
 	const wording = (key: ParameterlessKey): string => config.messages[key]?.() ?? key;
 
-	let status = $state<'idle' | 'dirty' | 'saving' | 'error'>('idle');
-	let announcement = $state('');
-	/** Last persisted value, what a failed draft is measured against. */
 	// svelte-ignore state_referenced_locally
-	let savedValue = $state(asText(value));
+	const commit_ = commitState(asText(value), config.editMessages);
 	// svelte-ignore state_referenced_locally
 	let draft = $state(asText(value));
 	let fileInput: HTMLInputElement | undefined = $state();
 
-	// Follow the prop only while idle — never repaint a held draft (the
-	// Editable rule).
-	// svelte-ignore state_referenced_locally
-	let lastPropValue = $state(asText(value));
 	$effect(() => {
-		const next = asText(value);
-		if (next !== lastPropValue) {
-			lastPropValue = next;
-			if (status === 'idle') {
-				savedValue = next;
-				draft = next;
-			}
-		}
+		const adopted = commit_.follow(asText(value));
+		if (adopted !== null) draft = adopted;
 	});
 
 	async function persist(next: PropertyValue): Promise<void> {
 		if (!adapter?.saveProperty) return;
-		status = 'saving';
-		announcement = config.editMessages.edit_saving();
-		try {
-			await adapter.saveProperty(descriptor, next);
-			savedValue = asText(next);
-			draft = asText(next);
-			status = 'idle';
-			announcement = config.editMessages.edit_saved();
-		} catch {
-			// Draft stays in the control; the editor decides whether to retry.
-			status = 'error';
-			announcement = config.editMessages.edit_saveError();
-		}
+		const landed = await commit_.commit(asText(next), () =>
+			adapter.saveProperty!(descriptor, next)
+		);
+		// Draft stays in the control on failure; the editor decides whether to
+		// retry. On success it takes the value the adapter actually stored.
+		if (landed) draft = asText(next);
 	}
 
 	function commit(): void {
 		const trimmed = draft.trim();
-		if (trimmed === savedValue) {
-			status = 'idle';
+		if (trimmed === commit_.saved) {
+			commit_.settle();
 			return;
 		}
 		if (descriptor.type === 'flag') {
-			void persist(trimmed === 'true');
+			void persist(propertyValue(descriptor, trimmed));
 			return;
 		}
 		if (trimmed === '') {
 			if (!descriptor.nullable) {
-				status = 'error';
-				announcement = config.editMessages.edit_emptyRequired();
+				commit_.refuse(config.editMessages.edit_emptyRequired());
 				return;
 			}
 			void persist(null);
@@ -98,20 +80,21 @@
 	}
 
 	function markDirty(): void {
-		if (status !== 'saving') status = 'dirty';
+		commit_.markDirty();
 	}
 
 	async function upload(event: Event): Promise<void> {
 		const file = (event.currentTarget as HTMLInputElement).files?.[0];
 		if (!file || !adapter?.uploadImage) return;
-		status = 'saving';
-		announcement = config.editMessages.edit_saving();
 		try {
-			const path = await adapter.uploadImage(descriptor, file);
-			await persist(path);
-		} catch {
-			status = 'error';
-			announcement = config.editMessages.edit_saveError();
+			// The upload and the write are ONE gesture to the editor, so the
+			// upload runs inside the same commit: a failed upload reports as a
+			// failed save, which is what it is from the panel's side.
+			await commit_.commit(asText(value), async () => {
+				const path = await adapter.uploadImage!(descriptor, file);
+				await adapter.saveProperty!(descriptor, path);
+				draft = asText(path);
+			});
 		} finally {
 			if (fileInput) fileInput.value = '';
 		}
@@ -127,7 +110,7 @@
 	{#if descriptor.type === 'select'}
 		<select
 			{id}
-			data-vit-editing={status}
+			data-vit-editing={commit_.status}
 			value={draft}
 			onchange={(event) => {
 				draft = event.currentTarget.value;
@@ -143,7 +126,7 @@
 		     (published/draft, open/closed), the adapter receives a boolean. -->
 		<select
 			{id}
-			data-vit-editing={status}
+			data-vit-editing={commit_.status}
 			value={draft}
 			onchange={(event) => {
 				draft = event.currentTarget.value;
@@ -154,13 +137,13 @@
 			<option value="false">{wording(descriptor.off ?? 'status_draft')}</option>
 		</select>
 	{:else if descriptor.type === 'image'}
-		{#if savedValue}
-			<img class="thumb" src={savedValue} alt="" />
+		{#if commit_.saved}
+			<img class="thumb" src={commit_.saved} alt="" />
 		{/if}
 		<input
 			{id}
 			type="text"
-			data-vit-editing={status}
+			data-vit-editing={commit_.status}
 			placeholder={descriptor.placeholder}
 			bind:value={draft}
 			oninput={markDirty}
@@ -183,7 +166,7 @@
 		<input
 			{id}
 			type={descriptor.type === 'date' ? 'date' : descriptor.type === 'url' ? 'url' : 'text'}
-			data-vit-editing={status}
+			data-vit-editing={commit_.status}
 			placeholder={descriptor.placeholder}
 			bind:value={draft}
 			oninput={markDirty}
@@ -191,7 +174,7 @@
 		/>
 	{/if}
 
-	{#if descriptor.nullable && savedValue !== ''}
+	{#if descriptor.nullable && commit_.saved !== ''}
 		<button
 			type="button"
 			class="aux"
@@ -204,7 +187,7 @@
 		</button>
 	{/if}
 
-	<span class="status" role="status">{announcement}</span>
+	<span class="status" role="status">{commit_.announcement}</span>
 </div>
 
 <style>
