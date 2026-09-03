@@ -2,6 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import { getUiConfig } from '../config/context.js';
 	import { getEditAdapter } from './context.js';
+	import { commitState } from './commit.svelte.js';
 	import type { EditDescriptor } from './types.js';
 
 	/**
@@ -58,30 +59,22 @@
 	const adapter = getEditAdapter();
 	const config = getUiConfig();
 
-	let status = $state<'idle' | 'dirty' | 'saving' | 'error'>('idle');
-	/** Last persisted value: what Escape restores and blur diffs against. */
+	/**
+	 * The commit lifecycle — the four states, the announcements, the last
+	 * persisted value and the follow-the-prop rule — is shared with
+	 * `PropertyRow` (see `./commit.svelte.js`). What stays here is where the
+	 * DRAFT lives: in the DOM, because this is a contenteditable.
+	 */
 	// svelte-ignore state_referenced_locally
-	let savedValue = $state(value);
+	const commit_ = commitState(value, config.editMessages);
 	/** What the child snippet renders. Only rewritten while the DOM is not
 	 * being typed in — Svelte and the reader must not fight over the node. */
 	// svelte-ignore state_referenced_locally
 	let renderText = $state(value);
-	let announcement = $state('');
 
-	// Follow the prop when the app reloads content underneath us — and only
-	// then. Diffing against savedValue instead would fire after every save,
-	// where savedValue has legitimately advanced past the prop, and repaint
-	// the committed draft with stale copy. Never over a draft being held.
-	// svelte-ignore state_referenced_locally
-	let lastPropValue = $state(value);
 	$effect(() => {
-		if (value !== lastPropValue) {
-			lastPropValue = value;
-			if (status === 'idle') {
-				savedValue = value;
-				renderText = value;
-			}
-		}
+		const adopted = commit_.follow(value);
+		if (adopted !== null) renderText = adopted;
 	});
 
 	const active = $derived(edit !== undefined && (adapter?.isEditing ?? false));
@@ -108,35 +101,27 @@
 		range.deleteContents();
 		range.insertNode(document.createTextNode(multiline ? text : text.replace(/\s*\n\s*/g, ' ')));
 		selection.collapseToEnd();
-		status = 'dirty';
+		commit_.markDirty();
 	}
 
 	function handleInput(): void {
-		if (status !== 'saving') status = 'dirty';
+		commit_.markDirty();
 	}
 
 	async function commit(element: HTMLElement): Promise<void> {
 		if (!edit || !adapter) return;
 		const draft = textOf(element).trim();
-		if (draft === savedValue) {
-			status = 'idle';
+		if (draft === commit_.saved) {
+			commit_.settle();
 			return;
 		}
-		status = 'saving';
-		announcement = config.editMessages.edit_saving();
-		try {
-			await adapter.save(edit, draft);
-			savedValue = draft;
-			status = 'idle';
-			announcement = config.editMessages.edit_saved();
-		} catch {
-			// Draft stays in the DOM; the reader decides whether to retry.
-			status = 'error';
-			announcement = config.editMessages.edit_saveError();
-		}
+		// A failed save leaves the draft in the DOM; the reader decides whether
+		// to retry.
+		await commit_.commit(draft, () => adapter.save(edit, draft));
 	}
 
 	function handleBlur(event: FocusEvent): void {
+		const status = commit_.status;
 		if (status === 'dirty' || status === 'error') void commit(event.currentTarget as HTMLElement);
 	}
 
@@ -146,9 +131,8 @@
 			// Svelte's cached text still equals renderText, so a state write
 			// alone cannot repaint a node the reader has mutated: restore the
 			// DOM directly, then settle.
-			element.textContent = savedValue;
-			status = 'idle';
-			announcement = '';
+			element.textContent = commit_.saved;
+			commit_.revert();
 			element.blur();
 			return;
 		}
@@ -168,7 +152,7 @@
 					role: 'textbox',
 					'aria-label': edit?.label,
 					'aria-multiline': multiline ? 'true' : undefined,
-					'data-vit-editing': status,
+					'data-vit-editing': commit_.status,
 					onbeforeinput: handleBeforeInput,
 					oninput: handleInput,
 					onblur: handleBlur,
@@ -181,7 +165,7 @@
 
 {@render children(renderText, attrs)}
 {#if active}
-	<span class="status" role="status">{announcement}</span>
+	<span class="status" role="status">{commit_.announcement}</span>
 {/if}
 
 <style>

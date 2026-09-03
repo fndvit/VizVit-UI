@@ -4,7 +4,9 @@
 	import Icon from '../../components/ui/Icon.svelte';
 	import Modal from '../../components/ui/Modal.svelte';
 	import { getUiConfig } from '../../config/context.js';
+	import type { ParameterlessKey } from '../../config/types.js';
 	import { getEditAdapter } from '../context.js';
+	import { propertyValue } from '../commit.svelte.js';
 	import type { EditDescriptor, EntityOp, PropertyDescriptor } from '../types.js';
 	import ConfirmDialog from './ConfirmDialog.svelte';
 
@@ -31,7 +33,11 @@
 		href: { descriptor: PropertyDescriptor | undefined; value: string };
 		/**
 		 * Extra property rows under Adreça — a menu link's Ordre. Labelled from
-		 * their descriptors, committed on Desa only when changed.
+		 * their descriptors, committed on Desa only when changed, and rendered
+		 * BY TYPE: this used to be a bare text input whatever the descriptor
+		 * said, which made it a second renderer that would silently miss any
+		 * property type the package grew. An `image` row has no place in a link
+		 * modal and is the one type refused here.
 		 */
 		extras?: { descriptor: PropertyDescriptor; value: string | null }[];
 		/** With `adapter.applyOp`, the modal gains a confirmed Elimina action. */
@@ -57,7 +63,14 @@
 	const editing = $derived(text.edit !== undefined && (adapter?.isEditing ?? false));
 	// Every field beyond the text needs both a place and a verb to save with.
 	const editsHref = $derived(href.descriptor !== undefined && adapter?.saveProperty !== undefined);
-	const editableExtras = $derived(adapter?.saveProperty !== undefined ? (extras ?? []) : []);
+	const editableExtras = $derived(
+		adapter?.saveProperty !== undefined
+			? (extras ?? []).filter((extra) => extra.descriptor.type !== 'image')
+			: []
+	);
+
+	/** A flag state's wording, from the same catalog the site renders. */
+	const wording = (key: ParameterlessKey): string => config.messages[key]?.() ?? key;
 	const removable = $derived(removeOp !== undefined && adapter?.applyOp !== undefined);
 
 	let open = $state(false);
@@ -104,7 +117,8 @@
 			for (const [index, extra] of editableExtras.entries()) {
 				const next = draftExtras[index].trim();
 				if (next === (extra.value ?? '')) continue;
-				await adapter.saveProperty!(extra.descriptor, next);
+				// A flag extra hands the adapter a BOOLEAN, like a panel row does.
+				await adapter.saveProperty!(extra.descriptor, propertyValue(extra.descriptor, next));
 				draftExtras[index] = next;
 			}
 			open = false;
@@ -167,7 +181,25 @@
 			{#each editableExtras as extra, index (index)}
 				<label>
 					<span>{extra.descriptor.label}</span>
-					<input type="text" bind:value={draftExtras[index]} disabled={saving} />
+					{#if extra.descriptor.type === 'select'}
+						<select bind:value={draftExtras[index]} disabled={saving}>
+							{#each extra.descriptor.options ?? [] as option (option.value)}
+								<option value={option.value}>{option.label}</option>
+							{/each}
+						</select>
+					{:else if extra.descriptor.type === 'flag'}
+						<select bind:value={draftExtras[index]} disabled={saving}>
+							<option value="true">{wording(extra.descriptor.on ?? 'status_published')}</option>
+							<option value="false">{wording(extra.descriptor.off ?? 'status_draft')}</option>
+						</select>
+					{:else}
+						<input
+							type={extra.descriptor.type === 'date' ? 'date' : 'text'}
+							placeholder={extra.descriptor.placeholder}
+							bind:value={draftExtras[index]}
+							disabled={saving}
+						/>
+					{/if}
 				</label>
 			{/each}
 		</div>
