@@ -1,6 +1,6 @@
 export { renderBody } from './richtext.js';
 export type { RichTextBlock } from './richtext.js';
-export { CONTACT_CATEGORIES, REACTIONS } from './types.js';
+export { CONTACT_CATEGORIES, MILESTONE_CATEGORIES, PROJECT_KINDS, REACTIONS } from './types.js';
 export type {
 	CollaboratorData,
 	CommentData,

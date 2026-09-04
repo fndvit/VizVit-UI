@@ -101,6 +101,7 @@ const CONTRACT_MODULES = [
 	'config/edit-messages.ts',
 	'content/types.ts',
 	'edit/types.ts',
+	'edit/helpers.ts',
 	'utils/weekly-list-contract.ts',
 	'forms/constraints.ts',
 	'forms/transport.ts',

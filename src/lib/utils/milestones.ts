@@ -6,6 +6,11 @@ import type { MilestoneCategory } from '../content/types.js';
  * teal, slots are never reordered). Labels always accompany the color dot,
  * so color is never the only encoding. The --series-* tokens ship in
  * tokens.css.
+ *
+ * Keyed, not positional, so a member added to `MILESTONE_CATEGORIES` fails to
+ * compile here rather than silently taking slot 6 — and so the display order
+ * is `MILESTONE_CATEGORIES`' to decide, not a side effect of this literal's
+ * key order, which is what the panel select used to read.
  */
 export const MILESTONE_CATEGORY_COLOR: Record<MilestoneCategory, string> = {
 	foundation: 'var(--series-1)',
