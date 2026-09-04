@@ -12,7 +12,14 @@ import type { EditMessages } from './edit-messages.js';
  */
 export const LOCALES = ['ca', 'en', 'es'] as const;
 export type Locale = (typeof LOCALES)[number];
-export const BASE_LOCALE: Locale = 'ca';
+/**
+ * Declared as the LITERAL, not widened to `Locale`. `Exclude<Locale, typeof
+ * BASE_LOCALE>` is how a host names "the locales that are not canonical" —
+ * the set a translations editor fills from the canonical one — and the
+ * annotation threw that away, resolving it to `never`. A consumer that wants
+ * the wide type can still write `const l: Locale = BASE_LOCALE`.
+ */
+export const BASE_LOCALE = 'ca' satisfies Locale;
 
 /** One primary-navigation entry, rendered by Nav and repeated by Footer. */
 export interface SiteLink {
