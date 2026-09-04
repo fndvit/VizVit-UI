@@ -15,5 +15,10 @@ export * from './forms/index.js';
 export * from './config/index.js';
 export * from './edit/index.js';
 
-// Path utilities shared with host apps.
-export { buildQueryString, isExternalUrl, isInternalPath, isPathUnder } from './utils/paths.js';
+// Path utilities shared with host apps — the two that a host actually reads.
+// `isInternalPath` and `isExternalUrl` are NOT exported: they are the
+// destination classifiers `Link` and `TimelineMilestone` branch on, both
+// reached by a deep import inside this package, and nothing outside it ever
+// asked. Publishing them would pin two regexes into semver for no reader;
+// `paths.test.ts` is what holds them instead.
+export { buildQueryString, isPathUnder } from './utils/paths.js';
