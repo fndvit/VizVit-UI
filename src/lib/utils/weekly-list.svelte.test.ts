@@ -1,13 +1,12 @@
 import { flushSync } from 'svelte';
 import { describe, expect, it, vi } from 'vitest';
 import type { WeeklyCardData } from '../content/types.js';
+import { createWeeklyList, type WeeklyListConfig } from './weekly-list.svelte.js';
 import {
-	createWeeklyList,
 	WEEKLY_LIST_DEFAULTS,
-	type WeeklyListConfig,
 	type WeeklyListFilters,
 	type WeeklyListServerData
-} from './weekly-list.svelte.js';
+} from './weekly-list-contract.js';
 
 /**
  * These branches lived in a route file, where nothing could reach them: the

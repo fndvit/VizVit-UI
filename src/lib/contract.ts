@@ -20,6 +20,22 @@
  * It adds nothing. Every name below is already exported from a semantic
  * subpath and stays there — this is a second door into the same rooms, not a
  * new floor, and the barrel remains the surface a component host reads.
+ *
+ * It was cut to fit ONE consumer, and the second one did not fit through it.
+ * vit-brain's four restatements were the motive, so the first version carried
+ * the locale vocabulary, the edit contract and REACTIONS — and of the fifteen
+ * names fndvit-website's SERVER modules take from the barrel, it covered
+ * exactly one. Its `schemas/{common,auth,comment,contact}.ts` and
+ * `remote/result.ts` are read by `server/auth.ts`, `server/form-action.ts` and
+ * eleven repositories, so that site reaches a sixty-component graph to obtain
+ * string bounds and a hidden field's name.
+ *
+ * The fix moved no files, which is the tell that the seam was in the right
+ * place and merely too narrow: `forms/constraints.ts`, `forms/transport.ts`,
+ * `forms/types.ts` and `utils/paths.ts` were ALREADY component-free leaves —
+ * they import nothing but `content/types.js`, or nothing at all. They were
+ * what this subpath promises, with no door onto them. Now there is one, and
+ * the guard walks them like the rest.
  */
 
 export { LOCALES, BASE_LOCALE } from './config/types.js';
@@ -48,3 +64,45 @@ export type {
 
 export { REACTIONS } from './content/types.js';
 export type { Reaction, ReactionSummary, SortDirection } from './content/types.js';
+
+export { WEEKLY_LIST_DEFAULTS } from './utils/weekly-list-contract.js';
+export type {
+	WeeklyListFilters,
+	WeeklyListPage,
+	WeeklyListServerData
+} from './utils/weekly-list-contract.js';
+
+export { CONTACT_CATEGORIES } from './content/types.js';
+export type { ContactCategory, FieldConstraint, FormFailReason } from './content/types.js';
+
+export {
+	COMMENT_BODY,
+	CONTACT_MESSAGE,
+	CONTACT_NAME,
+	DISPLAY_NAME,
+	EMAIL,
+	LOGIN_PASSWORD,
+	PASSWORD
+} from './forms/constraints.js';
+
+export {
+	hasNewsletterIntent,
+	HONEYPOT_FIELD,
+	isNewsletterIntent,
+	NEWSLETTER_INTENT_PARAM,
+	NEWSLETTER_INTENT_VALUE,
+	withNewsletterIntent
+} from './forms/transport.js';
+
+export type {
+	FormFail,
+	FormFieldIssue,
+	FormResultLike,
+	FormResultOf,
+	KeyedRemoteForms,
+	RemoteField,
+	RemoteFormAttributes,
+	RemoteFormInstance
+} from './forms/types.js';
+
+export { buildQueryString, isExternalUrl, isInternalPath, isPathUnder } from './utils/paths.js';
