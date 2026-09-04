@@ -31,6 +31,7 @@ Everything exports flat from the root, and again grouped by role:
 | [`/community`](./docs/components/community.md)                  | AuthPageShell, LoginForm, SignupForm, GoogleAuthForm, AccountPanel, NewsletterSignup, CommentSection, ReactionBar, ContactForm                                                                           |
 | [`/edit`](./docs/edit-mode.md)                                  | Editable, setEditAdapter/getEditAdapter, descriptors and helpers, collectionEditing, LocalizedText                                                                                                       |
 | [`/config`](./docs/getting-started.md#wiring-an-app-uiprovider) | UiProvider, UiConfig, the locale set, the default Catalan messages                                                                                                                                       |
+| `/contract`                                                     | The component-free half: LOCALES, BASE_LOCALE, localize, REACTIONS and the edit-descriptor types — the one subpath a host may import from SERVER code                                                    |
 | `/testing`                                                      | createRemoteFormMock — the remote-form stand-in for stories and tests                                                                                                                                    |
 
 Every component renders standalone (Catalan copy, identity hrefs); an app
@@ -83,5 +84,8 @@ diffable against history. The public structure is the semantic entry points
 above, assembled in `src/lib/{primitives,chrome,content-components,community}.ts`
 and `src/lib/forms/index.ts`.
 
-Releases: bump with `npm version`, push the `v*` tag, and the release
-workflow publishes to npm (requires the `NPM_TOKEN` secret).
+Releases are MANUAL: bump with `npm version`, then `npm publish`. The
+workflow this paragraph used to describe fired on every `v*` tag, had no
+`NPM_TOKEN` and no lint, check or test step, so it failed every time and was
+deleted; `prepublishOnly` (lint, check, unit tests) is the only publish gate
+now. Push the tag by all means — nothing reads it.
