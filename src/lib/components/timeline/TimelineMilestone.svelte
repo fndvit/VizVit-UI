@@ -25,7 +25,7 @@
 <script lang="ts">
 	import { getUiConfig } from '../../config/context.js';
 	import ActionLabel from '../../edit/ActionLabel.svelte';
-	import type { MilestoneCategory, MilestoneData } from '../../content/types.js';
+	import { MILESTONE_CATEGORIES, type MilestoneData } from '../../content/types.js';
 	import EditFrame from '../../edit/chrome/EditFrame.svelte';
 	import EditPanel from '../../edit/chrome/EditPanel.svelte';
 	import Editable from '../../edit/Editable.svelte';
@@ -46,7 +46,7 @@
 
 	const config = getUiConfig();
 
-	const CATEGORIES = Object.keys(MILESTONE_CATEGORY_COLOR) as MilestoneCategory[];
+	// The set's own order, not a colour map's key order and not a cast.
 
 	/**
 	 * The panel rows, zipped from the map's descriptors and this milestone's
@@ -58,7 +58,7 @@
 			edit?.occurredOn && { descriptor: edit.occurredOn, value: milestone.occurredOn },
 			edit?.category && {
 				descriptor: {
-					options: CATEGORIES.map((category) => ({
+					options: MILESTONE_CATEGORIES.map((category) => ({
 						value: category,
 						label: milestoneCategoryLabel(category, config.messages)
 					})),

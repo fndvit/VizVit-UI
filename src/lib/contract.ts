@@ -65,6 +65,12 @@ export type {
 export { REACTIONS } from './content/types.js';
 export type { Reaction, ReactionSummary, SortDirection } from './content/types.js';
 
+// The two content vocabularies a host's zod enum derives from, the way its
+// contact form already derives from CONTACT_CATEGORIES below. Values, because
+// a type cannot be the source of an enum.
+export { MILESTONE_CATEGORIES, PROJECT_KINDS } from './content/types.js';
+export type { MilestoneCategory, ProjectKind } from './content/types.js';
+
 export { WEEKLY_LIST_DEFAULTS } from './utils/weekly-list-contract.js';
 export type {
 	WeeklyListFilters,
@@ -106,3 +112,23 @@ export type {
 } from './forms/types.js';
 
 export { buildQueryString, isExternalUrl, isInternalPath, isPathUnder } from './utils/paths.js';
+
+/**
+ * The descriptor factories. `edit/helpers.ts` imports nothing but types from
+ * two modules this subpath already anchors, so it needed a door rather than a
+ * split.
+ *
+ * They were reachable only beside the components, which cost vit-brain an
+ * eslint exception that switched `no-restricted-imports` off WHOLESALE for the
+ * two files calling one factory each — and one of those, `mirror.ts`, is
+ * already reached from a server repository by `import type`. A per-specifier
+ * door replaces a per-file hole.
+ */
+export {
+	chromeEdit,
+	chromeProperty,
+	collectionOf,
+	entityEdit,
+	entityProperty,
+	pageCopyEdit
+} from './edit/helpers.js';

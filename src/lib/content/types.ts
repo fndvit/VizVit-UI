@@ -34,7 +34,9 @@ export interface WeeklyCardData {
 	imageUrl: string;
 }
 
-export type ProjectKind = 'collaboration' | 'passion';
+/** The kinds a project can have, in display order — a host's enum derives from this. */
+export const PROJECT_KINDS = ['collaboration', 'passion'] as const;
+export type ProjectKind = (typeof PROJECT_KINDS)[number];
 
 /** A project as its card shows it. */
 export interface ProjectCardData {
@@ -51,7 +53,29 @@ export interface ProjectCardData {
 	hasStory: boolean;
 }
 
-export type MilestoneCategory = 'education' | 'lab' | 'foundation' | 'collaboration' | 'press';
+/**
+ * The timeline's categories, in DISPLAY ORDER — every select that offers them
+ * and every host enum derives from this.
+ *
+ * The order was an emergent property of two unrelated literals before: the
+ * panel select read `Object.keys(MILESTONE_CATEGORY_COLOR)` while vit-brain's
+ * record form spelled its own array, so one CMS offered the same field in two
+ * orders and seeded a new row with the third member of one of them. The order
+ * kept here is the colour map's, which is the one with a reason attached (its
+ * slots are fixed and never reordered).
+ *
+ * A tuple rather than a union for the reason `CONTACT_CATEGORIES` is one: a
+ * `satisfies readonly MilestoneCategory[]` binds the element type and never
+ * the list, so a host could drop a member and still compile.
+ */
+export const MILESTONE_CATEGORIES = [
+	'foundation',
+	'lab',
+	'education',
+	'collaboration',
+	'press'
+] as const;
+export type MilestoneCategory = (typeof MILESTONE_CATEGORIES)[number];
 
 /** One timeline milestone. */
 export interface MilestoneData {
