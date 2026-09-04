@@ -28,13 +28,15 @@ export {
 // The two list rules: URL-mirrored filters, and the weeklies index over them.
 export { createUrlFilters } from './utils/url-filters.svelte.js';
 export type { UrlFilters, UrlFiltersConfig } from './utils/url-filters.svelte.js';
-export { createWeeklyList, WEEKLY_LIST_DEFAULTS } from './utils/weekly-list.svelte.js';
+export { createWeeklyList } from './utils/weekly-list.svelte.js';
+export type { WeeklyList, WeeklyListConfig } from './utils/weekly-list.svelte.js';
+// The list's contract is component-free on purpose, so ./contract carries it
+// too — a host's +page.server.ts reads these without loading the grid.
+export { WEEKLY_LIST_DEFAULTS } from './utils/weekly-list-contract.js';
 export type {
-	WeeklyList,
-	WeeklyListConfig,
 	WeeklyListFilters,
 	WeeklyListPage,
 	WeeklyListServerData
-} from './utils/weekly-list.svelte.js';
+} from './utils/weekly-list-contract.js';
 export { contactCategoryLabel } from './utils/contact.js';
 export { formatDate, yearOf } from './utils/dates.js';

@@ -2,49 +2,15 @@ import type { Locale } from '../config/types.js';
 import type { SortDirection, WeeklyCardData } from '../content/types.js';
 import { buildQueryString } from './paths.js';
 import { createUrlFilters } from './url-filters.svelte.js';
-
-/**
- * The weeklies index's URL defaults: the value a param stands for when it is
- * absent. Both halves of the URL contract — this module omitting a default,
- * the host's query schema supplying one — must name the same values, so a
- * host derives its schema defaults from here rather than restating them.
- *
- * `pageSize` is here for the same reason one step further out. It is not a
- * URL param: it is what a page of this list HOLDS, which the grid this
- * package renders decides. Every host was spelling its own — fndvit-website
- * as `WEEKLIES_PAGE_SIZE`, vit-brain's mirror as a bare `12` in markup — and
- * the two must agree, because the mirror exists to page the same corpus the
- * site pages. Two repositories that cannot import each other were each
- * holding half of one number. `createWeeklyList` still READS the size from
- * `config.server().pageSize`, so a host may still answer something else; this
- * is the value it should answer unless it means to differ.
- */
-export const WEEKLY_LIST_DEFAULTS = { sort: 'desc', page: 1, pageSize: 12 } as const;
+import { WEEKLY_LIST_DEFAULTS } from './weekly-list-contract.js';
+import type {
+	WeeklyListFilters,
+	WeeklyListPage,
+	WeeklyListServerData
+} from './weekly-list-contract.js';
 
 /** The index's path, shared by the mirrored URL and the paging hrefs. */
 const WEEKLIES_PATH = '/weeklies';
-
-/** A type alias, not an interface: createUrlFilters needs an index signature. */
-export type WeeklyListFilters = {
-	q: string;
-	theme: string | null;
-	sort: SortDirection;
-};
-
-/** One page of the list plus the unpaged total (for the pagination). */
-export interface WeeklyListPage {
-	items: WeeklyCardData[];
-	total: number;
-}
-
-/** The server-rendered page, re-read on every navigation. */
-export interface WeeklyListServerData {
-	weeklies: WeeklyCardData[];
-	total: number;
-	page: number;
-	pageSize: number;
-	query: WeeklyListFilters;
-}
 
 export interface WeeklyListConfig {
 	/** Reads the route's `data`; called inside an effect, so it tracks it. */

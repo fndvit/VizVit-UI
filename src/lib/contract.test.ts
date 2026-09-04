@@ -100,7 +100,8 @@ const CONTRACT_MODULES = [
 	'config/types.ts',
 	'config/edit-messages.ts',
 	'content/types.ts',
-	'edit/types.ts'
+	'edit/types.ts',
+	'utils/weekly-list-contract.ts'
 ] as const;
 
 describe('the contract subpath', () => {
