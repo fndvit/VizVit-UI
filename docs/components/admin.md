@@ -8,9 +8,10 @@ through props — the same genericization contract as `Nav`/`Footer`.
 An admin app normally brings its own theme instead of `tokens.css` — see
 [tokens.md](../tokens.md) for the manifest its `:root` must cover.
 
-## AdminShell
+## Sidebar
 
-The page frame: a fixed icon rail on the left, content beside it.
+The rail, which a host lays out itself — the package ships no page frame, on
+the evidence that the only admin host composes its own.
 
 | Prop        | Type            | Notes                                                  |
 | ----------- | --------------- | ------------------------------------------------------ |
@@ -18,23 +19,9 @@ The page frame: a fixed icon rail on the left, content beside it.
 | `navLabel?` | `string`        | accessible name of the nav landmark (`'Principal'`)    |
 | `logo?`     | `Snippet`       | brand mark above the rail; the host owns its home link |
 | `footer?`   | `Snippet`       | bottom of the rail — the host's logout form            |
-| `children`  | `Snippet`       | the page content                                       |
 | `url?`      | `URL`           | highlighting override; tests and stories only          |
 
-```svelte
-<AdminShell items={visibleSections}>
-	{#snippet logo()}<a href="/" aria-label="Inici"><Logo size={30} /></a>{/snippet}
-	{#snippet footer()}
-		<form {...logoutForm}><button aria-label="Surt"><Icon name="logout" /></button></form>
-	{/snippet}
-	{@render children()}
-</AdminShell>
-```
-
-## Sidebar
-
-The rail on its own, for hosts that lay the shell out themselves. Same props
-as AdminShell minus `children`. `SidebarItem = { href, icon: IconName, label }`.
+`SidebarItem = { href, icon: IconName, label }`.
 The current section highlights by path (`isPathUnder`, read from
 `UiConfig.url()`); `/` matches only itself.
 

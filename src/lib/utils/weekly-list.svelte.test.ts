@@ -4,7 +4,7 @@ import type { WeeklyCardData } from '../content/types.js';
 import { createWeeklyList, type WeeklyListConfig } from './weekly-list.svelte.js';
 import {
 	WEEKLY_LIST_DEFAULTS,
-	type WeeklyListFilters,
+	parseWeeklyListUrl,
 	type WeeklyListServerData
 } from './weekly-list-contract.js';
 
@@ -65,21 +65,6 @@ function setup(options: { fetchPage?: WeeklyListConfig['fetchPage'] } = {}) {
 			data = serverData(next);
 			flushSync();
 		}
-	};
-}
-
-/**
- * The host's half of the URL contract, as the site's query schema reads a
- * URL: an absent param takes the declared default. Stated here so the test
- * below can cross both halves inside the package.
- */
-function parseListUrl(href: string): WeeklyListFilters & { page: number } {
-	const params = new URL(href, 'https://example.org').searchParams;
-	return {
-		q: params.get('q') ?? '',
-		theme: params.get('theme'),
-		sort: (params.get('sort') as WeeklyListFilters['sort'] | null) ?? WEEKLY_LIST_DEFAULTS.sort,
-		page: Number(params.get('page') ?? WEEKLY_LIST_DEFAULTS.page)
 	};
 }
 
@@ -231,11 +216,12 @@ describe('createWeeklyList', () => {
 
 	it('builds URLs that parse back to the filters they were built from', () => {
 		// The two halves of the URL contract live in different modules: this one
-		// omits a value it considers default, and the host's query schema
-		// supplies one when a param is absent. They have to name the same value
-		// — WEEKLY_LIST_DEFAULTS is exported so the schema can derive its
-		// defaults from it — and only a test that crosses both notices when
-		// they stop.
+		// omits a value it considers default, and the read half supplies one when
+		// a param is absent. Only a test that crosses both notices when they stop
+		// naming the same thing — and until `parseWeeklyListUrl` existed, this
+		// case crossed the write half against a `parseListUrl` declared in this
+		// file, so it could not fail for the reason it was written. It now runs
+		// against the function both hosts read a URL with.
 		const h = setup();
 
 		for (const filters of [
@@ -245,7 +231,7 @@ describe('createWeeklyList', () => {
 		]) {
 			h.list.update(filters);
 
-			const parsed = parseListUrl(h.list.hrefFor(1));
+			const parsed = parseWeeklyListUrl(h.list.hrefFor(1));
 
 			expect({ q: parsed.q, theme: parsed.theme, sort: parsed.sort }).toEqual(filters);
 			expect(parsed.page).toBe(WEEKLY_LIST_DEFAULTS.page);

@@ -15,13 +15,7 @@ export * from './forms/index.js';
 export * from './config/index.js';
 export * from './edit/index.js';
 
-// The one path utility a host actually reads: fndvit-website re-exports
-// `buildQueryString` from its own `utils/nav.ts`, so the URL a list mirrors
-// and the hrefs it renders are spelled by this function in both codebases.
-// The other three are NOT exported. `isInternalPath` and `isExternalUrl` are
-// the destination classifiers `Link` and `TimelineMilestone` branch on, and
-// `isPathUnder` is the prefix match `Nav` and `Sidebar` highlight the current
-// section with — all four in-package readers reach them by deep import, and
-// no host imports any of the three. Exporting them would pin their behaviour
-// into semver for no reader; `paths.test.ts` is what holds them instead.
+// The one path utility this BARREL carries. The destination classifiers are
+// server-side rules, so they go through ./contract instead — see the note in
+// utils/paths.ts, which is where the export surface for all of them is decided.
 export { buildQueryString } from './utils/paths.js';

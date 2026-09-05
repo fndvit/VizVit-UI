@@ -32,7 +32,11 @@ export { createWeeklyList } from './utils/weekly-list.svelte.js';
 export type { WeeklyList, WeeklyListConfig } from './utils/weekly-list.svelte.js';
 // The list's contract is component-free on purpose, so ./contract carries it
 // too — a host's +page.server.ts reads these without loading the grid.
-export { WEEKLY_LIST_DEFAULTS } from './utils/weekly-list-contract.js';
+export {
+	WEEKLY_LIST_DEFAULTS,
+	WEEKLY_LIST_PARAMS,
+	parseWeeklyListUrl
+} from './utils/weekly-list-contract.js';
 export type {
 	WeeklyListFilters,
 	WeeklyListPage,
