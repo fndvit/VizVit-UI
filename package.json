@@ -25,7 +25,8 @@
 		"!dist/**/*.spec.*",
 		"!dist/fixtures.*",
 		"!dist/**/stories/**",
-		"!dist/**/tests/**"
+		"!dist/**/tests/**",
+		"!dist/testing/imports.*"
 	],
 	"sideEffects": [
 		"**/*.css"
