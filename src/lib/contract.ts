@@ -87,7 +87,13 @@ export type {
 } from './utils/weekly-list-contract.js';
 
 export { CONTACT_CATEGORIES } from './content/types.js';
-export type { ContactCategory, FieldConstraint, FormFailReason } from './content/types.js';
+export { COMMENT_STATUSES } from './content/types.js';
+export type {
+	CommentStatus,
+	ContactCategory,
+	FieldConstraint,
+	FormFailReason
+} from './content/types.js';
 
 export {
 	COMMENT_BODY,
