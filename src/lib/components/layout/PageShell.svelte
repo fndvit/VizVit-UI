@@ -1,12 +1,13 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { getUiConfig } from '../../config/context.js';
+	import { documentTitle } from '../../utils/document-title.js';
 
 	/**
 	 * The chrome every page shares: the content column, the vertical rhythm,
-	 * and the browser title, composed as `title — siteName` from the config's
-	 * site name. (The foundation site's error page spells the same format on
-	 * its own; the two are one decision, noted in both places.)
+	 * and the browser title. The title FORMAT is `documentTitle`'s — the
+	 * foundation site's error page cannot render through this component and
+	 * needs the same format, and the two used to spell it separately.
 	 *
 	 * The shape is one named variant rather than four presentation flags.
 	 * Width, spacing, stacking and the wrapper element were independent props,
@@ -45,7 +46,7 @@
 	let { title, description, variant = 'content', children }: Props = $props();
 
 	const config = getUiConfig();
-	const pageTitle = $derived(title ? `${title} — ${config.siteName}` : config.siteName);
+	const pageTitle = $derived(documentTitle(title, config.siteName));
 	/**
 	 * The editorial variants render an <article>, and say so to crawlers too.
 	 * og:type was hardcoded to 'website' while the element already switched,

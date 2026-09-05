@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { importSpecifiers } from './testing/imports.js';
 
 const LIB_ROOT = fileURLToPath(new URL('.', import.meta.url));
 
@@ -19,20 +20,19 @@ const LIB_ROOT = fileURLToPath(new URL('.', import.meta.url));
  * could reach a component, and `no-app-imports.test.ts` already forbids the
  * app virtual modules that would be the other way in.
  *
- * THREE import forms, because two of them used to be invisible here. The
- * pattern required the `from` keyword, so a side-effect import
- * (`import './Modal.svelte'`) and a dynamic one
- * (`() => import('./Icon.svelte')`) both walked past a guard whose whole job
- * is to see them — and the dynamic form is the likelier of the two, since it
- * is how a component gets lazily pulled into a module that is otherwise
- * server-safe. A bundler follows both.
+ * The three import forms a bundler follows are `importSpecifiers`' rule, not
+ * this file's. Two of them used to be invisible here — the pattern required
+ * the `from` keyword, so a side-effect import (`import './Modal.svelte'`) and
+ * a dynamic one (`() => import('./Icon.svelte')`) both walked past a guard
+ * whose whole job is to see them. The fix was made here and NOT in
+ * `no-app-imports.test.ts`, which this file delegates the other half of the
+ * promise to and which still required `from`; the grammar has one owner now.
+ * A type-only import from a `.svelte` file is reported here for the reason
+ * stated there.
  *
- * A type-only import from a `.svelte` file is erased at build and would still
- * be reported here. That is deliberate: it costs nothing today (there are
- * none), and the alternative is a pattern that has to understand `import
- * type`, which is how a guard starts missing things again.
+ * All this file adds is which specifiers it follows: the relative ones.
  */
-const RELATIVE_IMPORT = /(?:\bfrom|\bimport)\s*\(?\s*['"](\.[^'"]*)['"]/g;
+const isRelative = (specifier: string): boolean => specifier.startsWith('.');
 
 /** `./config/types.js` as authored resolves to `config/types.ts` on disk. */
 function resolveSource(fromFile: string, specifier: string): string | null {
@@ -74,7 +74,7 @@ function importGraph(entry: string, mustReach: readonly string[]): string[] {
 		if (seen.has(file)) continue;
 		seen.add(file);
 		const source = readFileSync(file, 'utf-8');
-		for (const [, specifier] of source.matchAll(RELATIVE_IMPORT)) {
+		for (const specifier of importSpecifiers(source).filter(isRelative)) {
 			const resolved = resolveSource(file, specifier);
 			if (resolved !== null) queue.push(resolved);
 		}
@@ -106,7 +106,8 @@ const CONTRACT_MODULES = [
 	'forms/constraints.ts',
 	'forms/transport.ts',
 	'forms/types.ts',
-	'utils/paths.ts'
+	'utils/paths.ts',
+	'utils/document-title.ts'
 ] as const;
 
 describe('the contract subpath', () => {

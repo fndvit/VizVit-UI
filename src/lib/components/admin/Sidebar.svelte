@@ -95,34 +95,14 @@
 		box-shadow: var(--shadow-1);
 	}
 
-	.item {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 2.4rem;
-		height: 2.4rem;
-		border-radius: 999px;
-		color: var(--color-navy);
-		border: none;
-		background: transparent;
-		cursor: pointer;
-		transition: background var(--transition-fast);
-	}
-
-	.item:hover {
-		background: color-mix(in srgb, var(--color-navy) 10%, transparent);
-	}
-
-	.item.active {
-		background: var(--color-navy);
-		color: var(--color-surface);
-	}
-
-	.footer {
-		margin-top: auto;
-	}
-
-	/* The host's footer control (a logout submit) should sit like an item. */
+	/*
+	 * The rail's footprint, and the host's footer control with it — "should sit
+	 * like an item" was the comment on a second, identical copy of these eleven
+	 * declarations, and vit-brain had a third on its own logout button. One
+	 * selector list is the whole rule: a host's footer submit is an item that
+	 * happens to come from outside.
+	 */
+	.item,
 	.footer :global(button) {
 		display: inline-flex;
 		align-items: center;
@@ -137,8 +117,18 @@
 		transition: background var(--transition-fast);
 	}
 
+	.item:hover,
 	.footer :global(button:hover) {
 		background: color-mix(in srgb, var(--color-navy) 10%, transparent);
+	}
+
+	.item.active {
+		background: var(--color-navy);
+		color: var(--color-surface);
+	}
+
+	.footer {
+		margin-top: auto;
 	}
 
 	@media print {
