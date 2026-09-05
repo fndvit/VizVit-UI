@@ -143,6 +143,23 @@ export interface CommentData {
 	reactions: ReactionSummary[];
 }
 
+/**
+ * A comment's moderation state, as the database constrains it.
+ *
+ * The set is `comments.status`'s CHECK in fndvit-website and the vocabulary
+ * vit-brain's Comentaris tab moderates through — two repositories that cannot
+ * import each other — and it had no owner in TypeScript at all: the site read
+ * `status = 'published'` as a bare SQL literal in four queries, typed the
+ * field `z.string()`, and never named the other two states anywhere. A test
+ * fixture using `'visible'`, a value the CHECK refuses, passed green.
+ *
+ * `published` is what a reader sees; `hidden` is moderated away; `pending`
+ * awaits review. Which of them a given surface SHOWS is that surface's rule,
+ * not this list's.
+ */
+export const COMMENT_STATUSES = ['published', 'pending', 'hidden'] as const;
+export type CommentStatus = (typeof COMMENT_STATUSES)[number];
+
 /** A top-level comment with its flat reply list. */
 export interface CommentThreadData extends CommentData {
 	replies: CommentData[];

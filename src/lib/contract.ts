@@ -71,7 +71,15 @@ export type { Reaction, ReactionSummary, SortDirection } from './content/types.j
 export { MILESTONE_CATEGORIES, PROJECT_KINDS } from './content/types.js';
 export type { MilestoneCategory, ProjectKind } from './content/types.js';
 
-export { WEEKLY_LIST_DEFAULTS } from './utils/weekly-list-contract.js';
+// The weeklies URL contract, both halves: the values a param stands for when
+// absent, the names it travels as, and the parse that reads one back. The read
+// half had three spellings across two repositories and this package's own test,
+// and the round-trip case guarding them crossed against the test's copy.
+export {
+	WEEKLY_LIST_DEFAULTS,
+	WEEKLY_LIST_PARAMS,
+	parseWeeklyListUrl
+} from './utils/weekly-list-contract.js';
 export type {
 	WeeklyListFilters,
 	WeeklyListPage,
@@ -79,7 +87,13 @@ export type {
 } from './utils/weekly-list-contract.js';
 
 export { CONTACT_CATEGORIES } from './content/types.js';
-export type { ContactCategory, FieldConstraint, FormFailReason } from './content/types.js';
+export { COMMENT_STATUSES } from './content/types.js';
+export type {
+	CommentStatus,
+	ContactCategory,
+	FieldConstraint,
+	FormFailReason
+} from './content/types.js';
 
 export {
 	COMMENT_BODY,
@@ -111,7 +125,10 @@ export type {
 	RemoteFormInstance
 } from './forms/types.js';
 
-export { buildQueryString, isExternalUrl, isInternalPath, isPathUnder } from './utils/paths.js';
+// `isPathUnder` is deliberately absent: `Nav` and `Sidebar` reach it by relative
+// import and no host has ever imported it, so exporting it pinned a prefix rule
+// into semver for nobody. See utils/paths.ts.
+export { buildQueryString, isExternalUrl, isInternalPath } from './utils/paths.js';
 
 /**
  * The descriptor factories. `edit/helpers.ts` imports nothing but types from

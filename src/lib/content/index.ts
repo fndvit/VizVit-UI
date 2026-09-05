@@ -1,10 +1,17 @@
 export { renderBody } from './richtext.js';
 export type { RichTextBlock } from './richtext.js';
-export { CONTACT_CATEGORIES, MILESTONE_CATEGORIES, PROJECT_KINDS, REACTIONS } from './types.js';
+export {
+	COMMENT_STATUSES,
+	CONTACT_CATEGORIES,
+	MILESTONE_CATEGORIES,
+	PROJECT_KINDS,
+	REACTIONS
+} from './types.js';
 export type {
 	CollaboratorData,
 	CommentData,
 	CommentThreadData,
+	CommentStatus,
 	ContactCategory,
 	FieldConstraint,
 	FormFailReason,

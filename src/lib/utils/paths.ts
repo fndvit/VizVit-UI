@@ -1,3 +1,31 @@
+/**
+ * The four path rules, and which doors they go out of.
+ *
+ * This note used to live in `index.ts` and argue that only `buildQueryString`
+ * was exported, that the other three were private, and that exporting them
+ * "would pin their behaviour into semver for no reader". All three claims had
+ * stopped being true:
+ *
+ * - `contract.ts` exports all four, and has since the subpath reached both
+ *   hosts.
+ * - Two of them DO have a host reader. fndvit-website's repository integration
+ *   suite asserts the `site_links.href` check constraint against
+ *   `isInternalPath` byte for byte, and the https columns against
+ *   `isExternalUrl` — that binding is the whole reason those cases exist, and
+ *   it is why these two belong on `./contract`: a CHECK constraint is a
+ *   server-side rule, and the classifier that has to agree with it must be
+ *   importable without loading a component.
+ * - fndvit-website does not re-export `buildQueryString` from its `nav.ts`
+ *   any more; that pass-through is deleted and its one reader imports the
+ *   package directly.
+ *
+ * What the old note got right is the principle, and `isPathUnder` is the name
+ * it applies to: it is the prefix match `Nav` and `Sidebar` highlight the
+ * current section with, both of them reach it by relative import, and no host
+ * has ever imported it. So it is the one of the four that stays in, held by
+ * `paths.test.ts` rather than by semver.
+ */
+
 /** Prefix match over a URL pathname: '/what-we-do' covers '/what-we-do/<slug>'. */
 export function isPathUnder(pathname: string, prefix: string): boolean {
 	return pathname === prefix || pathname.startsWith(`${prefix}/`);
