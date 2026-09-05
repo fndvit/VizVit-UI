@@ -131,6 +131,12 @@ export type {
 export { buildQueryString, isExternalUrl, isInternalPath } from './utils/paths.js';
 
 /**
+ * The browser-title format. On `./contract` because its second reader is a
+ * host's error page, which composes a title without rendering `PageShell`.
+ */
+export { documentTitle } from './utils/document-title.js';
+
+/**
  * The descriptor factories. `edit/helpers.ts` imports nothing but types from
  * two modules this subpath already anchors, so it needed a door rather than a
  * split.
