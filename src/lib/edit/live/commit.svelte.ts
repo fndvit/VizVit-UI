@@ -1,5 +1,5 @@
-import type { EditMessages } from '../config/edit-messages.js';
-import type { PropertyDescriptor, PropertyValue } from './types.js';
+import type { EditMessages } from '../../config/edit-messages.js';
+import type { PropertyDescriptor, PropertyValue } from '../types.js';
 
 /**
  * The commit lifecycle of ONE editable value — the state machine

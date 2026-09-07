@@ -2,6 +2,7 @@
 	import { setUiConfig } from '../../../config/context.js';
 	import type { ParameterlessKey, SiteLink } from '../../../config/types.js';
 	import { setEditAdapter } from '../../../edit/context.js';
+	import { EDIT_CHROME } from '../../../edit/live/index.js';
 	import type { CollectionRef, EditAdapter, EditDescriptor } from '../../../edit/types.js';
 	import { createRemoteFormMock } from '../../../testing/remote-form.js';
 	import type { NewsletterToggleFormInstance } from '../../account/AccountPanel.svelte';
@@ -37,7 +38,7 @@
 	}: Props = $props();
 
 	// svelte-ignore state_referenced_locally
-	if (adapter) setEditAdapter(adapter);
+	if (adapter) setEditAdapter(adapter, EDIT_CHROME);
 	setUiConfig(() => ({ messageEdit }));
 </script>
 

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { setEditAdapter } from '../../../edit/context.js';
+	import { EDIT_CHROME } from '../../../edit/live/index.js';
 	import { setUiConfig } from '../../../config/context.js';
 	import type { ParameterlessKey } from '../../../config/types.js';
 	import type { CollectionRef, EditAdapter, EditDescriptor } from '../../../edit/types.js';
@@ -71,7 +72,7 @@
 
 	// Context is set once at init, on purpose — tests swap adapters by remounting.
 	// svelte-ignore state_referenced_locally
-	if (adapter) setEditAdapter(adapter);
+	if (adapter) setEditAdapter(adapter, EDIT_CHROME);
 	// svelte-ignore state_referenced_locally
 	if (messageEdit) setUiConfig(() => ({ messageEdit }));
 </script>

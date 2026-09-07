@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { setEditAdapter } from '../../../edit/context.js';
+	import { EDIT_CHROME } from '../../../edit/live/index.js';
 	import { collectionOf, entityEdit, entityProperty, pageCopyEdit } from '../../../edit/helpers.js';
 	import type {
 		EditDescriptor,
@@ -115,7 +116,7 @@
 			if (failing) throw new Error('demo failure');
 			return URL.createObjectURL(file);
 		}
-	});
+	}, EDIT_CHROME);
 
 	function milestoneEditMap(milestone: MilestoneData) {
 		const property = entityProperty('milestones', milestone.id);

@@ -2,7 +2,7 @@
 	import { getUiConfig } from '../../config/context.js';
 	import type { ParameterlessKey } from '../../config/types.js';
 	import { getEditAdapter } from '../context.js';
-	import { commitState, propertyValue } from '../commit.svelte.js';
+	import { commitState, propertyValue } from './commit.svelte.js';
 	import type { PropertyDescriptor, PropertyValue } from '../types.js';
 
 	/**
