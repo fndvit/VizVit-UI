@@ -1,5 +1,7 @@
 export { renderBody } from './richtext.js';
 export type { RichTextBlock } from './richtext.js';
+export { GET_INVOLVED_REASON_KEYS, PAGE_COPY_KEYS } from './pages.js';
+export type { CopyEditFor, CopyKey, PageCopy, PageId } from './pages.js';
 export {
 	COMMENT_STATUSES,
 	CONTACT_CATEGORIES,
@@ -8,6 +10,7 @@ export {
 	REACTIONS
 } from './types.js';
 export type {
+	ArticleEdit,
 	CollaboratorData,
 	CommentData,
 	CommentThreadData,
@@ -18,6 +21,7 @@ export type {
 	JobOpeningData,
 	MilestoneCategory,
 	MilestoneData,
+	ProjectArticleData,
 	ProjectCardData,
 	ProjectKind,
 	Reaction,
@@ -25,5 +29,8 @@ export type {
 	ReactionTarget,
 	SortDirection,
 	TeamMemberData,
-	WeeklyCardData
+	ThemeData,
+	WeeklyArticleData,
+	WeeklyCardData,
+	WeeklySourceData
 } from './types.js';

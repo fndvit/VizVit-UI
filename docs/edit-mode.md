@@ -229,21 +229,40 @@ answer `undefined` otherwise, so a template's `{#if}` is the whole gate.
 
 The same shapes across the content components:
 
-| Component        | Inline text                                                                                | Panel properties                                                           | Collection ops             |
-| ---------------- | ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------- | -------------------------- |
-| Timeline         | title, body, category                                                                      | occurredOn, category, linkUrl, image, status (`flag`, `!draft`)            | add, remove                |
-| WeeklieCard      | title, excerpt                                                                             | image, status (`flag`, `!draft`)                                           | — (own authoring flow)     |
-| ProjectCard      | title, excerpt                                                                             | kind (options auto-filled), publishedOn, externalUrl, image, status (flag) | — (host-level)             |
-| TeamMemberCard   | role, bio                                                                                  | name (plain text), photo                                                   | — (host-level)             |
-| CollaboratorList | —                                                                                          | personName, affiliation, url (all plain text)                              | add, remove (rows with id) |
-| JobList          | title, description                                                                         | postedOn, status (`flag`, `!draft`; word it `status_open`/`status_closed`) | add, remove (rows with id) |
-| SearchInput      | —                                                                                          | the placeholder (`placeholderEdit`)                                        | —                          |
-| SortSelect       | its label (ActionLabel)                                                                    | the option labels (`optionsEdit`)                                          | —                          |
-| ContactForm      | labels, submit, copy                                                                       | category option labels + post-submit feedback (own keys)                   | —                          |
-| Nav / Footer     | one `LinkEdit` modal per entry: text (`editFor`) + href, order (`propertiesFor`) + Elimina | —                                                                          | add (`collection`)         |
-| NewsletterSignup | copy; links via `LinkEdit` (text + href modal)                                             | —                                                                          | —                          |
-| CommentSection   | copy, «Respon»; links via `LinkEdit` (text + href modal)                                   | —                                                                          | —                          |
-| CardMedia        | —                                                                                          | — (renders a placeholder when the src is missing or 404s)                  | —                          |
+| Component        | Inline text                                                                                    | Panel properties                                                           | Collection ops                   |
+| ---------------- | ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | -------------------------------- |
+| Timeline         | title, body, category                                                                          | occurredOn, category, linkUrl, image, status (`flag`, `!draft`)            | add, remove                      |
+| WeeklieCard      | title, excerpt                                                                                 | image, status (`flag`, `!draft`)                                           | — (own authoring flow)           |
+| ProjectCard      | title, excerpt                                                                                 | kind (options auto-filled), publishedOn, externalUrl, image, status (flag) | — (host-level)                   |
+| TeamMemberCard   | role, bio                                                                                      | name (plain text), photo                                                   | — (host-level)                   |
+| CollaboratorList | —                                                                                              | personName, affiliation, url (all plain text)                              | add, remove (rows with id)       |
+| JobList          | title, description                                                                             | postedOn, status (`flag`, `!draft`; word it `status_open`/`status_closed`) | add, remove (rows with id)       |
+| SearchInput      | —                                                                                              | the placeholder (`placeholderEdit`)                                        | —                                |
+| SortSelect       | its label (ActionLabel)                                                                        | the option labels (`optionsEdit`)                                          | —                                |
+| ContactForm      | labels, submit, copy                                                                           | category option labels + post-submit feedback (own keys)                   | —                                |
+| Nav / Footer     | one `LinkEdit` modal per entry: text (`editFor`) + href, order (`propertiesFor`) + Elimina     | —                                                                          | add (`collection`)               |
+| NewsletterSignup | copy; links via `LinkEdit` (text + href modal)                                                 | —                                                                          | —                                |
+| CommentSection   | copy, «Respon»; links via `LinkEdit` (text + href modal)                                       | —                                                                          | —                                |
+| CardMedia        | —                                                                                              | — (renders a placeholder when the src is missing or 404s)                  | —                                |
+| HomePage         | every copy block (`edit.copy`), «…o explora'n un»; see-all + CTAs via `LinkEdit`               | the search placeholder; link hrefs (`*Href` keys)                          | via `milestoneFor` / `weeklyFor` |
+| WhoWeArePage     | copy, the h1 (`nav_whoWeAre`)                                                                  | per card via `memberFor`; per row via `collaboratorFor`                    | add, remove (`collaborators`)    |
+| WhatWeDoPage     | copy, the h1 (`nav_whatWeDo`)                                                                  | per card via `projectFor`                                                  | —                                |
+| GetInvolvedPage  | copy incl. the five reasons, the h1 (`nav_getInvolved`)                                        | per opening via `jobFor`                                                   | add, remove (`jobs`)             |
+| TransparencyPage | copy, `timeline_empty`, category chips (`category_*`)                                          | the search placeholder; per milestone via `milestoneFor`                   | add, remove (`milestones`)       |
+| LegalPage        | heading; body via RichText                                                                     | —                                                                          | —                                |
+| WeekliesPage     | copy, the h1 (`nav_weeklies`), `weeklies_empty`, theme chips (`themeFor`)                      | the search placeholder, the sort options; per card via `weeklyFor`         | —                                |
+| ProjectPage      | title, excerpt, body (`ArticleEdit`), `back_label`                                             | —                                                                          | —                                |
+| WeeklyPage       | title, excerpt, body (`ArticleEdit`), `back_label`, `weeklie_sources`, `weeklie_keepExploring` | —                                                                          | —                                |
+
+The page modules (`HomePage` … `WeeklyPage`, [content reference](./components/content.md#pages))
+take ONE `edit` prop with every member optional: `copy` answers a descriptor
+per copy block by its key (`CopyEditFor<P>`), the `*For` members answer a
+card's map per row (reading the `id` the host put on the data), and a
+`CollectionRef` member (`collaborators`, `jobs`, `milestones`) turns on the
+list's add slot and removes. Their chrome wording needs no member — the
+modules read `config.messageEdit` for their own keys, as the components do.
+A read-only host passes no `edit` and no `messageEdit`, and the render is
+the website's markup, byte for byte.
 
 A collaborator, job or nav-link row offers structural affordances only when
 its data carries an `id` — a remove op needs an identity, and read-only hosts

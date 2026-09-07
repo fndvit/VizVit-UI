@@ -19,6 +19,27 @@ export { default as TimelineMilestone } from './components/timeline/TimelineMile
 export type { MilestoneEditMap } from './components/timeline/TimelineMilestone.svelte';
 export { default as WeeklieCard } from './components/weeklies/WeeklieCard.svelte';
 export type { WeeklyEditMap } from './components/weeklies/WeeklieCard.svelte';
+// The nine PAGE modules: a website route is one tag over the site's read
+// projection, and a CMS opens it with the module's `*PageEdit` map. Same door
+// as the cards they compose — a page is content that renders, not chrome.
+export { default as HomePage } from './components/pages/HomePage.svelte';
+export type { HomePageEdit } from './components/pages/HomePage.svelte';
+export { default as WhoWeArePage } from './components/pages/WhoWeArePage.svelte';
+export type { WhoWeArePageEdit } from './components/pages/WhoWeArePage.svelte';
+export { default as WhatWeDoPage } from './components/pages/WhatWeDoPage.svelte';
+export type { WhatWeDoPageEdit } from './components/pages/WhatWeDoPage.svelte';
+export { default as GetInvolvedPage } from './components/pages/GetInvolvedPage.svelte';
+export type { GetInvolvedPageEdit } from './components/pages/GetInvolvedPage.svelte';
+export { default as TransparencyPage } from './components/pages/TransparencyPage.svelte';
+export type { TransparencyPageEdit } from './components/pages/TransparencyPage.svelte';
+export { default as LegalPage } from './components/pages/LegalPage.svelte';
+export type { LegalPageEdit } from './components/pages/LegalPage.svelte';
+export { default as WeekliesPage } from './components/pages/WeekliesPage.svelte';
+export type { WeekliesPageEdit } from './components/pages/WeekliesPage.svelte';
+export { default as ProjectPage } from './components/pages/ProjectPage.svelte';
+export type { ProjectPageEdit } from './components/pages/ProjectPage.svelte';
+export { default as WeeklyPage } from './components/pages/WeeklyPage.svelte';
+export type { WeeklyPageEdit } from './components/pages/WeeklyPage.svelte';
 export * from './content/index.js';
 export {
 	MILESTONE_CATEGORY_COLOR,

@@ -148,6 +148,42 @@ export interface UiMessages {
 	category_collaboration(): string;
 	category_press(): string;
 	/**
+	 * The wording the PAGE MODULES read (`components/pages/*`), REQUIRED like
+	 * every key but the *Href pair above.
+	 *
+	 * ⚠ Adding them was a compile-break for any host whose `messages` object
+	 * lacked one — `messages` is all-or-nothing (see ./messages.js), so a
+	 * catalog that compiled against 0.24 stops compiling here rather than
+	 * rendering a hole. Both hosts already carried every key (the website's
+	 * Paraglide catalog, vit-brain's `ui_messages` table) because the nine
+	 * route files read them by hand before the pages moved in; the only thing
+	 * that changed is that the package now names what it reads. The four
+	 * `*Href` keys are destinations edited as wording (fndvit-website#11) —
+	 * a link's text and address are one editorial gesture, so both are keys.
+	 */
+	nav_whoWeAre(): string;
+	nav_whatWeDo(): string;
+	nav_getInvolved(): string;
+	nav_weeklies(): string;
+	common_seeAll(): string;
+	common_seeAllHref(): string;
+	cta_meetTeam(): string;
+	cta_meetTeamHref(): string;
+	cta_contactUs(): string;
+	cta_contactUsHref(): string;
+	weeklies_searchPlaceholder(): string;
+	weeklies_exploreOne(): string;
+	weeklies_filterLabel(): string;
+	weeklies_searchResultsLabel(): string;
+	weeklies_loadError(): string;
+	weeklies_empty(): string;
+	timeline_searchPlaceholder(): string;
+	timeline_filterLabel(): string;
+	timeline_empty(): string;
+	back_label(): string;
+	weeklie_sources(): string;
+	weeklie_keepExploring(): string;
+	/**
 	 * Editorial state, as the panel's `flag` rows word it: a card's
 	 * published/draft pair, an opening's open/closed pair. Catalog keys rather
 	 * than editor strings because the CMS edits them per locale like any other

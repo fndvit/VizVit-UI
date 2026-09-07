@@ -27,17 +27,23 @@ and skip that file.
 
 Everything is exported flat from the root, and again grouped by role:
 
-| Import                          | Contents                                                                             |
-| ------------------------------- | ------------------------------------------------------------------------------------ |
-| `@vit-foundation/ui`            | everything below, flat                                                               |
-| `@vit-foundation/ui/primitives` | generic UI atoms — [reference](./components/primitives.md)                           |
-| `@vit-foundation/ui/forms`      | form building blocks + the remote-form seam — [guide](./forms.md)                    |
-| `@vit-foundation/ui/chrome`     | PageShell, Nav, Footer — [reference](./components/chrome.md)                         |
-| `@vit-foundation/ui/content`    | content renderers + data shapes — [reference](./components/content.md)               |
-| `@vit-foundation/ui/community`  | auth, account, comments, reactions, contact — [reference](./components/community.md) |
-| `@vit-foundation/ui/edit`       | the edit-mode contract — [guide](./edit-mode.md)                                     |
-| `@vit-foundation/ui/config`     | `UiProvider` and the `UiConfig` context                                              |
-| `@vit-foundation/ui/testing`    | `createRemoteFormMock` for stories and tests                                         |
+| Import                          | Contents                                                                                      |
+| ------------------------------- | --------------------------------------------------------------------------------------------- |
+| `@vit-foundation/ui`            | everything below, flat                                                                        |
+| `@vit-foundation/ui/primitives` | generic UI atoms — [reference](./components/primitives.md)                                    |
+| `@vit-foundation/ui/forms`      | form building blocks + the remote-form seam — [guide](./forms.md)                             |
+| `@vit-foundation/ui/chrome`     | PageShell, Nav, Footer — [reference](./components/chrome.md)                                  |
+| `@vit-foundation/ui/content`    | content renderers, the nine page modules + data shapes — [reference](./components/content.md) |
+| `@vit-foundation/ui/community`  | auth, account, comments, reactions, contact — [reference](./components/community.md)          |
+| `@vit-foundation/ui/edit`       | the edit-mode contract — [guide](./edit-mode.md)                                              |
+| `@vit-foundation/ui/config`     | `UiProvider` and the `UiConfig` context                                                       |
+| `@vit-foundation/ui/testing`    | `createRemoteFormMock` for stories and tests                                                  |
+
+A website route is one tag: `<WhoWeArePage {...data} />` over the page module's
+data props, plus the host adapters the module names (a search handler, a
+shallow-routing `replaceUrl`, a preflighted form) — see the
+[Pages section](./components/content.md#pages). The module owns the markup,
+the styles and the browser title; the route owns the load.
 
 ## Wiring an app: `UiProvider`
 
