@@ -58,9 +58,7 @@ const RENDERERS = sourceFiles(COMPONENTS, [
 	'pages/WhoWeArePage.svelte',
 	'account/NewsletterSignup.svelte',
 	'layout/Nav.svelte'
-]).filter(
-	(file) => file.endsWith('.svelte') && !/\/components\/(tests|stories)\//.test(file)
-);
+]).filter((file) => file.endsWith('.svelte') && !/\/components\/(tests|stories)\//.test(file));
 
 const isLive = (module: string): boolean => module.startsWith('edit/live/');
 
