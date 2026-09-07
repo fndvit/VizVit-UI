@@ -9,22 +9,29 @@ host app injects; persistence is a function the host app provides.
 **1. The adapter** — install once, where the editing app decides:
 
 ```ts
-import { setEditAdapter } from '@vit-foundation/ui';
+import { EDIT_CHROME, setEditAdapter } from '@vit-foundation/ui';
 
 let editing = $state(false);
 
-setEditAdapter({
-	get isEditing() {
-		return editing; // reactive getter — gates every affordance live
+// Two arguments, both required: the adapter that persists, and the package's
+// live edit chrome — the contenteditable, the property panel, the link modal.
+// Only a host that installs the chrome ever imports it, which is what keeps
+// it out of a read-only host's bundle.
+setEditAdapter(
+	{
+		get isEditing() {
+			return editing; // reactive getter — gates every affordance live
+		},
+		save: async (descriptor, value) => {
+			// Persist { [descriptor.locale]: value } into the localized column
+			// descriptor.ref names. Merge, never replace; reject an empty 'ca'
+			// (it is the canonical, database-required locale). Reject on any
+			// failure — the editor keeps the draft and shows the error state.
+			await myBackend.saveContent(descriptor, value);
+		}
 	},
-	save: async (descriptor, value) => {
-		// Persist { [descriptor.locale]: value } into the localized column
-		// descriptor.ref names. Merge, never replace; reject an empty 'ca'
-		// (it is the canonical, database-required locale). Reject on any
-		// failure — the editor keeps the draft and shows the error state.
-		await myBackend.saveContent(descriptor, value);
-	}
-});
+	EDIT_CHROME
+);
 ```
 
 The adapter has three OPTIONAL members beyond `save`, and each one unlocks a
@@ -46,13 +53,16 @@ setEditAdapter({
 	// Image upload; resolves to the stored path an 'image' property saves.
 	// Leave it off and image rows fall back to a plain path input.
 	uploadImage: async (descriptor, file) => path
-});
+}, EDIT_CHROME);
 ```
 
 No adapter installed (or `isEditing` false, or no descriptor passed) means
 every edit prop is inert and the render is byte-identical to read-only.
 That is the foundation website's whole guarantee: it never calls
-`setEditAdapter`, so nothing there can ever become editable. The same
+`setEditAdapter`, so nothing there can ever become editable — and since the
+live chrome lives under `edit/live/` and is reached only through the table a
+host passes, nothing there ships the editing code either
+(`live-isolation.test.ts` walks every renderer's imports to keep it so). The same
 triple gate covers the new surface: a property panel or add/remove control
 renders only when its descriptor is present AND the adapter is editing AND
 the capability method exists.
