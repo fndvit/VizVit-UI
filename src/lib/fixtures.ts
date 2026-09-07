@@ -1,14 +1,26 @@
 // Sample domain data for stories AND component tests — excluded from the
 // published tarball. Shared so a shape change breaks one fixture, not one per
 // consumer.
+import {
+	GET_INVOLVED_REASON_KEYS,
+	PAGE_COPY_KEYS,
+	type PageCopy,
+	type PageId
+} from './content/pages.js';
 import type {
 	CollaboratorData,
+	CommentThreadData,
 	JobOpeningData,
 	MilestoneData,
+	ProjectArticleData,
 	ProjectCardData,
+	ReactionSummary,
 	TeamMemberData,
+	ThemeData,
+	WeeklyArticleData,
 	WeeklyCardData
 } from './content/types.js';
+import type { WeeklyListServerData } from './utils/weekly-list-contract.js';
 
 export const sampleWeekly: WeeklyCardData = {
 	id: 12,
@@ -85,4 +97,67 @@ export const sampleJobs: JobOpeningData[] = [
 export const sampleCollaborators: CollaboratorData[] = [
 	{ personName: 'Joan Ribas', affiliation: 'Universitat de Barcelona', url: 'https://example.org' },
 	{ personName: 'Marta Vidal', affiliation: 'Institut Català d’Estadística', url: null }
+];
+
+/**
+ * One page's copy, every declared key filled with a string that NAMES the
+ * key — so a page test can assert that `hero_title` rendered where the hero
+ * title goes, and a misrouted block reads as its own key. `PAGE_COPY_KEYS`
+ * drives it: a key added there is present here without an edit.
+ */
+export function samplePageCopy<P extends PageId>(page: P): PageCopy<P> {
+	return Object.fromEntries(
+		PAGE_COPY_KEYS[page].map((key: string) => [key, `Copy ${page} ${key}`])
+	) as PageCopy<P>;
+}
+
+/** The get-involved reasons as the copy fixture words them, in declared order. */
+export const sampleReasons = GET_INVOLVED_REASON_KEYS.map((key) => `Copy get-involved ${key}`);
+
+export const sampleProjectArticle: ProjectArticleData = {
+	...sampleProject,
+	body: 'Un projecte amb història.\n\n## Context\n\nEl segon bloc.',
+	previewImageUrl: '/images/placeholders/wide.svg',
+	externalUrl: 'https://aqli.example.org/index'
+};
+
+export const sampleWeeklyArticle: WeeklyArticleData = {
+	...sampleWeekly,
+	body: 'La Terra és una llentia.\n\nNeptú cau lluny.',
+	instagramUrl: 'https://instagram.com/p/abc',
+	sources: [
+		{ label: 'NASA', url: 'https://nasa.example/planets' },
+		{ label: 'ESA', url: 'https://esa.example/solar' }
+	]
+};
+
+export const sampleThemes: ThemeData[] = [
+	{ slug: 'ciencia', name: 'Ciència' },
+	{ slug: 'salut', name: 'Salut' }
+];
+
+/** The weeklies index as its server load renders it: one page, no filters. */
+export const sampleWeeklyListServer: WeeklyListServerData = {
+	weeklies: [sampleWeekly, { ...sampleWeekly, id: 11, number: 11, slug: 'onze', title: 'Onze' }],
+	total: 2,
+	page: 1,
+	pageSize: 12,
+	query: { q: '', theme: null, sort: 'desc' }
+};
+
+export const sampleReactions: ReactionSummary[] = [
+	{ reaction: 'like', count: 3, mine: false },
+	{ reaction: 'love', count: 1, mine: true },
+	{ reaction: 'clap', count: 0, mine: false }
+];
+
+export const sampleComments: CommentThreadData[] = [
+	{
+		id: 1,
+		displayName: 'Anna',
+		body: 'Quina passada.',
+		createdAt: '2026-08-11T10:00:00Z',
+		reactions: [],
+		replies: []
+	}
 ];

@@ -3,6 +3,7 @@
  * applied. The website's zod-inferred types satisfy these structurally; the
  * package states them itself so consumers owe it no schema library.
  */
+import type { EditDescriptor } from '../edit/types.js';
 
 /** The bounds of one form field; Field turns them into length attributes. */
 export interface FieldConstraint {
@@ -34,6 +35,29 @@ export interface WeeklyCardData {
 	imageUrl: string;
 }
 
+/** A theme a weekly is filed under, as the /weeklies filter chips render it. */
+export interface ThemeData {
+	slug: string;
+	name: string;
+}
+
+/** One cited source of a weekly. */
+export interface WeeklySourceData {
+	label: string;
+	url: string;
+}
+
+/**
+ * A weekly's OWN page: the card, plus what only the detail renders. The
+ * website's `weeklyDetailSchema` carries `related` too; the page module
+ * takes that list as its own prop, because vit-brain loads it separately.
+ */
+export interface WeeklyArticleData extends WeeklyCardData {
+	body: string | null;
+	instagramUrl: string | null;
+	sources: WeeklySourceData[];
+}
+
 /** The kinds a project can have, in display order — a host's enum derives from this. */
 export const PROJECT_KINDS = ['collaboration', 'passion'] as const;
 export type ProjectKind = (typeof PROJECT_KINDS)[number];
@@ -51,6 +75,30 @@ export interface ProjectCardData {
 	imageUrl: string;
 	externalUrl: string | null;
 	hasStory: boolean;
+}
+
+/**
+ * A project's OWN page: the card, plus what only the detail renders. The
+ * website's `projectDetailSchema` and vit-brain's `toProjectArticle` both
+ * answer this shape.
+ */
+export interface ProjectArticleData extends ProjectCardData {
+	body: string | null;
+	previewImageUrl: string | null;
+}
+
+/**
+ * A weekly's or a project's OWN page: the same localized fields as its card,
+ * except that `body` renders as rich text there. Which surface a field is
+ * rendered on is the page's fact, and these two are the only pages with one
+ * — so the map is shared by `ProjectPage` and `WeeklyPage` and answered by
+ * one producer (vit-brain's `articleEdit`). All members optional, like every
+ * `*EditMap`: a host may open the body and leave the title alone.
+ */
+export interface ArticleEdit {
+	title?: EditDescriptor;
+	excerpt?: EditDescriptor;
+	body?: EditDescriptor;
 }
 
 /**
@@ -91,6 +139,8 @@ export interface MilestoneData {
 }
 
 export interface TeamMemberData {
+	/** Present only where the card is editable — a descriptor needs the row (precedent: CollaboratorData). */
+	id?: string | number;
 	slug: string;
 	name: string;
 	role: string;

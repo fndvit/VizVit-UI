@@ -86,6 +86,19 @@ export type {
 	WeeklyListServerData
 } from './utils/weekly-list-contract.js';
 
+// The page-copy vocabulary: which blocks each static page reads. A host's
+// `+page.server.ts` builds `PageCopy<P>` from it and a CMS's producer binds
+// its own per-page format table to it, both on the server.
+export { GET_INVOLVED_REASON_KEYS, PAGE_COPY_KEYS } from './content/pages.js';
+export type { CopyEditFor, CopyKey, PageCopy, PageId } from './content/pages.js';
+export type {
+	ArticleEdit,
+	ProjectArticleData,
+	ThemeData,
+	WeeklyArticleData,
+	WeeklySourceData
+} from './content/types.js';
+
 export { CONTACT_CATEGORIES } from './content/types.js';
 export { COMMENT_STATUSES } from './content/types.js';
 export type {

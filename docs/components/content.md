@@ -61,13 +61,55 @@ Props: `jobs: JobOpeningData[]`, `editFor?: (job) => JobEditMap`
 The weeklies list's date-direction select.
 Props: `value: SortDirection`, `onchange(value)`.
 
+## Pages
+
+The nine website pages, as modules: a route file becomes one tag over the
+site's read projection, and a CMS opens the same tag with an `edit` map. Each
+module wraps its content in `PageShell` (so it owns the browser title), reads
+its interface wording from `UiMessages`, and renders the site's markup
+byte-for-byte when no `edit` is passed and the provider has no `messageEdit`
+— the inert `Editable`/`EditFrame`/`ActionLabel` path adds nothing.
+
+| Module             | Data props (the site's `+page.server.ts` shape)                        | Host adapters                                                  | `edit?`                                                                                   |
+| ------------------ | ---------------------------------------------------------------------- | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `HomePage`         | `content: PageCopy<'home'>`, `milestones`, `weeklies`                  | `onsearch(query)` — the host navigates to its /weeklies        | `HomePageEdit { copy?, milestoneFor?, weeklyFor? }`                                       |
+| `WhoWeArePage`     | `content`, `featured`, `board`, `collaborators`                        | —                                                              | `WhoWeArePageEdit { copy?, memberFor?, collaboratorFor?, collaborators?: CollectionRef }` |
+| `WhatWeDoPage`     | `content`, `latest?` (null = no showcase), `collaborations`, `passion` | —                                                              | `WhatWeDoPageEdit { copy?, projectFor? }`                                                 |
+| `GetInvolvedPage`  | `content`, `jobs`                                                      | `form: ContactFormInstance` (preflighted, or the testing mock) | `GetInvolvedPageEdit { copy?, jobFor?, jobs?: CollectionRef }`                            |
+| `TransparencyPage` | `content`, `milestones`                                                | `query: { q, category }` (server-parsed), `replaceUrl(path)`   | `TransparencyPageEdit { copy?, milestoneFor?, milestones?: CollectionRef }`               |
+| `LegalPage`        | `content: PageCopy<'legal'>`                                           | —                                                              | `LegalPageEdit { copy? }`                                                                 |
+| `WeekliesPage`     | `content`, `themes: ThemeData[]`, `server: WeeklyListServerData`       | `fetchPage`, `replaceUrl(path)` — see `createWeeklyList`       | `WeekliesPageEdit { copy?, weeklyFor?, themeFor? }`                                       |
+| `ProjectPage`      | `project: ProjectArticleData`                                          | —                                                              | `ProjectPageEdit` = `ArticleEdit { title?, excerpt?, body? }`                             |
+| `WeeklyPage`       | `weekly: WeeklyArticleData`, `related`, `comments`, `reactions`        | `isLoggedIn`, `commentForm`, `replyFormFor`, `reactionForms`   | `WeeklyPageEdit` = `ArticleEdit`                                                          |
+
+The page-copy vocabulary — `PAGE_COPY_KEYS` (which section keys each page
+reads), `GET_INVOLVED_REASON_KEYS` (the five reasons, in order), and the types
+`PageId`, `CopyKey<P>`, `PageCopy<P>`, `CopyEditFor<P>` — exports from here
+and from `./contract`, so a host's server load builds `PageCopy<P>` from the
+same tuple the module indexes. A `copy` editor is `(key: CopyKey<P>) =>
+EditDescriptor | undefined`: a CMS answers a `page-copy` ref per block and
+cannot name a block the page does not declare.
+
+Wording is the module's own business: the h1 (`nav_*`), the empty states,
+«…o explora'n un», the back link and the section headings edit inline through
+`config.messageEdit`; the search placeholders, the sort options and the
+`common_seeAll` / `cta_*` links edit through their panels and modals over
+`chromeProperty`, gated on the same `messageEdit`. The category chips on
+/transparency are `category_*` keys; the theme chips on /weeklies are entity
+names, so that page takes `themeFor`.
+
+Paging on `WeekliesPage` goes through `Pagination` → `Link` → `UiConfig.href`,
+so a host that re-roots the site (a CMS mirror under `/website/pages`) supplies
+that prefix ONCE, in `href`, and never wraps `hrefFor` itself.
+
 ## Helpers exported here
 
 `renderBody` (the rich-text block parser), `formatDate` / `yearOf`,
 `MILESTONE_CATEGORY_COLOR` / `milestoneCategoryLabel(category, messages)` /
 `matchesMilestoneFilter(milestone, { q, category })` (the transparency page's
 client-side predicate), `contactCategoryLabel(category, messages)`,
-`REACTIONS`, `CONTACT_CATEGORIES`.
+`REACTIONS`, `CONTACT_CATEGORIES`, `PAGE_COPY_KEYS` / `GET_INVOLVED_REASON_KEYS`
+(the page-copy vocabulary the page modules index by).
 
 ## The two list rules
 
