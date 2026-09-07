@@ -17,9 +17,13 @@
  * is what makes it a promise rather than a description: adding a `.svelte`
  * anywhere beneath it fails here rather than in a consumer's server build.
  *
- * It adds nothing. Every name below is already exported from a semantic
- * subpath and stays there — this is a second door into the same rooms, not a
- * new floor, and the barrel remains the surface a component host reads.
+ * It adds almost nothing. Every name below is already exported from a
+ * semantic subpath and stays there — this is a second door into the same
+ * rooms, not a new floor, and the barrel remains the surface a component host
+ * reads. `contract-names.test.ts` holds that to be true, name by name and from
+ * the same source module; its `CONTRACT_ONLY` list names the three exceptions
+ * (the two destination classifiers and the title format), each with its
+ * reason, so a fourth cannot arrive unexplained.
  *
  * It was cut to fit ONE consumer, and the second one did not fit through it.
  * vit-brain's four restatements were the motive, so the first version carried
@@ -42,7 +46,6 @@ export { LOCALES, BASE_LOCALE } from './config/types.js';
 export type {
 	Locale,
 	NotParameterized,
-	ParameterizedKey,
 	ParameterlessKey,
 	SiteLink,
 	UiMessages
