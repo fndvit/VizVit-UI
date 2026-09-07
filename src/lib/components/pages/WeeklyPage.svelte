@@ -1,17 +1,7 @@
-<script module lang="ts">
-	import type { ArticleEdit } from '../../content/types.js';
-
-	/**
-	 * What a CMS may open on a weekly's own page: title, excerpt, and the body
-	 * as rich text. The «Dades i fonts» and «Segueix explorant» headings and
-	 * the back link edit through `config.messageEdit` over their own keys.
-	 */
-	export type WeeklyPageEdit = ArticleEdit;
-</script>
-
 <script lang="ts">
 	import { getUiConfig } from '../../config/context.js';
 	import type {
+		ArticleEdit,
 		CommentThreadData,
 		ReactionSummary,
 		WeeklyArticleData,
@@ -48,7 +38,12 @@
 		/** One preflighted instance per reply box; see CommentSection. */
 		replyFormFor: (threadId: string) => CommentFormInstance;
 		reactionForms: ReactionBarForms;
-		edit?: WeeklyPageEdit;
+		/**
+		 * What a CMS may open on a weekly's own page: title, excerpt, and the body
+		 * as rich text. The «Dades i fonts» and «Segueix explorant» headings and
+		 * the back link edit through `config.messageEdit` over their own keys.
+		 */
+		edit?: ArticleEdit;
 	}
 
 	let {

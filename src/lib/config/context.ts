@@ -10,7 +10,7 @@ const KEY = Symbol.for('@vit-foundation/ui:config');
  * purpose — every component must render without a provider, which is what
  * keeps stories and component tests free of app wiring.
  */
-export const DEFAULT_UI_CONFIG: UiConfig = {
+const DEFAULT_UI_CONFIG: UiConfig = {
 	href: (path) => path,
 	locale: () => BASE_LOCALE,
 	locales: LOCALES,

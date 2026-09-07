@@ -1,13 +1,6 @@
-<script module lang="ts">
-	import type { ArticleEdit } from '../../content/types.js';
-
-	/** What a CMS may open on a project's own page: title, excerpt, and the body as rich text. */
-	export type ProjectPageEdit = ArticleEdit;
-</script>
-
 <script lang="ts">
 	import { getUiConfig } from '../../config/context.js';
-	import type { ProjectArticleData } from '../../content/types.js';
+	import type { ArticleEdit, ProjectArticleData } from '../../content/types.js';
 	import ActionLabel from '../../edit/ActionLabel.svelte';
 	import Editable from '../../edit/Editable.svelte';
 	import PageShell from '../layout/PageShell.svelte';
@@ -24,7 +17,8 @@
 	 */
 	interface Props {
 		project: ProjectArticleData;
-		edit?: ProjectPageEdit;
+		/** What a CMS may open on a project's own page: title, excerpt, and the body as rich text. */
+		edit?: ArticleEdit;
 	}
 
 	let { project, edit }: Props = $props();

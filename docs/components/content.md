@@ -79,8 +79,8 @@ byte-for-byte when no `edit` is passed and the provider has no `messageEdit`
 | `TransparencyPage` | `content`, `milestones`                                                | `query: { q, category }` (server-parsed), `replaceUrl(path)`   | `TransparencyPageEdit { copy?, milestoneFor?, milestones?: CollectionRef }`               |
 | `LegalPage`        | `content: PageCopy<'legal'>`                                           | —                                                              | `LegalPageEdit { copy? }`                                                                 |
 | `WeekliesPage`     | `content`, `themes: ThemeData[]`, `server: WeeklyListServerData`       | `fetchPage`, `replaceUrl(path)` — see `createWeeklyList`       | `WeekliesPageEdit { copy?, weeklyFor?, themeFor? }`                                       |
-| `ProjectPage`      | `project: ProjectArticleData`                                          | —                                                              | `ProjectPageEdit` = `ArticleEdit { title?, excerpt?, body? }`                             |
-| `WeeklyPage`       | `weekly: WeeklyArticleData`, `related`, `comments`, `reactions`        | `isLoggedIn`, `commentForm`, `replyFormFor`, `reactionForms`   | `WeeklyPageEdit` = `ArticleEdit`                                                          |
+| `ProjectPage`      | `project: ProjectArticleData`                                          | —                                                              | `ArticleEdit { title?, excerpt?, body? }`                                                 |
+| `WeeklyPage`       | `weekly: WeeklyArticleData`, `related`, `comments`, `reactions`        | `isLoggedIn`, `commentForm`, `replyFormFor`, `reactionForms`   | `ArticleEdit`                                                                             |
 
 The page-copy vocabulary — `PAGE_COPY_KEYS` (which section keys each page
 reads), `GET_INVOLVED_REASON_KEYS` (the five reasons, in order), and the types
