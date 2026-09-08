@@ -4,6 +4,7 @@
 	import type { ParameterlessKey } from '../../../config/types.js';
 	import type { UiMessages } from '../../../config/types.js';
 	import { setEditAdapter } from '../../../edit/context.js';
+	import { EDIT_CHROME } from '../../../edit/live/index.js';
 	import LinkEdit from '../../../edit/chrome/LinkEdit.svelte';
 	import type {
 		EditAdapter,
@@ -45,7 +46,7 @@
 	}: Props = $props();
 
 	// svelte-ignore state_referenced_locally
-	if (adapter) setEditAdapter(adapter);
+	if (adapter) setEditAdapter(adapter, EDIT_CHROME);
 	setUiConfig(() => (messages ? { messageEdit, messages } : { messageEdit }));
 
 	type CommentSectionProps = ComponentProps<typeof CommentSection>;

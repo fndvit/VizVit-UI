@@ -1,4 +1,4 @@
-export { DEFAULT_UI_CONFIG, getUiConfig, setUiConfig } from './context.js';
+export { getUiConfig, setUiConfig } from './context.js';
 export { defaultEditMessages } from './edit-messages.js';
 export type { EditMessages } from './edit-messages.js';
 export { defaultMessages } from './messages.js';
@@ -7,7 +7,6 @@ export { BASE_LOCALE, LOCALES } from './types.js';
 export type {
 	Locale,
 	NotParameterized,
-	ParameterizedKey,
 	ParameterlessKey,
 	SiteLink,
 	UiConfig,

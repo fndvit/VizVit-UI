@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { commitState } from './commit.svelte.js';
-import { defaultEditMessages } from '../config/edit-messages.js';
+import { defaultEditMessages } from '../../config/edit-messages.js';
 
 /**
  * The commit lifecycle at its own interface. It ran twice — inside

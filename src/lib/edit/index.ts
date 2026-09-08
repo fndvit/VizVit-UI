@@ -1,14 +1,16 @@
-export { getEditAdapter, setEditAdapter } from './context.js';
+export { getEditAdapter, getEditChrome, setEditAdapter } from './context.js';
+export type { EditChrome } from './context.js';
+export { EDIT_CHROME } from './live/index.js';
 export { collectionEditing } from './collection.svelte.js';
 export type { CollectionEditing, RemovableMap } from './collection.svelte.js';
 export { default as ActionLabel } from './ActionLabel.svelte';
 export { default as Editable } from './Editable.svelte';
 export { default as AddSlot } from './chrome/AddSlot.svelte';
-export { default as ConfirmDialog } from './chrome/ConfirmDialog.svelte';
+export { default as ConfirmDialog } from './live/ConfirmDialog.svelte';
 export { default as EditFrame } from './chrome/EditFrame.svelte';
-export type { EditFrameSpec } from './chrome/EditFrame.svelte';
+export type { EditFrameSpec } from './chrome-props.js';
 export { default as EditPanel } from './chrome/EditPanel.svelte';
-export { default as EditPopover } from './chrome/EditPopover.svelte';
+export { default as EditPopover } from './live/EditPopover.svelte';
 export { default as LinkEdit } from './chrome/LinkEdit.svelte';
 export {
 	chromeEdit,

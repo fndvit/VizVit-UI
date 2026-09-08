@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { setEditAdapter } from '../../../edit/context.js';
+	import { EDIT_CHROME } from '../../../edit/live/index.js';
 	import AddSlot from '../../../edit/chrome/AddSlot.svelte';
-	import EditFrame, { type EditFrameSpec } from '../../../edit/chrome/EditFrame.svelte';
+	import type { EditFrameSpec } from '../../../edit/chrome-props.js';
+	import EditFrame from '../../../edit/chrome/EditFrame.svelte';
 	import EditPanel from '../../../edit/chrome/EditPanel.svelte';
 	import type {
 		EditAdapter,
@@ -26,7 +28,7 @@
 
 	// Context is set once at init, on purpose — tests swap adapters by remounting.
 	// svelte-ignore state_referenced_locally
-	if (adapter) setEditAdapter(adapter);
+	if (adapter) setEditAdapter(adapter, EDIT_CHROME);
 </script>
 
 <div data-testid="frame-host">

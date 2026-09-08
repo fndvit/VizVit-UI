@@ -1,29 +1,21 @@
 <script lang="ts">
-	import type { PropertyDescriptor, PropertyValue } from '../types.js';
-	import PropertyRow from './PropertyRow.svelte';
+	import type { EditPanelProps } from '../chrome-props.js';
+	import { getEditChrome } from '../context.js';
 
 	/**
-	 * The property form an EditFrame's popover holds: one PropertyRow per
-	 * entry, each with its own independent commit lifecycle. The component
-	 * knows nothing about the entity — the descriptors say everything.
+	 * The property form's GATE. A renderer builds its panel snippet from this
+	 * whether or not anyone will ever open it, so this is the name it imports;
+	 * the rows themselves (`edit/live/EditPanel.svelte`, one PropertyRow per
+	 * entry with its own commit lifecycle) exist only where a host installed
+	 * the chrome. The snippet is only rendered inside a live frame's popover,
+	 * so with no chrome there is nothing to render and nothing is.
 	 */
-	interface Props {
-		rows: { descriptor: PropertyDescriptor; value: PropertyValue }[];
-	}
+	let { rows }: EditPanelProps = $props();
 
-	let { rows }: Props = $props();
+	const chrome = getEditChrome();
 </script>
 
-<div class="panel">
-	{#each rows as row (JSON.stringify(row.descriptor.ref) + row.descriptor.label)}
-		<PropertyRow descriptor={row.descriptor} value={row.value} />
-	{/each}
-</div>
-
-<style>
-	.panel {
-		display: flex;
-		flex-direction: column;
-		gap: var(--space-3);
-	}
-</style>
+{#if chrome}
+	{@const Live = chrome.EditPanel}
+	<Live {rows} />
+{/if}

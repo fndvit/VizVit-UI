@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { setEditAdapter } from '../../../edit/context.js';
+	import { EDIT_CHROME } from '../../../edit/live/index.js';
 	import type { EditAdapter, EditDescriptor } from '../../../edit/types.js';
 	import RichText from '../../ui/RichText.svelte';
 
@@ -14,7 +15,7 @@
 
 	// Context is set once at init, on purpose — the probe swaps adapters by remounting.
 	// svelte-ignore state_referenced_locally
-	setEditAdapter(adapter);
+	setEditAdapter(adapter, EDIT_CHROME);
 </script>
 
 <RichText {body} {edit} />

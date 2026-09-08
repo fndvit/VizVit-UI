@@ -37,10 +37,45 @@ export type { LegalPageEdit } from './components/pages/LegalPage.svelte';
 export { default as WeekliesPage } from './components/pages/WeekliesPage.svelte';
 export type { WeekliesPageEdit } from './components/pages/WeekliesPage.svelte';
 export { default as ProjectPage } from './components/pages/ProjectPage.svelte';
-export type { ProjectPageEdit } from './components/pages/ProjectPage.svelte';
 export { default as WeeklyPage } from './components/pages/WeeklyPage.svelte';
-export type { WeeklyPageEdit } from './components/pages/WeeklyPage.svelte';
-export * from './content/index.js';
+// The content vocabularies and data shapes, beside the renderers that consume
+// them. `./contract` names the component-free ones a second time, by design.
+export { renderBody } from './content/richtext.js';
+export type { RichTextBlock } from './content/richtext.js';
+export { GET_INVOLVED_REASON_KEYS, PAGE_COPY_KEYS } from './content/pages.js';
+export type { CopyEditFor, CopyKey, PageCopy, PageId } from './content/pages.js';
+export {
+	COMMENT_STATUSES,
+	CONTACT_CATEGORIES,
+	MILESTONE_CATEGORIES,
+	PROJECT_KINDS,
+	REACTIONS
+} from './content/types.js';
+export type {
+	ArticleEdit,
+	CollaboratorData,
+	CommentData,
+	CommentThreadData,
+	CommentStatus,
+	ContactCategory,
+	FieldConstraint,
+	FormFailReason,
+	JobOpeningData,
+	MilestoneCategory,
+	MilestoneData,
+	ProjectArticleData,
+	ProjectCardData,
+	ProjectKind,
+	Reaction,
+	ReactionSummary,
+	ReactionTarget,
+	SortDirection,
+	TeamMemberData,
+	ThemeData,
+	WeeklyArticleData,
+	WeeklyCardData,
+	WeeklySourceData
+} from './content/types.js';
 export {
 	MILESTONE_CATEGORY_COLOR,
 	matchesMilestoneFilter,

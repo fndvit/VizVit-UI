@@ -3,6 +3,7 @@
 	import { setUiConfig } from '../../../config/context.js';
 	import type { UiConfigInput } from '../../../config/types.js';
 	import { setEditAdapter } from '../../../edit/context.js';
+	import { EDIT_CHROME } from '../../../edit/live/index.js';
 	import type { EditAdapter } from '../../../edit/types.js';
 
 	/**
@@ -24,7 +25,7 @@
 
 	// Context is set once at init, on purpose — tests swap by remounting.
 	// svelte-ignore state_referenced_locally
-	if (adapter) setEditAdapter(adapter);
+	if (adapter) setEditAdapter(adapter, EDIT_CHROME);
 	// svelte-ignore state_referenced_locally
 	if (config) setUiConfig(() => config);
 </script>

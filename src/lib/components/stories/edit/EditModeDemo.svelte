@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { setEditAdapter } from '../../../edit/context.js';
+	import { EDIT_CHROME } from '../../../edit/live/index.js';
 	import { collectionOf, entityEdit, entityProperty, pageCopyEdit } from '../../../edit/helpers.js';
 	import type {
 		EditDescriptor,
@@ -43,79 +44,82 @@
 
 	// The living spec of the full adapter: text saves, panel properties,
 	// structural ops and image upload, all in memory.
-	setEditAdapter({
-		get isEditing() {
-			return isEditing;
-		},
-		save: async (descriptor: EditDescriptor, value: string) => {
-			await new Promise((resolve) => setTimeout(resolve, 400));
-			if (failing) throw new Error('demo failure');
-			log = [...log, `${nameOf(descriptor.ref)} [${descriptor.locale}] ← "${value}"`];
-		},
-		saveProperty: async (descriptor: PropertyDescriptor, value: PropertyValue) => {
-			await new Promise((resolve) => setTimeout(resolve, 400));
-			if (failing) throw new Error('demo failure');
-			const ref = descriptor.ref;
-			if (ref.kind === 'entity' && ref.entity === 'milestones') {
-				// The flag arrives as a boolean: on = published, so draft = !value.
-				const FIELDS = {
-					occurred_on: 'occurredOn',
-					category: 'category',
-					link_url: 'linkUrl'
-				} as const;
-				const field = FIELDS[ref.field as keyof typeof FIELDS];
-				const patch =
-					ref.field === 'is_published'
-						? { draft: value !== true }
-						: field
-							? { [field]: value }
-							: null;
-				if (patch) {
-					milestones = milestones
-						.map((m) => (m.id === ref.id ? { ...m, ...patch } : m))
-						.sort((a, b) => a.occurredOn.localeCompare(b.occurredOn));
+	setEditAdapter(
+		{
+			get isEditing() {
+				return isEditing;
+			},
+			save: async (descriptor: EditDescriptor, value: string) => {
+				await new Promise((resolve) => setTimeout(resolve, 400));
+				if (failing) throw new Error('demo failure');
+				log = [...log, `${nameOf(descriptor.ref)} [${descriptor.locale}] ← "${value}"`];
+			},
+			saveProperty: async (descriptor: PropertyDescriptor, value: PropertyValue) => {
+				await new Promise((resolve) => setTimeout(resolve, 400));
+				if (failing) throw new Error('demo failure');
+				const ref = descriptor.ref;
+				if (ref.kind === 'entity' && ref.entity === 'milestones') {
+					// The flag arrives as a boolean: on = published, so draft = !value.
+					const FIELDS = {
+						occurred_on: 'occurredOn',
+						category: 'category',
+						link_url: 'linkUrl'
+					} as const;
+					const field = FIELDS[ref.field as keyof typeof FIELDS];
+					const patch =
+						ref.field === 'is_published'
+							? { draft: value !== true }
+							: field
+								? { [field]: value }
+								: null;
+					if (patch) {
+						milestones = milestones
+							.map((m) => (m.id === ref.id ? { ...m, ...patch } : m))
+							.sort((a, b) => a.occurredOn.localeCompare(b.occurredOn));
+					}
 				}
+				log = [
+					...log,
+					`${nameOf(ref)} ← ${typeof value === 'string' ? `"${value}"` : String(value)}`
+				];
+			},
+			applyOp: async (op: EntityOp) => {
+				await new Promise((resolve) => setTimeout(resolve, 400));
+				if (failing) throw new Error('demo failure');
+				if (op.kind === 'create') {
+					const anchorIndex = op.anchor
+						? milestones.findIndex((m) => m.id === op.anchor?.id)
+						: milestones.length;
+					const created: MilestoneData = {
+						id: (nextId += 1),
+						occurredOn: milestones[anchorIndex]?.occurredOn ?? '2026-01-01',
+						category: 'foundation',
+						title: 'Nova fita',
+						body: null,
+						imageUrls: [],
+						linkUrl: null
+					};
+					milestones = milestones.toSpliced(
+						anchorIndex === -1 ? milestones.length : anchorIndex,
+						0,
+						created
+					);
+					log = [...log, `+ ${op.collection.entity}#${created.id}`];
+					return { id: created.id };
+				}
+				if (op.kind === 'remove') {
+					milestones = milestones.filter((m) => m.id !== op.id);
+					log = [...log, `− ${op.collection.entity}#${op.id}`];
+				}
+			},
+			uploadImage: async (_descriptor: PropertyDescriptor, file: File) => {
+				await new Promise((resolve) => setTimeout(resolve, 400));
+				if (failing) throw new Error('demo failure');
+				return URL.createObjectURL(file);
 			}
-			log = [
-				...log,
-				`${nameOf(ref)} ← ${typeof value === 'string' ? `"${value}"` : String(value)}`
-			];
 		},
-		applyOp: async (op: EntityOp) => {
-			await new Promise((resolve) => setTimeout(resolve, 400));
-			if (failing) throw new Error('demo failure');
-			if (op.kind === 'create') {
-				const anchorIndex = op.anchor
-					? milestones.findIndex((m) => m.id === op.anchor?.id)
-					: milestones.length;
-				const created: MilestoneData = {
-					id: (nextId += 1),
-					occurredOn: milestones[anchorIndex]?.occurredOn ?? '2026-01-01',
-					category: 'foundation',
-					title: 'Nova fita',
-					body: null,
-					imageUrls: [],
-					linkUrl: null
-				};
-				milestones = milestones.toSpliced(
-					anchorIndex === -1 ? milestones.length : anchorIndex,
-					0,
-					created
-				);
-				log = [...log, `+ ${op.collection.entity}#${created.id}`];
-				return { id: created.id };
-			}
-			if (op.kind === 'remove') {
-				milestones = milestones.filter((m) => m.id !== op.id);
-				log = [...log, `− ${op.collection.entity}#${op.id}`];
-			}
-		},
-		uploadImage: async (_descriptor: PropertyDescriptor, file: File) => {
-			await new Promise((resolve) => setTimeout(resolve, 400));
-			if (failing) throw new Error('demo failure');
-			return URL.createObjectURL(file);
-		}
-	});
+		EDIT_CHROME
+	);
 
 	function milestoneEditMap(milestone: MilestoneData) {
 		const property = entityProperty('milestones', milestone.id);
