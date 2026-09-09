@@ -10,6 +10,10 @@
 			'M5 7h14M10 7V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2m3 0v12a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V7m3 4v6m4-6v6',
 		duplicate: 'M9 9h10v12H9zM5 15V3h10',
 		plus: 'M12 5v14M5 12h14',
+		/* A month sheet: body, its two hanging tabs, and the rule under the
+		   weekday row. One subpath list, like `trash` and `logout`. */
+		calendar:
+			'M5 6h14a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1zM4 10.5h16M8.5 3.5V6M15.5 3.5V6',
 		'chevron-right': 'M9 5l7 7-7 7',
 		'chevron-left': 'M15 5l-7 7 7 7',
 		close: 'M6 6l12 12M18 6L6 18',

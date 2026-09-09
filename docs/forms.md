@@ -89,3 +89,28 @@ values directly.
 | `attributes?`                                         | `HTMLInputAttributes`         | a remote field's `.as(…)` spread — the form owns value, name, and type      |
 | `error?`                                              | `string \| null`              | rendered and wired through `aria-invalid`/`aria-describedby` (`--series-8`) |
 | `type?`, `required?`, `autocomplete?`, `placeholder?` |                               | input passthroughs                                                          |
+
+## SelectField
+
+`TextField`'s sibling for a choice out of a list: label, `<select>`, hint and
+error in one module. Use it for a select the host binds or handles itself;
+a remote-form select stays with `Field`, whose snippet spreads the form's own
+attributes.
+
+| Prop                              | Type                          | Notes                                                                                     |
+| --------------------------------- | ----------------------------- | ----------------------------------------------------------------------------------------- |
+| `id`, `label`                     | `string`                      | label shows except in `bare`, where it stays for screen readers                           |
+| `variant?`                        | `'field' \| 'pill' \| 'bare'` | labelled box / filled navy toolbar control / box labelled by its surroundings             |
+| `inline?`                         | `boolean`                     | label beside the control rather than above it                                             |
+| `value?`                          | `string` (bindable)           | a `<select>` carries a string; coerce at the edge. Ignored when `attributes` is given     |
+| `options?`                        | `SelectOption[]`              | `{ value, label, disabled? }` — for labels that are data                                  |
+| `children?`                       | `Snippet`                     | options as markup, for labels that are computed                                           |
+| `placeholder?`                    | `{ label, disabled? }`        | leading option. `disabled` = must be chosen past; otherwise the empty value is selectable |
+| `error?`, `hint?`                 | `string \| null`              | both wired through `aria-describedby`; the error also sets `aria-invalid` (`--series-8`)  |
+| `onchange?`                       | `(value: string) => void`     | beside the binding — for coercion, or for acting on the choice                            |
+| `attributes?`                     | `HTMLSelectAttributes`        | a remote field's `.as('select')` spread — the form owns the value                         |
+| `name?`, `required?`, `disabled?` |                               | select passthroughs; `name` is for a native form submit                                   |
+
+The boxed variants take their corner from `--radius-control` rather than
+`--radius`, because a theme that makes its buttons pills still wants a boxed
+field. `.control` in `base.css` reads the same token.

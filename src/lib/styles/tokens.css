@@ -50,6 +50,10 @@
 
 	/* Shape & layout */
 	--radius: 8px;
+	/* The corner of an input, a select, a textarea — the `.control` skin.
+	   Separate from `--radius` because a theme that makes its buttons pills
+	   (the admin app sets `--radius: 999px`) still wants a boxed field. */
+	--radius-control: 8px;
 	--radius-lg: 16px;
 	--content-max: 1200px;
 

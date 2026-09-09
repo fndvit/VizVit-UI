@@ -40,7 +40,7 @@
  * Sizing (padding, widths) stays with the component that adds the class. */
 .control {
 	border: 1px solid var(--color-axis);
-	border-radius: var(--radius);
+	border-radius: var(--radius-control);
 	background: var(--color-surface);
 }
 
