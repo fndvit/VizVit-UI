@@ -24,13 +24,19 @@
 <Story name="Placeholder" args={{ placeholder: { label: 'tria…', disabled: true } }} />
 
 <!-- Standing help, and a rejection wired through aria. -->
-<Story name="WithHint" args={{ hint: 'Es pot canviar més tard' }} />
-<Story name="WithError" args={{ error: 'Tria un tipus' }} />
+<Story name="WithHint" args={{ value: 'vacation', hint: 'Es pot canviar més tard' }} />
+<Story
+	name="WithError"
+	args={{ placeholder: { label: 'tria…', disabled: true }, error: 'Tria un tipus' }}
+/>
 
 <!-- The filled toolbar control, label beside it. -->
-<Story name="PillInline" args={{ variant: 'pill', inline: true, label: 'Vista' }} />
+<Story
+	name="PillInline"
+	args={{ variant: 'pill', inline: true, label: 'Vista', value: 'vacation' }}
+/>
 
 <!-- Inline chrome: the surroundings label it. -->
-<Story name="Bare" args={{ variant: 'bare' }} />
+<Story name="Bare" args={{ variant: 'bare', value: 'justified' }} />
 
 <Story name="Disabled" args={{ disabled: true, value: 'vacation' }} />

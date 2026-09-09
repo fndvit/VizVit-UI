@@ -176,8 +176,10 @@
 		opacity: 0.5;
 	}
 
-	/* The filled toolbar control: a heading's neighbour, not a form field. */
+	/* The filled toolbar control: a heading's neighbour, not a form field. It
+	   takes its content's width — a form field stretches, a pill does not. */
 	.pill select {
+		align-self: flex-start;
 		border-color: var(--color-navy);
 		border-radius: 999px;
 		background: var(--color-navy);
