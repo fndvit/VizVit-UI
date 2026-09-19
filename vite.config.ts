@@ -5,6 +5,11 @@ import { sveltekit } from '@sveltejs/kit/vite';
 
 export default defineConfig({
 	plugins: [sveltekit(), devtoolsJson()],
+	// `@sveltejs/svelte-scroller` ships raw `.svelte` with a `svelte` field and
+	// no `exports`, so Vite's dependency pre-bundling cannot handle it — it has
+	// to reach the Svelte plugin as source, or the browser project loads a
+	// component compiled against a second Svelte runtime and dies on mount.
+	optimizeDeps: { exclude: ['@sveltejs/svelte-scroller'] },
 	test: {
 		expect: { requireAssertions: true },
 		projects: [

@@ -65,4 +65,18 @@
 
 	/* Motion */
 	--transition-fast: 150ms ease;
+
+	/* Scrollytelling (the `./scrolly` subpath) */
+	/* The sticky background's height. Mobile browsers change `100vh` when the
+	   URL bar collapses, so a host that measures the real viewport sets this. */
+	--device-h: 100vh;
+	--dot-size: 0.375rem;
+	--dot-gap: var(--space-2);
+	--dot-color: currentColor;
+	--dot-active: var(--dot-color);
+	--glass-padding: var(--space-5);
+	--glass-blur: 4px;
+	--video-badge-padding: var(--space-3);
+	--video-badge-color: var(--color-ink);
+	--video-badge-bg: rgb(255 255 255 / 50%);
 }
