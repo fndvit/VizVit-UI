@@ -8,6 +8,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 | Version                       | Released   | What it is                                                       |
 | ----------------------------- | ---------- | ---------------------------------------------------------------- |
 | [Unreleased](./unreleased.md) | —          | On `main`, not yet in a tagged version                           |
+| [0.30.0](./0.30.0.md)         | 2026-09-21 | `CrossfadeVideoHandle` reaches the `./scrolly` surface           |
 | [0.29.0](./0.29.0.md)         | 2026-09-21 | The `./scrolly` subpath; the `user` glyph rejoins the repository |
 
 This package is installed rather than deployed, so the number describes the
