@@ -4,7 +4,11 @@
 npm install @vit-foundation/ui
 ```
 
-`svelte` ^5.0.0 is the only peer dependency.
+`svelte` ^5.0.0 is the only required peer dependency.
+`@sveltejs/svelte-scroller` is an optional one, needed by `ScrollySteps`
+and nothing else — npm will not install it for you, and a missing optional
+peer surfaces at build time rather than at install time. See
+[scrolly](./components/scrolly.md#installing-the-peer).
 
 ## Styles
 
@@ -35,6 +39,8 @@ Everything is exported flat from the root, and again grouped by role:
 | `@vit-foundation/ui/chrome`     | PageShell, Nav, Footer — [reference](./components/chrome.md)                                  |
 | `@vit-foundation/ui/content`    | content renderers, the nine page modules + data shapes — [reference](./components/content.md) |
 | `@vit-foundation/ui/community`  | auth, account, comments, reactions, contact — [reference](./components/community.md)          |
+| `@vit-foundation/ui/admin`      | shell composition for internal tools — [reference](./components/admin.md)                     |
+| `@vit-foundation/ui/scrolly`    | scrollytelling primitives; **not** in the root export — [reference](./components/scrolly.md)  |
 | `@vit-foundation/ui/edit`       | the edit-mode contract — [guide](./edit-mode.md)                                              |
 | `@vit-foundation/ui/config`     | `UiProvider` and the `UiConfig` context                                                       |
 | `@vit-foundation/ui/testing`    | `createRemoteFormMock` for stories and tests                                                  |
@@ -103,3 +109,9 @@ npm run storybook
 
 Every component has a story; `Edit mode/EditMode` is an interactive demo of
 the whole editing loop against an in-memory adapter.
+
+## What changed between versions
+
+The [changelog](./changelog/index.md) is one page per version, newest first.
+[Unreleased](./changelog/unreleased.md) is what is on `main` and not yet
+published.
