@@ -10,6 +10,7 @@
 export { default as ScrollySteps } from './components/scrolly/ScrollySteps.svelte';
 export { default as ScrollyStepIndicator } from './components/scrolly/ScrollyStepIndicator.svelte';
 export { default as CrossfadeVideo } from './components/scrolly/CrossfadeVideo.svelte';
+export type { CrossfadeVideoHandle } from './components/scrolly/CrossfadeVideo.svelte';
 export { default as GlassCard } from './components/scrolly/GlassCard.svelte';
 export {
 	calcOpacity,
