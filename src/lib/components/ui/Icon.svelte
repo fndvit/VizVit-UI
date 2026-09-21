@@ -19,7 +19,12 @@
 		close: 'M6 6l12 12M18 6L6 18',
 		globe:
 			'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM3 12h18M12 3c-2.5 2.4-3.8 5.5-3.8 9s1.3 6.6 3.8 9c2.5-2.4 3.8-5.5 3.8-9S14.5 5.4 12 3z',
-		logout: 'M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4M10 8l-4 4 4 4M6 12h10'
+		logout: 'M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4M10 8l-4 4 4 4M6 12h10',
+		// A person: head above shoulders, both open strokes like every other
+		// glyph here. Named `user` rather than `person` or `account` because the
+		// consuming rails label the entry themselves — the glyph says who, not
+		// which page.
+		user: 'M12 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM5.5 20a6.5 6.5 0 0 1 13 0'
 	} as const;
 
 	export type IconName = keyof typeof PATHS;
