@@ -79,4 +79,17 @@
 	--video-badge-padding: var(--space-3);
 	--video-badge-color: var(--color-ink);
 	--video-badge-bg: rgb(255 255 255 / 50%);
+
+	/* Floating overlays (the `./overlay` subpath) */
+	/* The hover card's fixed width. Fixed rather than fluid because the card is
+	   positioned by measuring it: a width that depends on its content makes the
+	   placement arithmetic chase itself for a frame. */
+	--vit-card-width: 277px;
+	--vit-card-padding: var(--space-2, 10px);
+	--vit-card-gap: var(--space-2, 10px);
+	--vit-card-bg: #ffffff;
+	--vit-card-radius: 0;
+	--vit-card-shadow: none;
+	--vit-card-font: inherit;
+	--vit-card-shimmer-color: currentColor;
 }

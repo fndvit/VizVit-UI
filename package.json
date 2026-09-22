@@ -7,7 +7,7 @@
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
 		"prepack": "svelte-kit sync && svelte-package && publint",
-		"_comment:prepublishOnly": "Publishing is MANUAL — the release workflow that fired on every v* tag had no NPM_TOKEN, failed every time, and was deleted, so this is the ONLY publish gate. npm runs it before prepack.",
+		"_comment:prepublishOnly": "Publishing is MANUAL \u2014 the release workflow that fired on every v* tag had no NPM_TOKEN, failed every time, and was deleted, so this is the ONLY publish gate. npm runs it before prepack.",
 		"prepublishOnly": "npm run lint && npm run check && npm run test:unit -- --run",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
@@ -96,6 +96,11 @@
 			"types": "./dist/scrolly.d.ts",
 			"svelte": "./dist/scrolly.js",
 			"default": "./dist/scrolly.js"
+		},
+		"./overlay": {
+			"types": "./dist/overlay.d.ts",
+			"svelte": "./dist/overlay.js",
+			"default": "./dist/overlay.js"
 		}
 	},
 	"peerDependencies": {
@@ -142,7 +147,7 @@
 		"svelte"
 	],
 	"license": "MIT",
-	"description": "Fundació VIT's shared Svelte 5 component library with pluggable edit mode",
+	"description": "Fundaci\u00f3 VIT's shared Svelte 5 component library with pluggable edit mode",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/fndvit/VizVit-UI.git"

@@ -19,3 +19,4 @@ export * from './edit/index.js';
 // server-side rules, so they go through ./contract instead — see the note in
 // utils/paths.ts, which is where the export surface for all of them is decided.
 export { buildQueryString } from './utils/paths.js';
+export { anchor, HoverCard } from './overlay.js';
