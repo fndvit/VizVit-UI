@@ -233,12 +233,12 @@
 	}
 
 	.vit-madlib__separator {
-		padding: 0 0.375em;
+		padding: 0 6px;
 		color: var(--vit-madlib-muted-color, color-mix(in srgb, currentColor 35%, transparent));
 	}
 
 	.vit-madlib__toggle {
-		padding: 0 0 0.125em;
+		padding: 0 0 2px;
 		margin: 0;
 		border: 0;
 		border-bottom: 2px solid transparent;
