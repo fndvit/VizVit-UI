@@ -145,7 +145,7 @@
 
 	.vit-inline-select__trigger {
 		display: inline;
-		padding: 0 0 0.1em;
+		padding: 0;
 		margin: 0;
 		border: 0;
 		border-bottom: 2px solid currentColor;
@@ -183,8 +183,10 @@
 		position: absolute;
 		left: 0;
 		z-index: var(--vit-madlib-menu-z, 40);
-		margin: 0.25em 0 0;
-		padding: 0.25em 0;
+		/* Pixel spacing, not em: the menu sits beside sentence text that can be
+		   24px, and em-scaled rows read as a different, roomier control there. */
+		margin: 4px 0 0;
+		padding: 4px 0;
 		list-style: none;
 		width: max-content;
 		max-width: 42rem;
@@ -197,7 +199,7 @@
 	}
 
 	.vit-inline-select__option {
-		padding: 0.375em 1em;
+		padding: 6px 16px;
 		font-weight: var(--vit-madlib-control-weight, 700);
 		color: var(--vit-madlib-muted-color, color-mix(in srgb, currentColor 35%, transparent));
 		cursor: pointer;
