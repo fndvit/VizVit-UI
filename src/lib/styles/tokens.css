@@ -92,4 +92,27 @@
 	--vit-card-shadow: none;
 	--vit-card-font: inherit;
 	--vit-card-shimmer-color: currentColor;
+
+	/* Madlib (`./madlib`): a sentence with blanks. The controls inherit the
+	   font, size and weight of the text around them, so most of these default
+	   to "whatever the sentence is"; the menu and the accents are the ones a
+	   theme sets. `--vit-madlib-select-accent` follows `--vit-madlib-accent`
+	   unless a theme wants the dropdown underline and the toggle underline to
+	   differ, which the first host did. */
+	--vit-madlib-font: inherit;
+	--vit-madlib-color: inherit;
+	--vit-madlib-weight: inherit;
+	--vit-madlib-control-weight: 700;
+	--vit-madlib-lead-size: 1em;
+	--vit-madlib-lead-line-height: 1.4;
+	--vit-madlib-size: 1em;
+	--vit-madlib-line-height: 1.4;
+	--vit-madlib-muted-color: color-mix(in srgb, currentColor 35%, transparent);
+	--vit-madlib-accent: currentColor;
+	--vit-madlib-select-accent: var(--vit-madlib-accent);
+	--vit-madlib-menu-bg: var(--color-surface);
+	--vit-madlib-menu-hover: color-mix(in srgb, currentColor 10%, transparent);
+	--vit-madlib-menu-shadow: none;
+	--vit-madlib-menu-max-height: 15rem;
+	--vit-madlib-menu-z: 40;
 }

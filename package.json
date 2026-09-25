@@ -101,6 +101,11 @@
 			"types": "./dist/overlay.d.ts",
 			"svelte": "./dist/overlay.js",
 			"default": "./dist/overlay.js"
+		},
+		"./madlib": {
+			"types": "./dist/madlib.d.ts",
+			"svelte": "./dist/madlib.js",
+			"default": "./dist/madlib.js"
 		}
 	},
 	"peerDependencies": {
