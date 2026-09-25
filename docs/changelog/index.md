@@ -8,6 +8,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 | Version                       | Released   | What it is                                                         |
 | ----------------------------- | ---------- | ------------------------------------------------------------------ |
 | [Unreleased](./unreleased.md) | —          | On `main`, not yet in a tagged version                             |
+| [0.32.1](./0.32.1.md)         | 2026-09-25 | `./madlib` metrics match the selector it was extracted from        |
 | [0.32.0](./0.32.0.md)         | 2026-09-25 | The `./madlib` subpath: `<Madlib>`, `<InlineSelect>`, tree helpers |
 | [0.31.0](./0.31.0.md)         | 2026-09-22 | The `./overlay` subpath: `anchor` placement and `<HoverCard>`      |
 | [0.30.0](./0.30.0.md)         | 2026-09-21 | `CrossfadeVideoHandle` reaches the `./scrolly` surface             |
