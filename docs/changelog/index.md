@@ -5,12 +5,13 @@ version**, newest first. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-| Version                       | Released   | What it is                                                       |
-| ----------------------------- | ---------- | ---------------------------------------------------------------- |
-| [Unreleased](./unreleased.md) | —          | On `main`, not yet in a tagged version                           |
-| [0.31.0](./0.31.0.md)         | 2026-09-22 | The `./overlay` subpath: `anchor` placement and `<HoverCard>`    |
-| [0.30.0](./0.30.0.md)         | 2026-09-21 | `CrossfadeVideoHandle` reaches the `./scrolly` surface           |
-| [0.29.0](./0.29.0.md)         | 2026-09-21 | The `./scrolly` subpath; the `user` glyph rejoins the repository |
+| Version                       | Released   | What it is                                                         |
+| ----------------------------- | ---------- | ------------------------------------------------------------------ |
+| [Unreleased](./unreleased.md) | —          | On `main`, not yet in a tagged version                             |
+| [0.32.0](./0.32.0.md)         | 2026-09-25 | The `./madlib` subpath: `<Madlib>`, `<InlineSelect>`, tree helpers |
+| [0.31.0](./0.31.0.md)         | 2026-09-22 | The `./overlay` subpath: `anchor` placement and `<HoverCard>`      |
+| [0.30.0](./0.30.0.md)         | 2026-09-21 | `CrossfadeVideoHandle` reaches the `./scrolly` surface             |
+| [0.29.0](./0.29.0.md)         | 2026-09-21 | The `./scrolly` subpath; the `user` glyph rejoins the repository   |
 
 This package is installed rather than deployed, so the number describes the
 API: MINOR for new exports and features, PATCH for fixes alone, MAJOR for a
