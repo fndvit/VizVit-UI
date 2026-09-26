@@ -15,6 +15,12 @@ export { default as IconButton } from './components/ui/IconButton.svelte';
 export { default as Link } from './components/ui/Link.svelte';
 export { default as Logo } from './components/ui/Logo.svelte';
 export { default as Modal } from './components/ui/Modal.svelte';
+export {
+	default as PersonFigure,
+	type ArmsPose,
+	type HeadShape,
+	type LegsPose
+} from './components/ui/PersonFigure.svelte';
 export { default as Pagination } from './components/ui/Pagination.svelte';
 export { default as RichText } from './components/ui/RichText.svelte';
 export { default as SearchInput } from './components/ui/SearchInput.svelte';

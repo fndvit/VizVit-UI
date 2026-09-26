@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500" preserveAspectRatio="xMidYMid slice">
+  <!-- `slice` on the root: an SVG drawn through an svg `<image>` fits with ITS
+       OWN preserveAspectRatio, not the referencing element's, so without it
+       the figure's circle mode would letterbox this where a photo would crop. -->
+  <!-- An opaque 4:5 portrait, for the card fixtures and `PersonFigure`'s circle mode. -->
+  <rect width="400" height="500" fill="#c9d6dc"/>
+  <ellipse cx="200" cy="215" rx="88" ry="108" fill="#e9b98d"/>
+  <path d="M112 215c0-80 34-136 88-136s88 56 88 136c-12-46-36-70-88-70s-76 24-88 70z" fill="#3b2a24"/>
+  <circle cx="168" cy="220" r="8" fill="#2b2b2b"/>
+  <circle cx="232" cy="220" r="8" fill="#2b2b2b"/>
+  <path d="M176 270q24 18 48 0" fill="none" stroke="#a5613f" stroke-width="6" stroke-linecap="round"/>
+  <path d="M60 500c0-90 60-150 140-150s140 60 140 150z" fill="#1f2a5e"/>
+</svg>

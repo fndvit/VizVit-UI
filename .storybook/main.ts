@@ -1,6 +1,9 @@
 import type { StorybookConfig } from '@storybook/sveltekit';
 
 const config: StorybookConfig = {
+	// The fixtures' placeholder images live in `static/`, which SvelteKit
+	// serves and Storybook does not unless told.
+	staticDirs: ['../static'],
 	stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|ts|svelte)'],
 	addons: [
 		'@storybook/addon-svelte-csf',
