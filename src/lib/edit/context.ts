@@ -5,7 +5,8 @@ import type {
 	EditableProps,
 	EditFrameProps,
 	EditPanelProps,
-	LinkEditProps
+	LinkEditProps,
+	PlaceableProps
 } from './chrome-props.js';
 import type { EditAdapter } from './types.js';
 
@@ -33,6 +34,12 @@ export interface EditChrome {
 	EditPanel: Component<EditPanelProps>;
 	AddSlot: Component<AddSlotProps>;
 	LinkEdit: Component<LinkEditProps>;
+	/**
+	 * The canvas handles: drag, arrow keys, resize, layer. Optional, so a host
+	 * that composed its own table before it existed still type-checks; without
+	 * it a canvas item renders as it does read-only.
+	 */
+	Placeable?: Component<PlaceableProps>;
 }
 
 interface Installed {

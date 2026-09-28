@@ -15,6 +15,10 @@
 	 * and the add slot call `openRecord`, which a CMS answers with its own
 	 * form; here it only logs the target. The selects'
 	 * options are worded here, inline, the way a host words them.
+	 *
+	 * On a wide canvas every figure can be dragged, nudged from its grip with
+	 * the arrow keys, resized from its corner or sent a layer up or down:
+	 * `savePlacement` writes the patch into the row, and the log shows it.
 	 */
 	let isEditing = $state(true);
 	let members = $state<TeamMemberData[]>(sampleTeam.map((m, index) => ({ ...m, id: index + 1 })));
@@ -33,6 +37,20 @@
 						? `obre la fitxa d’un ${target.entity} nou`
 						: `obre la fitxa de ${target.entity}#${target.id}`
 				];
+			},
+			savePlacement: async (target, placement) => {
+				members = members.map((m) =>
+					m.id === target.id
+						? {
+								...m,
+								...(placement.x !== undefined && { figureX: placement.x }),
+								...(placement.y !== undefined && { figureY: placement.y }),
+								...(placement.z !== undefined && { figureZ: placement.z }),
+								...(placement.size !== undefined && { figureSize: placement.size })
+							}
+						: m
+				);
+				log = [...log, `place ${target.entity}#${target.id} ${JSON.stringify(placement)}`];
 			},
 			applyOp: async (op) => {
 				if (op.kind === 'remove') members = members.filter((m) => m.id !== op.id);

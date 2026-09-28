@@ -63,6 +63,17 @@ export type HeadMode = (typeof HEAD_MODES)[number];
 /** Bounds a host's integer columns share with `TeamFigure`: px of vertical shift, and percents. */
 export const FIGURE_OFFSET = { min: 0, max: 400 } as const;
 export const FIGURE_PERCENT = { min: 50, max: 200 } as const;
+/**
+ * Where a figure stands on a canvas, and on which layer. Both axes are in
+ * thousandths of the canvas WIDTH — y too, so a collage scales as one piece
+ * and does not depend on the canvas's height, which follows from the figures.
+ * y runs to three widths, room for a tall collage.
+ */
+export const FIGURE_POSITION = {
+	x: { min: 0, max: 1000 },
+	y: { min: 0, max: 3000 }
+} as const;
+export const FIGURE_LAYER = { min: 0, max: 99 } as const;
 
 /**
  * The composed box. The survey stacked three svgs on a grid (rows 48 / 111 /

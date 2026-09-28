@@ -47,7 +47,22 @@
 	{/snippet}
 </Story>
 
-<!-- Open a member's panel and change a pose: the figure redraws. -->
+<!-- A collage: some members placed, the rest on the row layout, one on a higher layer. -->
+<Story name="Canvas">
+	{#snippet template()}
+		<TeamFigureField
+			members={sampleTeam.map((m, index) =>
+				index === 0
+					? { ...m, figureX: 40, figureY: 260, figureZ: 2 }
+					: index === 2
+						? { ...m, figureX: 640, figureY: 20 }
+						: m
+			)}
+		/>
+	{/snippet}
+</Story>
+
+<!-- Drag a figure, nudge it from its grip, resize it from its corner: the canvas saves one patch per gesture. -->
 <Story name="Editing">
 	{#snippet template()}
 		<TeamFigureEditDemo />

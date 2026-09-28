@@ -1,7 +1,11 @@
 <script lang="ts">
 	import type { TeamMemberData } from '../../content/types.js';
 	import EditFrame from '../../edit/chrome/EditFrame.svelte';
+	import Placeable from '../../edit/chrome/Placeable.svelte';
+	import type { PlaceableSpec, PlacementBounds } from '../../edit/chrome-props.js';
+	import { FIGURE_LAYER, FIGURE_PERCENT, FIGURE_POSITION } from '../ui/figure/paths.js';
 	import PersonFigure from '../ui/figure/PersonFigure.svelte';
+	import type { FigurePlacement } from './layout.js';
 	import type { TeamMemberEditMap } from './TeamMemberCard.svelte';
 
 	/**
@@ -12,15 +16,24 @@
 	 * panel beside it would repeat the figure rows behind a second button,
 	 * and nothing edits inline: a caption is too small a place for three
 	 * languages, and a bio that reveals on hover is no place for a caret.
+	 *
+	 * On the field's canvas the figure also stands at a `placement`, which
+	 * the field resolves for every member; where the host saves placements
+	 * the same record gives it the canvas handles (drag, arrow keys, resize,
+	 * layer). Alone, or on a flowing field, it ignores the placement.
 	 */
 	interface Props {
 		member: TeamMemberData;
 		/** Marks fields editable where an edit adapter is active. */
 		edit?: TeamMemberEditMap;
+		/** Where the field's canvas puts it — resolved, auto places included. */
+		placement?: FigurePlacement;
+		/** The lowest and highest layer the field's OTHER figures use. */
+		layers?: PlacementBounds;
 		class?: string;
 	}
 
-	let { member, edit, class: className = '' }: Props = $props();
+	let { member, edit, placement, layers, class: className = '' }: Props = $props();
 
 	const arms = $derived(member.figureArms ?? 'down');
 	const legs = $derived(member.figureLegs ?? 'standing');
@@ -37,6 +50,38 @@
 	const photo = $derived(head === 'drawn' ? null : member.photoUrl || null);
 	const photoShape = $derived(head === 'circle' ? 'circle' : 'cutout');
 
+	// Size and offset drive the flowing field; the canvas reads x, y and z.
+	const wrapperStyle = $derived(
+		[
+			`--vit-team-figure-scale: ${size / 100}`,
+			`--vit-team-figure-offset: ${offset}px`,
+			...(placement
+				? [
+						`--vit-team-figure-x: ${placement.x}`,
+						`--vit-team-figure-y: ${placement.y}`,
+						`--vit-team-figure-z: ${placement.z}`
+					]
+				: [])
+		].join('; ')
+	);
+
+	const placeSpec = $derived<PlaceableSpec | undefined>(
+		edit?.record && placement
+			? {
+					label: edit.label ?? member.name,
+					target: edit.record,
+					placement,
+					layers: layers ?? { min: placement.z, max: placement.z },
+					bounds: {
+						x: FIGURE_POSITION.x,
+						y: FIGURE_POSITION.y,
+						z: FIGURE_LAYER,
+						size: FIGURE_PERCENT
+					}
+				}
+			: undefined
+	);
+
 	const frameSpec = $derived(
 		edit && (edit.record || edit.removeOp)
 			? { label: edit.label ?? member.name, record: edit.record, removeOp: edit.removeOp }
@@ -46,26 +91,26 @@
 
 <!-- The frame goes around the whole figure, inside this wrapper: inside, so
      the field's flex row never gains a child (the WeeklieCard rule); around,
-     so its div never sits between the figure and its figcaption. -->
-<div
-	class="vit-team-figure {className}"
-	style="--vit-team-figure-scale: {size / 100}; --vit-team-figure-offset: {offset}px"
->
-	<EditFrame spec={frameSpec}>
-		<PersonFigure
-			name={member.name}
-			role={member.role}
-			bio={member.bio}
-			{photo}
-			{photoShape}
-			head={headShape}
-			{arms}
-			{legs}
-			headScale={headScale / 100}
-			{labelSide}
-			{labelAlign}
-		/>
-	</EditFrame>
+     so its div never sits between the figure and its figcaption. The canvas
+     handles go around the frame, so a drag carries the frame's toolbar too. -->
+<div class="vit-team-figure {className}" style={wrapperStyle}>
+	<Placeable spec={placeSpec}>
+		<EditFrame spec={frameSpec}>
+			<PersonFigure
+				name={member.name}
+				role={member.role}
+				bio={member.bio}
+				{photo}
+				{photoShape}
+				head={headShape}
+				{arms}
+				{legs}
+				headScale={headScale / 100}
+				{labelSide}
+				{labelAlign}
+			/>
+		</EditFrame>
+	</Placeable>
 </div>
 
 <style>

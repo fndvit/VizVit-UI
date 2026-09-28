@@ -40,6 +40,13 @@ export interface EditMessages {
 	edit_editLink(params: { label: string }): string;
 	edit_linkText(): string;
 	edit_linkUrl(): string;
+	/** The canvas handles: move, resize, layer. */
+	edit_move(params: { label: string }): string;
+	edit_moveHint(): string;
+	edit_resize(): string;
+	edit_bringFront(): string;
+	edit_sendBack(): string;
+	edit_placed(): string;
 }
 
 /**
@@ -70,5 +77,12 @@ export const defaultEditMessages: EditMessages = {
 	edit_emptyRequired: () => 'Aquest camp no pot quedar buit',
 	edit_editLink: ({ label }) => `Edita l’enllaç «${label}»`,
 	edit_linkText: () => 'Text',
-	edit_linkUrl: () => 'Adreça'
+	edit_linkUrl: () => 'Adreça',
+	edit_move: ({ label }) => `Mou: ${label}`,
+	edit_moveHint: () =>
+		'Arrossega-la, o mou-la amb les fletxes (amb Maj, a passos grans); + i − en canvien la mida.',
+	edit_resize: () => 'Canvia la mida',
+	edit_bringFront: () => 'Porta al davant',
+	edit_sendBack: () => 'Envia al fons',
+	edit_placed: () => 'Posició desada'
 };

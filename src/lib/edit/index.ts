@@ -8,7 +8,8 @@ export { default as Editable } from './Editable.svelte';
 export { default as AddSlot } from './chrome/AddSlot.svelte';
 export { default as ConfirmDialog } from './live/ConfirmDialog.svelte';
 export { default as EditFrame } from './chrome/EditFrame.svelte';
-export type { EditFrameSpec } from './chrome-props.js';
+export type { EditFrameSpec, PlaceableSpec, PlacementBounds } from './chrome-props.js';
+export { default as Placeable } from './chrome/Placeable.svelte';
 export { default as EditPanel } from './chrome/EditPanel.svelte';
 export { default as EditPopover } from './live/EditPopover.svelte';
 export { default as LinkEdit } from './chrome/LinkEdit.svelte';
@@ -29,6 +30,7 @@ export type {
 	EditableEntity,
 	EntityOp,
 	LocalizedText,
+	Placement,
 	PropertyDescriptor,
 	PropertyOption,
 	PropertyType,

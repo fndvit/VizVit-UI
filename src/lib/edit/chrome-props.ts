@@ -2,13 +2,14 @@ import type { Snippet } from 'svelte';
 import type {
 	EditDescriptor,
 	EntityOp,
+	Placement,
 	PropertyDescriptor,
 	PropertyValue,
 	RecordTarget
 } from './types.js';
 
 /**
- * The props of the five edit-chrome modules, in one component-free file.
+ * The props of the six edit-chrome modules, in one component-free file.
  *
  * Each of these modules is TWO components with one interface: a GATE at the
  * name every renderer imports (`edit/Editable.svelte`, `edit/chrome/*`), and
@@ -99,4 +100,29 @@ export interface LinkEditProps {
 	/** Accessible name for the modal, e.g. the link's current text. */
 	label?: string;
 	control: Snippet;
+}
+
+/** The range one placement key may take, inclusive. */
+export interface PlacementBounds {
+	min: number;
+	max: number;
+}
+
+/** What one canvas item tells the `Placeable` chrome about itself. */
+export interface PlaceableSpec {
+	/** Human name of the thing, e.g. the member's name. */
+	label: string;
+	/** The row `savePlacement` writes. */
+	target: RecordTarget & { id: string | number };
+	/** Where it stands now — resolved, so an unplaced item passes its automatic place. */
+	placement: Required<Placement>;
+	/** The lowest and highest layer the OTHER items use: «to the front» is one above them. */
+	layers: PlacementBounds;
+	/** What each key may be written as — the host's CHECK constraints. */
+	bounds: Record<keyof Placement, PlacementBounds>;
+}
+
+export interface PlaceableProps {
+	spec?: PlaceableSpec;
+	children: Snippet;
 }

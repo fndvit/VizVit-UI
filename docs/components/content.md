@@ -68,17 +68,34 @@ behind a second button. With a `collection` on the field, the trash removes.
 
 Sizing: `--vit-figure-width` is `--vit-team-figure-base` × `figureSize`, and
 the offset is an in-flow `margin-top` × `--vit-team-figure-offsets` (both in
-`tokens.css`; the field sets them per breakpoint).
+`tokens.css`; the field sets them per breakpoint). On the field's canvas it
+also takes `placement` (the field's resolved x, y, layer and size) and
+`layers` (the other figures' lowest and highest layer), which it sets as
+`--vit-team-figure-x` / `-y` / `-z` and hands to the `Placeable` handles.
 
 ## TeamFigureField
 
 The featured team between the brand shapes: `DecorShapes` left and right on
-the home hero's grid, the figures in a wrapping row scattered by their own
-offsets and sizes. Below 900px the shapes go, the base width drops to 7rem and
-offsets collapse. Props: `members: TeamMemberData[]`,
+the home hero's grid, the figures on a CANVAS between them. Each member stands
+at its row's `figureX` / `figureY` on its `figureZ` layer — thousandths of the
+canvas WIDTH, both axes (`FIGURE_POSITION`, `FIGURE_LAYER` on `./contract`),
+so the collage scales as one piece and the base width is `12cqi`. A member
+with no position takes the next place of a centred row layout of four, its
+`figureOffset` nudging it down, keyed on its index among ALL the members, so
+moving one figure never moves another (`layout.ts`: `placeFigures`,
+`canvasHeight`). The canvas grows to the lowest figure.
+
+Narrow — the field's container under 40rem — the positions are ignored and the
+figures flow in order (`sort_order`), wrapping like any list; below 900px the
+shapes go, the base width drops to 6.5rem and offsets collapse. The switch is a
+container query: the server renders both and no script decides.
+
+Props: `members: TeamMemberData[]`,
 `editFor?: (member) => TeamMemberEditMap | undefined`, `collection?:
 CollectionRef` (turns on the add slot — which prefers the host's `openRecord`
 form for a new member over a seeded row — and each figure's remove), `class?`.
+Where the adapter implements `savePlacement`, each figure on the canvas takes
+the `Placeable` handles through its `record` (see the edit-mode guide).
 
 ## CollaboratorList
 

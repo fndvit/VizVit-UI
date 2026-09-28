@@ -175,6 +175,16 @@ export interface TeamMemberData {
 	figureHeadScale?: number;
 	/** Percent of the base figure width — `FIGURE_PERCENT`'s range. */
 	figureSize?: number;
+	/**
+	 * Where the figure stands on the field's canvas, in thousandths of its
+	 * width (`FIGURE_POSITION`). Null or absent is unplaced: the field gives it
+	 * the next place of its own row layout. A narrow field ignores both and
+	 * flows the figures in order.
+	 */
+	figureX?: number | null;
+	figureY?: number | null;
+	/** The figure's layer on the canvas (`FIGURE_LAYER`); a higher one draws above. */
+	figureZ?: number;
 }
 
 export interface CollaboratorData {

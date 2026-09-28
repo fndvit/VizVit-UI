@@ -132,4 +132,15 @@
 	   the field sets 0 on a narrow viewport, where figures simply wrap. */
 	--vit-team-figure-base: 10rem;
 	--vit-team-figure-offsets: 1;
+	/* A figure's place on the field's canvas, in thousandths of its width, and
+	   its layer — each `TeamFigure` sets its own; these are the unplaced
+	   defaults the canvas reads. */
+	--vit-team-figure-x: 0;
+	--vit-team-figure-y: 0;
+	--vit-team-figure-z: 0;
+	/* The canvas handles (`Placeable`) show and take gestures only where a
+	   canvas turns these on — while it places by position, not while it flows. */
+	--vit-placement-handles: none;
+	--vit-placement-touch: auto;
+	--vit-placement-cursor: auto;
 }

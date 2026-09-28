@@ -54,7 +54,9 @@ setEditAdapter({
 	// Leave it off and image rows fall back to a plain path input.
 	uploadImage: async (descriptor, file) => path,
 	// Optional: the host's own full form for one row, or a new one (no id).
-	openRecord: (target) => { … }
+	openRecord: (target) => { … },
+	// Optional: one patch per canvas gesture — { x?, y?, z?, size? }.
+	savePlacement: async (target, placement) => { … }
 }, EDIT_CHROME);
 ```
 
@@ -244,6 +246,24 @@ Timeline injects each milestone's remove op from `collection` and renders add
 slots between and after the cards. It offers NO reorder: order derives from
 `occurredOn`, so editing the date IS the reorder. The category select fills
 its options from the same labels the category chip renders.
+
+`Placeable` is the canvas item's wrapper, the sixth chrome module: with a
+`PlaceableSpec` (`label`, the row `target`, its resolved `placement`, the other
+items' `layers`, the `bounds` each key may be written as) and an adapter that
+implements `savePlacement`, it gives the item a drag surface, a grip whose
+arrow keys nudge it (Shift for big steps, + and − resize, Escape drops an
+unsaved nudge), a corner that resizes it and two layer buttons. Every gesture
+ends in ONE `savePlacement(target, patch)` holding only what changed — a move
+writes both axes, since an unplaced item's automatic place is not stored — so
+a drag is one write and one revision. The item is previewed where it will land
+until the host's refresh brings the stored placement back; a rejected save
+drops the preview. The canvas decides whether it is one: the handles show and
+take gestures only where it sets `--vit-placement: on` (and the
+`--vit-placement-*` tokens) around a `[data-vit-placement-canvas]` element,
+which is what its lengths are thousandths of. `TeamFigureField` is the one
+canvas. `EditChrome.Placeable` is optional, so a host's own chrome table still
+type-checks; without it, or without `savePlacement`, the item renders
+read-only.
 
 Every list with a `collection` prop — Timeline, CollaboratorList, JobList,
 Nav, Footer — reads its structural half through one helper,

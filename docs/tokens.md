@@ -71,17 +71,21 @@ dialogs follow it — an admin theme wanting pills sets `999px` here);
 Read by `PersonFigure` (`./primitives`). Every one has a fallback in the
 component, so a theme may omit them.
 
-| Token                       | Website value      | Role                                                                          |
-| --------------------------- | ------------------ | ----------------------------------------------------------------------------- |
-| `--vit-figure-width`        | `10rem`            | the drawing's width; body, callout run and rule follow                        |
-| `--vit-figure-ink`          | `var(--color-ink)` | body stroke                                                                   |
-| `--vit-figure-stroke`       | `4`                | body stroke width in viewBox units (153 across)                               |
-| `--vit-figure-callout-ink`  | `var(--color-ink)` | the label's callout line and rule                                             |
-| `--vit-figure-name-size`    | `var(--text-base)` | the name                                                                      |
-| `--vit-figure-role-size`    | `var(--text-sm)`   | the role                                                                      |
-| `--vit-figure-bio-width`    | `14rem`            | the revealed bio's width                                                      |
-| `--vit-team-figure-base`    | `10rem`            | `TeamFigureField`: the width a member's size is a percent of                  |
-| `--vit-team-figure-offsets` | `1`                | `TeamFigureField`: multiplier on members' vertical offsets (0 collapses them) |
+| Token                               | Website value      | Role                                                                                          |
+| ----------------------------------- | ------------------ | --------------------------------------------------------------------------------------------- |
+| `--vit-figure-width`                | `10rem`            | the drawing's width; body, callout run and rule follow                                        |
+| `--vit-figure-ink`                  | `var(--color-ink)` | body stroke                                                                                   |
+| `--vit-figure-stroke`               | `4`                | body stroke width in viewBox units (153 across)                                               |
+| `--vit-figure-callout-ink`          | `var(--color-ink)` | the label's callout line and rule                                                             |
+| `--vit-figure-name-size`            | `var(--text-base)` | the name                                                                                      |
+| `--vit-figure-role-size`            | `var(--text-sm)`   | the role                                                                                      |
+| `--vit-figure-bio-width`            | `14rem`            | the revealed bio's width                                                                      |
+| `--vit-team-figure-base`            | `10rem`            | `TeamFigureField`: the width a member's size is a percent of                                  |
+| `--vit-team-figure-offsets`         | `1`                | `TeamFigureField`: multiplier on members' vertical offsets (0 collapses them)                 |
+| `--vit-team-figure-x` / `-y` / `-z` | `0`                | `TeamFigureField`: a figure's place on the canvas (‰ of its width) and layer — set per figure |
+| `--vit-placement-handles`           | `none`             | `Placeable`: the handles' `display`; a canvas sets `flex` while it places by position         |
+| `--vit-placement-touch`             | `auto`             | `Placeable`: `touch-action`; a canvas sets `none` so a finger drags instead of scrolling      |
+| `--vit-placement-cursor`            | `auto`             | `Placeable`: the hover cursor; a canvas sets `grab`                                           |
 
 ## Not part of the contract
 

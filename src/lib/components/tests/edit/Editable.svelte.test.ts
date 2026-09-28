@@ -229,7 +229,13 @@ describe('editMessages', () => {
 					edit_emptyRequired: () => 'x',
 					edit_editLink: () => 'x',
 					edit_linkText: () => 'x',
-					edit_linkUrl: () => 'x'
+					edit_linkUrl: () => 'x',
+					edit_move: () => 'x',
+					edit_moveHint: () => 'x',
+					edit_resize: () => 'x',
+					edit_bringFront: () => 'x',
+					edit_sendBack: () => 'x',
+					edit_placed: () => 'x'
 				}
 			}
 		});
