@@ -1,19 +1,17 @@
 <script lang="ts">
 	import type { TeamMemberData } from '../../content/types.js';
 	import EditFrame from '../../edit/chrome/EditFrame.svelte';
-	import EditPanel from '../../edit/chrome/EditPanel.svelte';
 	import PersonFigure from '../ui/figure/PersonFigure.svelte';
 	import type { TeamMemberEditMap } from './TeamMemberCard.svelte';
 
 	/**
 	 * One team member as a `PersonFigure`, drawn from the row's `figure*`
-	 * fields (defaults applied here, once, and shared by the drawing and the
-	 * panel rows). Two doors to edit it, both on the frame: the gear's panel
-	 * holds what is VISUAL and immediate — the photo and the nine figure
-	 * settings — and the pencil opens the host's full form (`record`) for the
-	 * rest: the name, the role and bio in every language, the slug. Nothing
-	 * edits inline: a caption is too small a place for three languages, and
-	 * a bio that reveals on hover is no place for a caret.
+	 * fields, defaults applied here. ONE door to edit it, the frame's pencil:
+	 * the host's full form (`record`) holds the name, the role and bio in
+	 * every language, the photo and the nine figure settings together. A
+	 * panel beside it would repeat the figure rows behind a second button,
+	 * and nothing edits inline: a caption is too small a place for three
+	 * languages, and a bio that reveals on hover is no place for a caret.
 	 */
 	interface Props {
 		member: TeamMemberData;
@@ -39,29 +37,9 @@
 	const photo = $derived(head === 'drawn' ? null : member.photoUrl || null);
 	const photoShape = $derived(head === 'circle' ? 'circle' : 'cutout');
 
-	const panelRows = $derived(
-		[
-			edit?.photo && { descriptor: edit.photo, value: member.photoUrl },
-			edit?.figureArms && { descriptor: edit.figureArms, value: arms },
-			edit?.figureLegs && { descriptor: edit.figureLegs, value: legs },
-			edit?.figureHead && { descriptor: edit.figureHead, value: head },
-			edit?.figureHeadShape && { descriptor: edit.figureHeadShape, value: headShape },
-			edit?.figureLabelSide && { descriptor: edit.figureLabelSide, value: labelSide },
-			edit?.figureLabelAlign && { descriptor: edit.figureLabelAlign, value: labelAlign },
-			// The numbers travel as text: the panel has no number row.
-			edit?.figureOffset && { descriptor: edit.figureOffset, value: String(offset) },
-			edit?.figureHeadScale && { descriptor: edit.figureHeadScale, value: String(headScale) },
-			edit?.figureSize && { descriptor: edit.figureSize, value: String(size) }
-		].filter((row) => row !== undefined)
-	);
 	const frameSpec = $derived(
-		edit && (panelRows.length > 0 || edit.record || edit.removeOp)
-			? {
-					label: edit.label ?? member.name,
-					hasPanel: panelRows.length > 0,
-					record: edit.record,
-					removeOp: edit.removeOp
-				}
+		edit && (edit.record || edit.removeOp)
+			? { label: edit.label ?? member.name, record: edit.record, removeOp: edit.removeOp }
 			: undefined
 	);
 </script>
@@ -74,9 +52,6 @@
 	style="--vit-team-figure-scale: {size / 100}; --vit-team-figure-offset: {offset}px"
 >
 	<EditFrame spec={frameSpec}>
-		{#snippet panel()}
-			<EditPanel rows={panelRows} />
-		{/snippet}
 		<PersonFigure
 			name={member.name}
 			role={member.role}

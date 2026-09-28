@@ -1,5 +1,10 @@
 <script module lang="ts">
-	import type { EditDescriptor, EntityOp, PropertyDescriptor } from '../../edit/types.js';
+	import type {
+		EditDescriptor,
+		EntityOp,
+		PropertyDescriptor,
+		RecordTarget
+	} from '../../edit/types.js';
 
 	/**
 	 * Which of the milestone's fields are editable at this render site:
@@ -15,6 +20,8 @@
 		image?: PropertyDescriptor;
 		/** Editorial-state `flag` row; on while the milestone is not a draft. */
 		status?: PropertyDescriptor;
+		/** The host's full form for this row: the frame's pencil, where the adapter opens records. */
+		record?: RecordTarget & { id: string | number };
 		/** Accessible name for the frame, e.g. "Fita: Neix la fundació". */
 		label?: string;
 		/** Set by Timeline from its `collection` — removal of this milestone. */
@@ -73,11 +80,12 @@
 	);
 
 	const frameSpec = $derived(
-		edit && (panelRows.length > 0 || edit.removeOp)
+		edit && (panelRows.length > 0 || edit.removeOp || edit.record)
 			? {
 					label: edit.label ?? milestone.title,
 					hasPanel: panelRows.length > 0,
-					removeOp: edit.removeOp
+					removeOp: edit.removeOp,
+					record: edit.record
 				}
 			: undefined
 	);

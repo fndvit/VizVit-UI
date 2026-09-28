@@ -1,5 +1,5 @@
 <script module lang="ts">
-	import type { EditDescriptor, PropertyDescriptor } from '../../edit/types.js';
+	import type { EditDescriptor, PropertyDescriptor, RecordTarget } from '../../edit/types.js';
 
 	/**
 	 * Which of the card's fields are editable at this render site: localized
@@ -14,6 +14,8 @@
 		image?: PropertyDescriptor;
 		/** Editorial-state `flag` row; on while the project is not a draft. */
 		status?: PropertyDescriptor;
+		/** The host's full form for this row: the frame's pencil, where the adapter opens records. */
+		record?: RecordTarget & { id: string | number };
 		/** Accessible name for the frame, e.g. the project's title. */
 		label?: string;
 	}
@@ -74,8 +76,8 @@
 		].filter((row) => row !== undefined)
 	);
 	const frameSpec = $derived(
-		edit && panelRows.length > 0
-			? { label: edit.label ?? project.title, hasPanel: true }
+		edit && (panelRows.length > 0 || edit.record)
+			? { label: edit.label ?? project.title, hasPanel: panelRows.length > 0, record: edit.record }
 			: undefined
 	);
 </script>

@@ -89,20 +89,27 @@
  * by the consuming component's own markup (Editable hands it attributes
  * through a snippet), which scoped styles inside Editable can never reach. */
 [data-vit-editing] {
-	outline: 2px dashed var(--color-brand);
-	outline-offset: 3px;
+	/* Quiet until pointed at: a permanent dashed box on every editable text
+	   weighed on the whole page and, offset outward, walked over its
+	   neighbours. The outline sits ON the element's own edge now (no
+	   offset), and only while hovered or focused. */
+	outline: 1px solid transparent;
+	outline-offset: 0;
 	border-radius: 2px;
 	cursor: text;
+	transition: outline-color var(--transition-fast);
 }
 
+[data-vit-editing]:hover,
 [data-vit-editing]:focus-visible {
-	outline-style: solid;
+	outline-color: var(--color-brand);
 }
 
 [data-vit-editing='saving'] {
 	opacity: 0.6;
 }
 
+/* A failed save must be seen without pointing at it. */
 [data-vit-editing='error'] {
 	outline-color: var(--series-8);
 }

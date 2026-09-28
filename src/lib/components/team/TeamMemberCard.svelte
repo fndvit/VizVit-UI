@@ -17,25 +17,10 @@
 		name?: PropertyDescriptor;
 		photo?: PropertyDescriptor;
 		/**
-		 * The figure rows, read by `TeamFigure` only (the card ignores them).
-		 * Keys mirror `TeamMemberData`'s fields. The five selects carry the
-		 * HOST's worded `options`; the three numbers are `text` rows whose
-		 * value the component stringifies and the host parses.
-		 */
-		figureArms?: PropertyDescriptor;
-		figureLegs?: PropertyDescriptor;
-		figureHead?: PropertyDescriptor;
-		figureHeadShape?: PropertyDescriptor;
-		figureLabelSide?: PropertyDescriptor;
-		figureLabelAlign?: PropertyDescriptor;
-		figureOffset?: PropertyDescriptor;
-		figureHeadScale?: PropertyDescriptor;
-		figureSize?: PropertyDescriptor;
-		/**
 		 * The host's full form for this row — name, role and bio in every
-		 * language, the photo, the slug. `TeamFigure` offers it as the frame's
-		 * pencil and edits no text inline: a caption is too small a place for
-		 * three languages.
+		 * language, the photo, the figure. The frame's pencil, on the card and
+		 * on `TeamFigure`, which edits nothing else: a caption is too small a
+		 * place for three languages.
 		 */
 		record?: RecordTarget & { id: string | number };
 		/** Set by `TeamFigureField` from its `collection` — removal of this row. */
@@ -69,7 +54,9 @@
 		].filter((row) => row !== undefined)
 	);
 	const frameSpec = $derived(
-		edit && panelRows.length > 0 ? { label: edit.label ?? member.name, hasPanel: true } : undefined
+		edit && (panelRows.length > 0 || edit.record)
+			? { label: edit.label ?? member.name, hasPanel: panelRows.length > 0, record: edit.record }
+			: undefined
 	);
 </script>
 

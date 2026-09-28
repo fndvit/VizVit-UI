@@ -121,8 +121,10 @@
 	.vit-edit-frame {
 		position: relative;
 		border-radius: var(--radius);
-		outline: 1px dashed transparent;
-		outline-offset: 4px;
+		/* On the frame's own edge, not offset outward: an outline that grew
+		   past the box walked over neighbouring cards and captions. */
+		outline: 1px solid transparent;
+		outline-offset: 0;
 		transition: outline-color var(--transition-fast);
 	}
 
@@ -132,9 +134,10 @@
 	}
 
 	.toolbar {
+		/* Inside the frame's corner, so it never floats over what sits above. */
 		position: absolute;
-		top: calc(-1 * var(--space-2));
-		right: 0;
+		top: var(--space-1);
+		right: var(--space-1);
 		display: flex;
 		gap: 2px;
 		z-index: var(--z-raised);

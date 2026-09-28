@@ -49,7 +49,6 @@ function fullEdit(): TeamMemberEditMap {
 	};
 }
 
-const settle = () => new Promise((resolve) => setTimeout(resolve, 20));
 const root = () => document.querySelector<HTMLElement>('.vit-team-figure');
 const figure = () => document.querySelector<HTMLElement>('figure');
 const strokes = () =>
@@ -133,49 +132,15 @@ describe('TeamFigure, editing', () => {
 		expect(host(described.container).innerHTML).toBe(host(bare.container).innerHTML);
 	});
 
-	it('edits no text inline — the caption is never contenteditable', () => {
+	it('edits no text inline and opens no panel — the pencil is the one door', () => {
 		const { container } = mountPage(TeamFigure, {
 			props: { member, edit: fullEdit() },
 			adapter: withRecord()
 		});
 
 		expect(container.querySelectorAll('[contenteditable]')).toHaveLength(0);
-		expect(container.querySelector('.vit-edit-frame')).not.toBeNull();
-	});
-
-	it('opens a panel with the photo and the nine figure rows, valued as the drawing is', async () => {
-		const { container } = mountPage(TeamFigure, {
-			props: { member: { ...member, figureLegs: 'walking', figureOffset: 40 }, edit: fullEdit() },
-			adapter: fullAdapter()
-		});
-
-		container.querySelector<HTMLButtonElement>('.toolbar button')!.click();
-		await settle();
-
-		const labels = [...container.querySelectorAll('.vit-edit-frame label')].map((l) =>
-			l.textContent?.trim()
-		);
-		expect(labels).toEqual([
-			'Fotografia',
-			'Braços',
-			'Cames',
-			'Cap',
-			'Forma del cap',
-			'Costat',
-			'Alçada',
-			'Desplaçament',
-			'Escala del cap',
-			'Mida'
-		]);
-		const selects = [...container.querySelectorAll<HTMLSelectElement>('select')].map(
-			(s) => s.value
-		);
-		expect(selects).toEqual(['down', 'walking', 'cutout', 'round', 'right', 'top']);
-		const texts = [...container.querySelectorAll<HTMLInputElement>('input[type="text"]')].map(
-			(i) => i.value
-		);
-		// The photo path, then the three numbers as strings.
-		expect(texts).toEqual(['/ada.png', '40', '100', '100']);
+		const buttons = [...container.querySelectorAll<HTMLButtonElement>('.toolbar button')];
+		expect(buttons.map((b) => b.getAttribute('aria-label'))).toEqual(['Edita la fitxa: Ada']);
 	});
 
 	it('offers the pencil only to an adapter that opens records, and hands it the row', () => {

@@ -1,18 +1,10 @@
 <script lang="ts">
 	import { setEditAdapter } from '../../../edit/context.js';
 	import { EDIT_CHROME } from '../../../edit/live/index.js';
-	import { collectionOf, entityProperty } from '../../../edit/helpers.js';
-	import type { PropertyDescriptor, PropertyValue, RecordTarget } from '../../../edit/types.js';
+	import { collectionOf } from '../../../edit/helpers.js';
+	import type { RecordTarget } from '../../../edit/types.js';
 	import type { TeamMemberData } from '../../../content/types.js';
 	import { sampleTeam } from '../../../fixtures.js';
-	import {
-		ARM_POSES,
-		HEAD_MODES,
-		HEAD_SHAPES,
-		LABEL_ALIGNS,
-		LABEL_SIDES,
-		LEG_POSES
-	} from '../../ui/figure/paths.js';
 	import TeamFigureField from '../../team/TeamFigureField.svelte';
 	import type { TeamMemberEditMap } from '../../team/TeamMemberCard.svelte';
 
@@ -28,8 +20,6 @@
 	let members = $state<TeamMemberData[]>(sampleTeam.map((m, index) => ({ ...m, id: index + 1 })));
 	let log = $state<string[]>([]);
 
-	const NUMBERS = new Set(['figureOffset', 'figureHeadScale', 'figureSize']);
-
 	setEditAdapter(
 		{
 			get isEditing() {
@@ -44,61 +34,19 @@
 						: `obre la fitxa de ${target.entity}#${target.id}`
 				];
 			},
-			saveProperty: async (descriptor: PropertyDescriptor, value: PropertyValue) => {
-				const ref = descriptor.ref;
-				if (ref.kind !== 'entity') return;
-				const field = ref.field === 'photo_url' ? 'photoUrl' : ref.field;
-				const next = NUMBERS.has(field) ? Number(value) : value;
-				members = members.map((m) => (m.id === ref.id ? { ...m, [field]: next } : m));
-				log = [...log, `#${ref.id}.${field} ← ${JSON.stringify(next)}`];
-			},
-			uploadImage: async (_descriptor, file: File) => URL.createObjectURL(file)
+			applyOp: async (op) => {
+				if (op.kind === 'remove') members = members.filter((m) => m.id !== op.id);
+				log = [...log, `${op.kind} ${op.collection.entity}${'id' in op ? `#${op.id}` : ''}`];
+			}
 		},
 		EDIT_CHROME
 	);
 
-	const options = (values: readonly string[]) => values.map((value) => ({ value, label: value }));
-
 	function editFor(member: TeamMemberData): TeamMemberEditMap {
 		const id = member.id ?? member.slug;
-		const property = entityProperty('team_members', id);
 		return {
 			label: member.name,
-			record: { entity: 'team_members', id },
-			photo: property('photo_url', { type: 'image', label: 'Fotografia' }),
-			figureArms: property('figureArms', {
-				type: 'select',
-				label: 'Braços',
-				options: options(ARM_POSES)
-			}),
-			figureLegs: property('figureLegs', {
-				type: 'select',
-				label: 'Cames',
-				options: options(LEG_POSES)
-			}),
-			figureHead: property('figureHead', {
-				type: 'select',
-				label: 'Cap',
-				options: options(HEAD_MODES)
-			}),
-			figureHeadShape: property('figureHeadShape', {
-				type: 'select',
-				label: 'Forma del cap',
-				options: options(HEAD_SHAPES)
-			}),
-			figureLabelSide: property('figureLabelSide', {
-				type: 'select',
-				label: 'Costat de l’etiqueta',
-				options: options(LABEL_SIDES)
-			}),
-			figureLabelAlign: property('figureLabelAlign', {
-				type: 'select',
-				label: 'Alçada de l’etiqueta',
-				options: options(LABEL_ALIGNS)
-			}),
-			figureOffset: property('figureOffset', { type: 'text', label: 'Desplaçament (px)' }),
-			figureHeadScale: property('figureHeadScale', { type: 'text', label: 'Escala del cap (%)' }),
-			figureSize: property('figureSize', { type: 'text', label: 'Mida (%)' })
+			record: { entity: 'team_members', id }
 		};
 	}
 </script>
