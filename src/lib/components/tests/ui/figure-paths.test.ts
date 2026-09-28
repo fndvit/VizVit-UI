@@ -6,6 +6,7 @@ import {
 	CALLOUT_RUN,
 	FIGURE_WIDTH,
 	HEAD_MODES,
+	HEAD_SHAPES,
 	HEADS,
 	LABEL_ALIGNS,
 	LABEL_SIDES,
@@ -68,6 +69,7 @@ describe('the figure vocabulary', () => {
 		expect(Object.keys(ARMS)).toEqual([...ARM_POSES]);
 		expect(Object.keys(LEGS)).toEqual([...LEG_POSES]);
 		expect(Object.keys(RULE_Y)).toEqual([...LABEL_ALIGNS]);
+		expect(Object.keys(HEADS)).toEqual([...HEAD_SHAPES]);
 	});
 
 	it('is the head MODE, not the drawn outline set', () => {

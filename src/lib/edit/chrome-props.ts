@@ -1,5 +1,11 @@
 import type { Snippet } from 'svelte';
-import type { EditDescriptor, EntityOp, PropertyDescriptor, PropertyValue } from './types.js';
+import type {
+	EditDescriptor,
+	EntityOp,
+	PropertyDescriptor,
+	PropertyValue,
+	RecordTarget
+} from './types.js';
 
 /**
  * The props of the five edit-chrome modules, in one component-free file.
@@ -47,6 +53,8 @@ export interface EditFrameSpec {
 	hasPanel?: boolean;
 	/** Gates the trash: removing this item from its collection. */
 	removeOp?: Extract<EntityOp, { kind: 'remove' }>;
+	/** Gates the pencil: the host's full record editor for this row (`adapter.openRecord`). */
+	record?: RecordTarget & { id: string | number };
 }
 
 export interface EditFrameProps {
@@ -64,6 +72,12 @@ export interface AddSlotProps {
 	op: Extract<EntityOp, { kind: 'create' }>;
 	/** The entity noun for the label, e.g. "una fita". */
 	label?: string;
+	/**
+	 * Where the host's record editor should open a NEW row instead of the op
+	 * creating a seeded one in place. With an adapter that implements
+	 * `openRecord`, the click opens the form; without, the op applies as ever.
+	 */
+	record?: RecordTarget;
 }
 
 export interface LinkEditProps {

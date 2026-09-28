@@ -169,4 +169,18 @@ export interface EditAdapter {
 	applyOp?(op: EntityOp): Promise<{ id?: string | number } | void>;
 	/** Image upload; resolves to the stored path an `image` property saves. */
 	uploadImage?(descriptor: PropertyDescriptor, file: File): Promise<string>;
+	/**
+	 * Opens the host's own record editor — its full form for one row, or for
+	 * a new row when `id` is absent — where a panel of scalar rows is the
+	 * wrong shape: localized text in three languages, a photo to upload, a
+	 * name, a slug. The host owns the form and the refresh after its save;
+	 * the frame only offers the door.
+	 */
+	openRecord?(target: RecordTarget): void;
+}
+
+/** One row of an entity, or a new one of it (no `id`), for `openRecord`. */
+export interface RecordTarget {
+	entity: EditableEntity;
+	id?: string | number;
 }

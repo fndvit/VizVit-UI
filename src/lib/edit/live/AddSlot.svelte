@@ -10,7 +10,7 @@
 	 * byte-identical invariant. The op resolves server-side and the host's
 	 * refresh brings the new row in; this control only shows pending/error.
 	 */
-	let { op, label = '' }: AddSlotProps = $props();
+	let { op, label = '', record }: AddSlotProps = $props();
 
 	const adapter = getEditAdapter();
 	const config = getUiConfig();
@@ -18,11 +18,21 @@
 	let pending = $state(false);
 	let announcement = $state('');
 
-	const active = $derived((adapter?.isEditing ?? false) && adapter?.applyOp !== undefined);
+	// A slot that names a `record` opens the host's form for a new row when
+	// the adapter has one; otherwise the op creates a seeded row in place.
+	const opensRecord = $derived(record !== undefined && adapter?.openRecord !== undefined);
+	const active = $derived(
+		(adapter?.isEditing ?? false) && (adapter?.applyOp !== undefined || opensRecord)
+	);
 	const text = $derived(config.editMessages.edit_add({ label }).trim());
 
 	async function add(): Promise<void> {
-		if (!adapter?.applyOp || pending) return;
+		if (pending) return;
+		if (opensRecord && record) {
+			adapter?.openRecord?.(record);
+			return;
+		}
+		if (!adapter?.applyOp) return;
 		pending = true;
 		announcement = '';
 		try {

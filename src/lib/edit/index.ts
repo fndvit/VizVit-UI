@@ -24,15 +24,16 @@ export { localize } from './types.js';
 export type {
 	CollectionRef,
 	ContentRef,
-	EditableEntity,
 	EditAdapter,
 	EditDescriptor,
+	EditableEntity,
 	EntityOp,
 	LocalizedText,
 	PropertyDescriptor,
 	PropertyOption,
 	PropertyType,
-	PropertyValue
+	PropertyValue,
+	RecordTarget
 } from './types.js';
 // The rule behind chromeEdit's key parameter, next to the helper that enforces it.
 export type { NotParameterized, ParameterlessKey } from '../config/types.js';

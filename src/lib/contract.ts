@@ -55,14 +55,15 @@ export { localize } from './edit/types.js';
 export type {
 	CollectionRef,
 	ContentRef,
-	EditableEntity,
 	EditDescriptor,
+	EditableEntity,
 	EntityOp,
 	LocalizedText,
 	PropertyDescriptor,
 	PropertyOption,
 	PropertyType,
-	PropertyValue
+	PropertyValue,
+	RecordTarget
 } from './edit/types.js';
 
 export { REACTIONS } from './content/types.js';
@@ -92,6 +93,7 @@ export {
 export type {
 	ArmsPose,
 	HeadMode,
+	HeadShape,
 	LabelAlign,
 	LabelSide,
 	LegsPose

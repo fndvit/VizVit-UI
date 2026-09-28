@@ -40,16 +40,17 @@ export const LEGS = {
 	sit: 'M21 7V130.087L45 168.589V182M69 7L54 129.857L69 179H57.3546'
 } as const satisfies Record<LegsPose, string>;
 
+/** The drawn outlines, in display order — a host row may store which one it wears. */
+export const HEAD_SHAPES = ['round', 'cup', 'd'] as const;
+export type HeadShape = (typeof HEAD_SHAPES)[number];
+
 /** Drawn head outlines in the survey's 49×48 box, for a figure with no photo. */
 export const HEADS = {
 	round:
 		'M25 41C33.8366 41 41 33.6127 41 24.5C41 15.3873 33.8366 8 25 8C16.1634 8 9 15.3873 9 24.5C9 33.6127 16.1634 41 25 41Z',
 	cup: 'M8 8V24.4952C7.99874 26.6662 8.4255 28.8161 9.25592 30.8216C10.0863 32.8271 11.3042 34.6488 12.8393 36.1822C14.3745 37.7155 16.1968 38.9304 18.2019 39.7571C20.207 40.5839 22.3554 41.0062 24.5239 40.9999C28.8936 40.9999 33.0843 39.262 36.1742 36.1686C39.2641 33.0751 41 28.8795 41 24.5047V8.00955L8 8Z',
 	d: 'M27.571 8H38V41H27.571C23.1726 40.9949 18.9563 39.2535 15.8489 36.1585C12.7415 33.0636 10.9975 28.8684 11 24.4952C11 20.1237 12.7453 15.931 15.8524 12.8381C18.9595 9.74519 23.1743 8.00507 27.571 8V8Z'
-} as const;
-
-/** The drawn outlines are not a host vocabulary, so this one stays keyof-derived. */
-export type HeadShape = keyof typeof HEADS;
+} as const satisfies Record<HeadShape, string>;
 
 /**
  * How a figure gets its head: a cut-out photo sat on the neck, a portrait

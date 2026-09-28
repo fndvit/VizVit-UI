@@ -1,5 +1,10 @@
 <script module lang="ts">
-	import type { EditDescriptor, PropertyDescriptor } from '../../edit/types.js';
+	import type {
+		EditDescriptor,
+		EntityOp,
+		PropertyDescriptor,
+		RecordTarget
+	} from '../../edit/types.js';
 
 	/**
 	 * Which of the card's fields are editable at this render site. `name` and
@@ -20,11 +25,21 @@
 		figureArms?: PropertyDescriptor;
 		figureLegs?: PropertyDescriptor;
 		figureHead?: PropertyDescriptor;
+		figureHeadShape?: PropertyDescriptor;
 		figureLabelSide?: PropertyDescriptor;
 		figureLabelAlign?: PropertyDescriptor;
 		figureOffset?: PropertyDescriptor;
 		figureHeadScale?: PropertyDescriptor;
 		figureSize?: PropertyDescriptor;
+		/**
+		 * The host's full form for this row — name, role and bio in every
+		 * language, the photo, the slug. `TeamFigure` offers it as the frame's
+		 * pencil and edits no text inline: a caption is too small a place for
+		 * three languages.
+		 */
+		record?: RecordTarget & { id: string | number };
+		/** Set by `TeamFigureField` from its `collection` — removal of this row. */
+		removeOp?: Extract<EntityOp, { kind: 'remove' }>;
 		/** Accessible name for the frame — usually the member's name. */
 		label?: string;
 	}

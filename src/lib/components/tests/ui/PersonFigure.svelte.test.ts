@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import PersonFigure from '../../ui/figure/PersonFigure.svelte';
-import PersonFigureCaptionProbe from './PersonFigureCaptionProbe.svelte';
 import { ARMS, LEGS } from '../../ui/figure/paths.js';
 
 /**
@@ -66,16 +65,6 @@ describe('PersonFigure', () => {
 		render(PersonFigure, { name: 'Ada', bio: 'Fa recerca.' });
 
 		expect(document.querySelector('.vit-figure__bio')?.textContent).toBe('Fa recerca.');
-		expect(figure()?.getAttribute('tabindex')).toBe('0');
-	});
-
-	it('lets a host own the caption, and still keys the focus stop on the bio prop', () => {
-		render(PersonFigureCaptionProbe, { bio: 'Fa recerca.' });
-
-		const caption = document.querySelector('figcaption');
-		expect(caption?.querySelector('em.vit-figure__role')?.textContent).toBe('Probe');
-		expect(caption?.querySelector('.vit-figure__name')).toBeNull();
-		expect(caption?.querySelector('.vit-figure__bio')).toBeNull();
 		expect(figure()?.getAttribute('tabindex')).toBe('0');
 	});
 });

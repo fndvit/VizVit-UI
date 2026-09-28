@@ -24,6 +24,8 @@ export interface EditMessages {
 	edit_properties(params: { label: string }): string;
 	edit_remove(): string;
 	edit_removeConfirm(params: { label: string }): string;
+	/** The pencil: the host's full record editor for this row. */
+	edit_editRecord(params: { label: string }): string;
 	edit_close(): string;
 	/** Collections. */
 	edit_add(params: { label: string }): string;
@@ -58,6 +60,7 @@ export const defaultEditMessages: EditMessages = {
 	edit_remove: () => 'Elimina',
 	edit_removeConfirm: ({ label }) =>
 		`Segur que vols eliminar «${label}»? Es pot desfer des de l’historial.`,
+	edit_editRecord: ({ label }) => `Edita la fitxa: ${label}`,
 	edit_close: () => 'Tanca',
 	edit_add: ({ label }) => `Afegeix ${label}`,
 	edit_addFailed: () => 'No s’ha pogut afegir',

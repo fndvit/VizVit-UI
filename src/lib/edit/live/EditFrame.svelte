@@ -9,7 +9,8 @@
 	/**
 	 * The page-builder wrapper: a corner toolbar (revealed on hover AND
 	 * :focus-within — never hover-only) with a gear that opens the property
-	 * panel and a trash that confirms, then applies the remove op.
+	 * panel, a pencil that opens the host's record editor, and a trash that
+	 * confirms, then applies the remove op.
 	 *
 	 * Triple-gated per affordance: spec present ∧ adapter editing ∧ the
 	 * capability method present. With nothing to offer it renders the children
@@ -29,7 +30,12 @@
 	const showTrash = $derived(
 		editing && spec?.removeOp !== undefined && adapter?.applyOp !== undefined
 	);
-	const framed = $derived(showGear || showTrash);
+	// The pencil: the host's full form for this row, where a panel is the
+	// wrong shape (three languages of text, a photo, a slug).
+	const showPencil = $derived(
+		editing && spec?.record !== undefined && adapter?.openRecord !== undefined
+	);
+	const framed = $derived(showGear || showTrash || showPencil);
 
 	let panelOpen = $state(false);
 	let confirming = $state(false);
@@ -68,6 +74,14 @@
 					icon="gear"
 					label={config.editMessages.edit_properties({ label: spec.label })}
 					onclick={() => (panelOpen = !panelOpen)}
+				/>
+			{/if}
+			{#if showPencil && spec.record}
+				{@const record = spec.record}
+				<IconButton
+					icon="pencil"
+					label={config.editMessages.edit_editRecord({ label: spec.label })}
+					onclick={() => adapter?.openRecord?.(record)}
 				/>
 			{/if}
 			{#if showTrash}

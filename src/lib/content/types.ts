@@ -7,6 +7,7 @@ import type { EditDescriptor } from '../edit/types.js';
 import type {
 	ArmsPose,
 	HeadMode,
+	HeadShape,
 	LabelAlign,
 	LabelSide,
 	LegsPose
@@ -164,6 +165,8 @@ export interface TeamMemberData {
 	figureLegs?: LegsPose;
 	/** `drawn` forces the outline even with a photo; an empty `photoUrl` draws anyway. */
 	figureHead?: HeadMode;
+	/** Which outline a drawn head wears. */
+	figureHeadShape?: HeadShape;
 	figureLabelSide?: LabelSide;
 	figureLabelAlign?: LabelAlign;
 	/** Vertical shift down, in px — `FIGURE_OFFSET`'s range. */

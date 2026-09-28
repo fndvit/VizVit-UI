@@ -1,8 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import type { TeamMemberData } from '../../../content/types.js';
-import { entityEdit, entityProperty } from '../../../edit/helpers.js';
-import { ARMS, LEGS } from '../../ui/figure/paths.js';
+import { entityProperty } from '../../../edit/helpers.js';
+import type { EditAdapter, RecordTarget } from '../../../edit/types.js';
+import { ARMS, HEADS, LEGS } from '../../ui/figure/paths.js';
 import TeamFigure from '../../team/TeamFigure.svelte';
 import type { TeamMemberEditMap } from '../../team/TeamMemberCard.svelte';
 import { AFFORDANCES, fullAdapter, host, mountPage } from '../pages/helpers.js';
@@ -11,6 +12,8 @@ import { AFFORDANCES, fullAdapter, host, mountPage } from '../pages/helpers.js';
  * The row → figure mapping and the editing contract. Every `figure*` field
  * is optional with a default, so the two things to hold are: a set field
  * reaches the drawing, and an unset one draws the plain standing figure.
+ * Editing has two doors and no inline text: the gear's panel for what is
+ * visual, the pencil for the host's form.
  */
 const member: TeamMemberData = {
 	id: 7,
@@ -22,21 +25,9 @@ const member: TeamMemberData = {
 	isBoard: false
 };
 
-const FIELDS = [
-	'figureArms',
-	'figureLegs',
-	'figureHead',
-	'figureLabelSide',
-	'figureLabelAlign',
-	'figureOffset',
-	'figureHeadScale',
-	'figureSize'
-] as const;
-
 /** A full map the way a CMS words one: selects with options, numbers as text. */
 function fullEdit(): TeamMemberEditMap {
 	const property = entityProperty('team_members', 7);
-	const edit = entityEdit('team_members', 7, 'ca');
 	const select = (field: string, label: string, values: readonly string[]) =>
 		property(field, {
 			type: 'select',
@@ -44,18 +35,17 @@ function fullEdit(): TeamMemberEditMap {
 			options: values.map((v) => ({ value: v, label: v }))
 		});
 	return {
-		role: edit('role', { label: 'Càrrec' }),
-		bio: edit('bio', { format: 'multiline', label: 'Biografia' }),
-		name: property('name', { type: 'text', label: 'Nom' }),
 		photo: property('photo_url', { type: 'image', label: 'Fotografia' }),
 		figureArms: select('figureArms', 'Braços', Object.keys(ARMS)),
 		figureLegs: select('figureLegs', 'Cames', Object.keys(LEGS)),
 		figureHead: select('figureHead', 'Cap', ['cutout', 'circle', 'drawn']),
+		figureHeadShape: select('figureHeadShape', 'Forma del cap', Object.keys(HEADS)),
 		figureLabelSide: select('figureLabelSide', 'Costat', ['left', 'right']),
 		figureLabelAlign: select('figureLabelAlign', 'Alçada', ['top', 'bottom']),
 		figureOffset: property('figureOffset', { type: 'text', label: 'Desplaçament' }),
 		figureHeadScale: property('figureHeadScale', { type: 'text', label: 'Escala del cap' }),
-		figureSize: property('figureSize', { type: 'text', label: 'Mida' })
+		figureSize: property('figureSize', { type: 'text', label: 'Mida' }),
+		record: { entity: 'team_members', id: 7 }
 	};
 }
 
@@ -109,18 +99,18 @@ describe('TeamFigure, the drawing', () => {
 		expect(document.querySelector('image')?.getAttribute('clip-path')).toMatch(/^url\(#/);
 	});
 
-	it('draws the outline for the drawn mode even with a photo, and for no photo at all', () => {
-		render(TeamFigure, { member: { ...member, figureHead: 'drawn' } });
+	it('draws the outline for the drawn mode even with a photo, in the shape asked for', () => {
+		render(TeamFigure, { member: { ...member, figureHead: 'drawn', figureHeadShape: 'cup' } });
 		expect(document.querySelector('image')).toBeNull();
-		expect(document.querySelector('.vit-figure-head')).not.toBeNull();
+		expect(document.querySelector('.vit-figure-head')?.getAttribute('d')).toBe(HEADS.cup);
 
 		document.body.innerHTML = '';
 		render(TeamFigure, { member: { ...member, photoUrl: '' } });
 		expect(document.querySelector('image')).toBeNull();
-		expect(document.querySelector('.vit-figure-head')).not.toBeNull();
+		expect(document.querySelector('.vit-figure-head')?.getAttribute('d')).toBe(HEADS.round);
 	});
 
-	it('captions the name, role and bio by the figure classes', () => {
+	it('captions the name, role and bio', () => {
 		render(TeamFigure, { member });
 
 		const caption = document.querySelector('figcaption');
@@ -132,6 +122,9 @@ describe('TeamFigure, the drawing', () => {
 });
 
 describe('TeamFigure, editing', () => {
+	const openRecord = vi.fn<(target: RecordTarget) => void>();
+	const withRecord = (): EditAdapter => ({ ...fullAdapter(), openRecord });
+
 	it('renders no affordance and byte-identically without an adapter, map or not', () => {
 		const bare = mountPage(TeamFigure, { props: { member } });
 		const described = mountPage(TeamFigure, { props: { member, edit: fullEdit() } });
@@ -140,21 +133,17 @@ describe('TeamFigure, editing', () => {
 		expect(host(described.container).innerHTML).toBe(host(bare.container).innerHTML);
 	});
 
-	it('shows no frame under an adapter when the map has no panel row', () => {
-		const edit = fullEdit();
+	it('edits no text inline — the caption is never contenteditable', () => {
 		const { container } = mountPage(TeamFigure, {
-			props: { member, edit: { role: edit.role, bio: edit.bio } },
-			adapter: fullAdapter()
+			props: { member, edit: fullEdit() },
+			adapter: withRecord()
 		});
 
-		expect(container.querySelector('.vit-edit-frame')).toBeNull();
-		expect(container.querySelector('.vit-figure__role')?.hasAttribute('contenteditable')).toBe(
-			true
-		);
-		expect(container.querySelector('.vit-figure__bio')?.hasAttribute('contenteditable')).toBe(true);
+		expect(container.querySelectorAll('[contenteditable]')).toHaveLength(0);
+		expect(container.querySelector('.vit-edit-frame')).not.toBeNull();
 	});
 
-	it('opens a panel with the name, the photo and the eight figure rows, valued as the drawing is', async () => {
+	it('opens a panel with the photo and the nine figure rows, valued as the drawing is', async () => {
 		const { container } = mountPage(TeamFigure, {
 			props: { member: { ...member, figureLegs: 'walking', figureOffset: 40 }, edit: fullEdit() },
 			adapter: fullAdapter()
@@ -167,11 +156,11 @@ describe('TeamFigure, editing', () => {
 			l.textContent?.trim()
 		);
 		expect(labels).toEqual([
-			'Nom',
 			'Fotografia',
 			'Braços',
 			'Cames',
 			'Cap',
+			'Forma del cap',
 			'Costat',
 			'Alçada',
 			'Desplaçament',
@@ -181,12 +170,32 @@ describe('TeamFigure, editing', () => {
 		const selects = [...container.querySelectorAll<HTMLSelectElement>('select')].map(
 			(s) => s.value
 		);
-		expect(selects).toEqual(['down', 'walking', 'cutout', 'right', 'top']);
+		expect(selects).toEqual(['down', 'walking', 'cutout', 'round', 'right', 'top']);
 		const texts = [...container.querySelectorAll<HTMLInputElement>('input[type="text"]')].map(
 			(i) => i.value
 		);
-		// The name, then the photo path, then the three numbers as strings.
-		expect(texts).toEqual(['Ada', '/ada.png', '40', '100', '100']);
-		expect(FIELDS).toHaveLength(8);
+		// The photo path, then the three numbers as strings.
+		expect(texts).toEqual(['/ada.png', '40', '100', '100']);
+	});
+
+	it('offers the pencil only to an adapter that opens records, and hands it the row', () => {
+		openRecord.mockClear();
+		const adapter = withRecord();
+		const { container } = mountPage(TeamFigure, {
+			props: { member, edit: { record: { entity: 'team_members', id: 7 }, label: 'Ada' } },
+			adapter
+		});
+
+		const buttons = [...container.querySelectorAll<HTMLButtonElement>('.toolbar button')];
+		expect(buttons.map((b) => b.getAttribute('aria-label'))).toEqual(['Edita la fitxa: Ada']);
+		buttons[0]?.click();
+		expect(openRecord).toHaveBeenCalledWith({ entity: 'team_members', id: 7 });
+
+		document.body.innerHTML = '';
+		const noDoor = mountPage(TeamFigure, {
+			props: { member, edit: { record: { entity: 'team_members', id: 7 } } },
+			adapter: fullAdapter()
+		});
+		expect(noDoor.container.querySelector('.vit-edit-frame')).toBeNull();
 	});
 });

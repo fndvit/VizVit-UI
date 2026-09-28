@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { setEditAdapter } from '../../../edit/context.js';
 	import { EDIT_CHROME } from '../../../edit/live/index.js';
-	import { entityEdit, entityProperty } from '../../../edit/helpers.js';
-	import type { PropertyDescriptor, PropertyValue } from '../../../edit/types.js';
+	import { collectionOf, entityProperty } from '../../../edit/helpers.js';
+	import type { PropertyDescriptor, PropertyValue, RecordTarget } from '../../../edit/types.js';
 	import type { TeamMemberData } from '../../../content/types.js';
 	import { sampleTeam } from '../../../fixtures.js';
 	import {
 		ARM_POSES,
 		HEAD_MODES,
+		HEAD_SHAPES,
 		LABEL_ALIGNS,
 		LABEL_SIDES,
 		LEG_POSES
@@ -18,7 +19,9 @@
 	/**
 	 * The figure's whole editing loop with an in-memory adapter: open a
 	 * member's panel, change a pose or a number, and watch the figure redraw —
-	 * what a CMS wires up with a real row behind `saveProperty`. The selects'
+	 * what a CMS wires up with a real row behind `saveProperty`. The pencil
+	 * and the add slot call `openRecord`, which a CMS answers with its own
+	 * form; here it only logs the target. The selects'
 	 * options are worded here, inline, the way a host words them.
 	 */
 	let isEditing = $state(true);
@@ -32,12 +35,14 @@
 			get isEditing() {
 				return isEditing;
 			},
-			save: async (descriptor, value) => {
-				const ref = descriptor.ref;
-				if (ref.kind === 'entity') {
-					members = members.map((m) => (m.id === ref.id ? { ...m, [ref.field]: value } : m));
-					log = [...log, `#${ref.id}.${ref.field} ← "${value}"`];
-				}
+			save: async () => {},
+			openRecord: (target: RecordTarget) => {
+				log = [
+					...log,
+					target.id === undefined
+						? `obre la fitxa d’un ${target.entity} nou`
+						: `obre la fitxa de ${target.entity}#${target.id}`
+				];
 			},
 			saveProperty: async (descriptor: PropertyDescriptor, value: PropertyValue) => {
 				const ref = descriptor.ref;
@@ -57,12 +62,9 @@
 	function editFor(member: TeamMemberData): TeamMemberEditMap {
 		const id = member.id ?? member.slug;
 		const property = entityProperty('team_members', id);
-		const edit = entityEdit('team_members', id, 'ca');
 		return {
 			label: member.name,
-			role: edit('role', { label: 'Càrrec' }),
-			bio: edit('bio', { format: 'multiline', label: 'Biografia' }),
-			name: property('name', { type: 'text', label: 'Nom' }),
+			record: { entity: 'team_members', id },
 			photo: property('photo_url', { type: 'image', label: 'Fotografia' }),
 			figureArms: property('figureArms', {
 				type: 'select',
@@ -78,6 +80,11 @@
 				type: 'select',
 				label: 'Cap',
 				options: options(HEAD_MODES)
+			}),
+			figureHeadShape: property('figureHeadShape', {
+				type: 'select',
+				label: 'Forma del cap',
+				options: options(HEAD_SHAPES)
 			}),
 			figureLabelSide: property('figureLabelSide', {
 				type: 'select',
@@ -102,7 +109,7 @@
 		Mode edició
 	</label>
 
-	<TeamFigureField {members} {editFor} />
+	<TeamFigureField {members} {editFor} collection={collectionOf('team_members')} />
 
 	{#if log.length > 0}
 		<div class="log">

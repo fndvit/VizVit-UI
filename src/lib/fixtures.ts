@@ -101,6 +101,7 @@ export const sampleTeam: TeamMemberData[] = [
 		role: 'Periodista',
 		photoUrl: '',
 		figureHead: 'drawn',
+		figureHeadShape: 'cup',
 		figureArms: 'raised',
 		figureLegs: 'stride',
 		figureLabelSide: 'left',

@@ -15,6 +15,8 @@
 		memberFor?: (member: TeamMemberData) => TeamMemberEditMap | undefined;
 		collaboratorFor?: (collaborator: CollaboratorData) => CollaboratorEditMap | undefined;
 		collaborators?: CollectionRef;
+		/** The featured members' collection: the field's add slot and each figure's remove. */
+		members?: CollectionRef;
 	}
 </script>
 
@@ -60,7 +62,12 @@
 			{/snippet}
 		</Editable>
 		<CopyIntro text={content.team_intro} edit={edit?.copy?.('team_intro')} />
-		<TeamFigureField class="featured" members={featured} editFor={edit?.memberFor} />
+		<TeamFigureField
+			class="featured"
+			members={featured}
+			editFor={edit?.memberFor}
+			collection={edit?.members}
+		/>
 	</section>
 
 	<section aria-labelledby="board-heading">

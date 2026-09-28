@@ -219,6 +219,7 @@ describe('editMessages', () => {
 					edit_properties: () => 'x',
 					edit_remove: () => 'x',
 					edit_removeConfirm: () => 'x',
+					edit_editRecord: () => 'x',
 					edit_close: () => 'x',
 					edit_add: () => 'x',
 					edit_addFailed: () => 'x',

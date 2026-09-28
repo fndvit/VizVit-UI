@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { TeamMemberData } from '../../content/types.js';
-	import Editable from '../../edit/Editable.svelte';
 	import EditFrame from '../../edit/chrome/EditFrame.svelte';
 	import EditPanel from '../../edit/chrome/EditPanel.svelte';
 	import PersonFigure from '../ui/figure/PersonFigure.svelte';
@@ -9,10 +8,12 @@
 	/**
 	 * One team member as a `PersonFigure`, drawn from the row's `figure*`
 	 * fields (defaults applied here, once, and shared by the drawing and the
-	 * panel rows), with the card's editing contract: `name` and `photo` and
-	 * the eight figure settings through the frame's panel, `role` and `bio`
-	 * inline — which is why the caption is this component's snippet and not
-	 * the figure's default: `Editable` spreads onto an element the host owns.
+	 * panel rows). Two doors to edit it, both on the frame: the gear's panel
+	 * holds what is VISUAL and immediate — the photo and the nine figure
+	 * settings — and the pencil opens the host's full form (`record`) for the
+	 * rest: the name, the role and bio in every language, the slug. Nothing
+	 * edits inline: a caption is too small a place for three languages, and
+	 * a bio that reveals on hover is no place for a caret.
 	 */
 	interface Props {
 		member: TeamMemberData;
@@ -26,6 +27,7 @@
 	const arms = $derived(member.figureArms ?? 'down');
 	const legs = $derived(member.figureLegs ?? 'standing');
 	const head = $derived(member.figureHead ?? 'cutout');
+	const headShape = $derived(member.figureHeadShape ?? 'round');
 	const labelSide = $derived(member.figureLabelSide ?? 'right');
 	const labelAlign = $derived(member.figureLabelAlign ?? 'top');
 	const offset = $derived(member.figureOffset ?? 0);
@@ -39,11 +41,11 @@
 
 	const panelRows = $derived(
 		[
-			edit?.name && { descriptor: edit.name, value: member.name },
 			edit?.photo && { descriptor: edit.photo, value: member.photoUrl },
 			edit?.figureArms && { descriptor: edit.figureArms, value: arms },
 			edit?.figureLegs && { descriptor: edit.figureLegs, value: legs },
 			edit?.figureHead && { descriptor: edit.figureHead, value: head },
+			edit?.figureHeadShape && { descriptor: edit.figureHeadShape, value: headShape },
 			edit?.figureLabelSide && { descriptor: edit.figureLabelSide, value: labelSide },
 			edit?.figureLabelAlign && { descriptor: edit.figureLabelAlign, value: labelAlign },
 			// The numbers travel as text: the panel has no number row.
@@ -53,7 +55,14 @@
 		].filter((row) => row !== undefined)
 	);
 	const frameSpec = $derived(
-		edit && panelRows.length > 0 ? { label: edit.label ?? member.name, hasPanel: true } : undefined
+		edit && (panelRows.length > 0 || edit.record || edit.removeOp)
+			? {
+					label: edit.label ?? member.name,
+					hasPanel: panelRows.length > 0,
+					record: edit.record,
+					removeOp: edit.removeOp
+				}
+			: undefined
 	);
 </script>
 
@@ -74,27 +83,13 @@
 			bio={member.bio}
 			{photo}
 			{photoShape}
+			head={headShape}
 			{arms}
 			{legs}
 			headScale={headScale / 100}
 			{labelSide}
 			{labelAlign}
-		>
-			{#snippet caption()}
-				<strong class="vit-figure__name">{member.name}</strong>
-				<Editable edit={edit?.role} value={member.role}>
-					{#snippet children(text, attrs)}<span class="vit-figure__role" {...attrs}>{text}</span
-						>{/snippet}
-				</Editable>
-				{#if member.bio}
-					<Editable edit={edit?.bio} value={member.bio}>
-						{#snippet children(text, attrs)}<p class="vit-figure__bio" {...attrs}>
-								{text}
-							</p>{/snippet}
-					</Editable>
-				{/if}
-			{/snippet}
-		</PersonFigure>
+		/>
 	</EditFrame>
 </div>
 

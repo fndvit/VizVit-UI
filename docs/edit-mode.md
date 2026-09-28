@@ -52,7 +52,9 @@ setEditAdapter({
 
 	// Image upload; resolves to the stored path an 'image' property saves.
 	// Leave it off and image rows fall back to a plain path input.
-	uploadImage: async (descriptor, file) => path
+	uploadImage: async (descriptor, file) => path,
+	// Optional: the host's own full form for one row, or a new one (no id).
+	openRecord: (target) => { … }
 }, EDIT_CHROME);
 ```
 
@@ -201,10 +203,18 @@ corner toolbar — a gear opening the property panel (an `EditPopover` holding
 an `EditPanel` of rows), and a trash that confirms (`ConfirmDialog`, over
 Modal) before applying a remove op. Inactive it renders its children alone,
 with zero wrapper element.
+A spec may also name a `record` (`{ entity, id }`): with an adapter that
+implements `openRecord`, the toolbar gains a pencil that opens the host's full
+form for that row — for what a panel of scalar rows cannot hold, such as text
+in three languages. `TeamFigure` edits nothing inline for that reason.
 
 `AddSlot` is the "+" of an editable collection; it applies a `create` op,
 optionally anchored before an existing row. Lists own identity and order, so
 collection wiring lives on the LIST component:
+A slot may name a `record` (`{ entity }`): with an adapter that implements
+`openRecord`, the click opens the host's form for a NEW row instead of creating
+a seeded one in place; without one, the op applies as ever. `TeamFigureField`
+does this — a new member is a whole person, not a blank to fill in after.
 
 ```svelte
 <Timeline

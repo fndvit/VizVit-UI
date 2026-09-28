@@ -66,7 +66,8 @@ describe('WhoWeArePage, editing', () => {
 					copy: copyEditFor('who-we-are'),
 					memberFor,
 					collaboratorFor,
-					collaborators: { entity: 'collaborators' }
+					collaborators: { entity: 'collaborators' },
+					members: { entity: 'team_members' }
 				}
 			},
 			adapter: fullAdapter(),
@@ -79,8 +80,10 @@ describe('WhoWeArePage, editing', () => {
 		expect(labelOf(page, '#collaborators-heading')).toBe('Bloc collaborators_heading');
 		expect(memberFor.mock.calls.map(([m]) => m)).toEqual([...featured, ...board]);
 		expect(collaboratorFor.mock.calls.map(([c]) => c)).toEqual(collaborators);
-		// The collection ref reaches the list: one trailing add slot, one remove per identified row.
-		expect(page.querySelectorAll('button.add')).toHaveLength(1);
+		// The collection refs reach the lists: one trailing add slot each (the
+		// figures' and the collaborators'), one remove per identified row.
+		expect(page.querySelectorAll('button.add')).toHaveLength(2);
+		expect(page.querySelectorAll('.featured button.add')).toHaveLength(1);
 		expect(page.querySelectorAll('ul .vit-edit-frame')).toHaveLength(collaborators.length);
 	});
 });
