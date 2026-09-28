@@ -31,8 +31,10 @@
 		editing && spec?.record !== undefined && adapter?.openRecord !== undefined
 	);
 	// ONE door: the form holds everything the panel would, so where the
-	// pencil is offered the gear is not — two buttons for overlapping fields
+	// form is offered the panel is not — two buttons for overlapping fields
 	// read as two things to learn. A host without a form keeps the panel.
+	// Both doors wear the same pencil: to the person editing, either one is
+	// "edit this", and a second icon only asked what the difference was.
 	const showGear = $derived(
 		!showPencil &&
 			editing &&
@@ -79,7 +81,7 @@
 		<div class="toolbar" bind:this={toolbar}>
 			{#if showGear}
 				<IconButton
-					icon="gear"
+					icon="pencil"
 					label={config.editMessages.edit_properties({ label: spec.label })}
 					onclick={() => (panelOpen = !panelOpen)}
 				/>

@@ -56,7 +56,7 @@ export const defaultEditMessages: EditMessages = {
 	edit_edit: () => 'Edita',
 	edit_preview: () => 'Vista prèvia',
 	edit_editBody: () => 'Edita el contingut',
-	edit_properties: ({ label }) => `Propietats: ${label}`,
+	edit_properties: ({ label }) => `Edita: ${label}`,
 	edit_remove: () => 'Elimina',
 	edit_removeConfirm: ({ label }) =>
 		`Segur que vols eliminar «${label}»? Es pot desfer des de l’historial.`,

@@ -199,19 +199,21 @@ attrs bag carries `contenteditable`, the textbox role, and the state hooks.
 
 `EditFrame` is the page-builder wrapper a component mounts INSIDE its own
 root element: while editing it outlines the block on hover/focus and shows a
-corner toolbar — a gear opening the property panel (an `EditPopover` holding
+corner toolbar — a pencil opening the property panel (an `EditPopover` holding
 an `EditPanel` of rows), and a trash that confirms (`ConfirmDialog`, over
 Modal) before applying a remove op. Inactive it renders its children alone,
 with zero wrapper element.
 A spec may also name a `record` (`{ entity, id }`): with an adapter that
 implements `openRecord`, the toolbar shows a pencil that opens the host's full
 form for that row — for what a panel of scalar rows cannot hold, such as text
-in three languages — and the gear goes: the form holds everything the panel
+in three languages — and the panel's door goes: the form holds everything the panel
 would, and two buttons for overlapping fields read as two things to learn.
 Inside such a frame `Editable` is inert too: one door per card, the same door
 for every field — a caption edited in place beside a form that edits it was
 two ways to change one thing, and the inline way reached only the localized
-columns. A host without `openRecord` keeps the gear and the inline editing.
+columns. A host without `openRecord` keeps the panel and the inline editing;
+both doors wear the same pencil, since to the person editing either is «edit
+this».
 Page copy and chrome wording, which have no record, edit inline as ever. `TeamFigure` edits nothing inline and opens no panel for
 that reason; every card's map takes the same `record`.
 

@@ -150,7 +150,7 @@ describe('EditFrame gating', () => {
 			[...gearOnly.container.querySelectorAll<HTMLButtonElement>('.toolbar button')].map((b) =>
 				b.getAttribute('aria-label')
 			)
-		).toEqual(['Propietats: Fita']);
+		).toEqual(['Edita: Fita']);
 	});
 
 	it('confirming the trash applies the remove op', async () => {
