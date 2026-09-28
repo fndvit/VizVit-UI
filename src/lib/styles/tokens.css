@@ -115,4 +115,16 @@
 	--vit-madlib-menu-shadow: none;
 	--vit-madlib-menu-max-height: 15rem;
 	--vit-madlib-menu-z: 40;
+
+	/* Person figure (`PersonFigure`, on `./primitives`) */
+	/* The drawing's width; everything in the figure — body, callout run, the
+	   rule's height above the baseline — derives from it. Text stays in rem. */
+	--vit-figure-width: 10rem;
+	--vit-figure-ink: var(--color-ink);
+	/* Body stroke in viewBox units (153 across), so it scales with the width. */
+	--vit-figure-stroke: 4;
+	--vit-figure-callout-ink: var(--color-ink);
+	--vit-figure-name-size: var(--text-base);
+	--vit-figure-role-size: var(--text-sm);
+	--vit-figure-bio-width: 14rem;
 }

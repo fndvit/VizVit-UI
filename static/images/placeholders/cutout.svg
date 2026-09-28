@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 320" width="240" height="320">
+  <!-- A cut-out head on a transparent background: hair, face, neck reaching
+       the bottom edge, so `PersonFigure`'s cutout mode lands its chin on the neck. -->
+  <path d="M96 236h48v84H96z" fill="#d9a67a"/>
+  <ellipse cx="120" cy="150" rx="78" ry="98" fill="#e9b98d"/>
+  <path d="M42 150c0-72 30-124 78-124s78 52 78 124c-10-42-32-64-78-64s-68 22-78 64z" fill="#3b2a24"/>
+  <circle cx="92" cy="152" r="7" fill="#2b2b2b"/>
+  <circle cx="148" cy="152" r="7" fill="#2b2b2b"/>
+  <path d="M100 200q20 16 40 0" fill="none" stroke="#a5613f" stroke-width="5" stroke-linecap="round"/>
+</svg>
