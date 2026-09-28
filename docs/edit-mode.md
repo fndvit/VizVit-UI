@@ -204,9 +204,11 @@ an `EditPanel` of rows), and a trash that confirms (`ConfirmDialog`, over
 Modal) before applying a remove op. Inactive it renders its children alone,
 with zero wrapper element.
 A spec may also name a `record` (`{ entity, id }`): with an adapter that
-implements `openRecord`, the toolbar gains a pencil that opens the host's full
+implements `openRecord`, the toolbar shows a pencil that opens the host's full
 form for that row — for what a panel of scalar rows cannot hold, such as text
-in three languages. `TeamFigure` edits nothing inline and opens no panel for
+in three languages — and the gear goes: the form holds everything the panel
+would, and two buttons for overlapping fields read as two things to learn. A
+host without `openRecord` keeps the gear. `TeamFigure` edits nothing inline and opens no panel for
 that reason; every card's map takes the same `record`.
 
 `AddSlot` is the "+" of an editable collection; it applies a `create` op,

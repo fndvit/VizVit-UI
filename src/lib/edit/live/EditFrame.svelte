@@ -8,9 +8,10 @@
 
 	/**
 	 * The page-builder wrapper: a corner toolbar (revealed on hover AND
-	 * :focus-within — never hover-only) with a gear that opens the property
-	 * panel, a pencil that opens the host's record editor, and a trash that
-	 * confirms, then applies the remove op.
+	 * :focus-within — never hover-only) with ONE door to the row — a pencil
+	 * that opens the host's record editor, or, for a host without one, a gear
+	 * that opens the property panel — and a trash that confirms, then applies
+	 * the remove op.
 	 *
 	 * Triple-gated per affordance: spec present ∧ adapter editing ∧ the
 	 * capability method present. With nothing to offer it renders the children
@@ -24,16 +25,23 @@
 	const config = getUiConfig();
 
 	const editing = $derived(spec !== undefined && (adapter?.isEditing ?? false));
-	const showGear = $derived(
-		editing && spec?.hasPanel === true && panel !== undefined && adapter?.saveProperty !== undefined
-	);
-	const showTrash = $derived(
-		editing && spec?.removeOp !== undefined && adapter?.applyOp !== undefined
-	);
 	// The pencil: the host's full form for this row, where a panel is the
 	// wrong shape (three languages of text, a photo, a slug).
 	const showPencil = $derived(
 		editing && spec?.record !== undefined && adapter?.openRecord !== undefined
+	);
+	// ONE door: the form holds everything the panel would, so where the
+	// pencil is offered the gear is not — two buttons for overlapping fields
+	// read as two things to learn. A host without a form keeps the panel.
+	const showGear = $derived(
+		!showPencil &&
+			editing &&
+			spec?.hasPanel === true &&
+			panel !== undefined &&
+			adapter?.saveProperty !== undefined
+	);
+	const showTrash = $derived(
+		editing && spec?.removeOp !== undefined && adapter?.applyOp !== undefined
 	);
 	const framed = $derived(showGear || showTrash || showPencil);
 
