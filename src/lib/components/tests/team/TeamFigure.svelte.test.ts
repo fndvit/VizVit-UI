@@ -25,26 +25,12 @@ const member: TeamMemberData = {
 	isBoard: false
 };
 
-/** A full map the way a CMS words one: selects with options, numbers as text. */
+/** The map a CMS hands a figure: the record, and the card's rows it ignores. */
 function fullEdit(): TeamMemberEditMap {
 	const property = entityProperty('team_members', 7);
-	const select = (field: string, label: string, values: readonly string[]) =>
-		property(field, {
-			type: 'select',
-			label,
-			options: values.map((v) => ({ value: v, label: v }))
-		});
 	return {
+		name: property('name', { type: 'text', label: 'Nom' }),
 		photo: property('photo_url', { type: 'image', label: 'Fotografia' }),
-		figureArms: select('figureArms', 'Braços', Object.keys(ARMS)),
-		figureLegs: select('figureLegs', 'Cames', Object.keys(LEGS)),
-		figureHead: select('figureHead', 'Cap', ['cutout', 'circle', 'drawn']),
-		figureHeadShape: select('figureHeadShape', 'Forma del cap', Object.keys(HEADS)),
-		figureLabelSide: select('figureLabelSide', 'Costat', ['left', 'right']),
-		figureLabelAlign: select('figureLabelAlign', 'Alçada', ['top', 'bottom']),
-		figureOffset: property('figureOffset', { type: 'text', label: 'Desplaçament' }),
-		figureHeadScale: property('figureHeadScale', { type: 'text', label: 'Escala del cap' }),
-		figureSize: property('figureSize', { type: 'text', label: 'Mida' }),
 		record: { entity: 'team_members', id: 7 }
 	};
 }
