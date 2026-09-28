@@ -1,100 +1,38 @@
-import { flushSync } from 'svelte';
 import { describe, expect, it } from 'vitest';
 import { render } from 'vitest-browser-svelte';
-import PersonFigure from '../../ui/PersonFigure.svelte';
+import PersonFigure from '../../ui/figure/PersonFigure.svelte';
+import { ARMS, LEGS } from '../../ui/figure/paths.js';
 
 /**
- * The figure is a drawing that must never speak, a head that has three ways
- * of being there, and a label whose line has four places to go. Each is a
- * branch a story shows and, before this file, nothing asserted.
+ * The composition: the parts are held by their own suites (`FigureBody`,
+ * `FigureHead`, `figure-paths`); what is asserted here is that they meet —
+ * the head and callout inside the body's svg — and the two things only the
+ * whole owns: where the label goes, and what the caption says.
  */
-
-const DOWN = 'M27 107L39.375 8H113.625L126 107';
-const STANDING = 'M21 7V179H8M70 7V179H82';
-const ROUND_HEAD_START = 'M25 41C33.8366 41';
-
-const svg = () => document.querySelector('svg');
-const bodyPaths = () =>
-	[...document.querySelectorAll('.vit-figure__body path')].map((path) => path.getAttribute('d'));
 const figure = () => document.querySelector('figure');
+const svg = () => document.querySelector('svg');
 const callout = () => document.querySelector('.vit-figure__callout')?.getAttribute('d') ?? '';
 
 describe('PersonFigure', () => {
-	it('draws the default pose as a decorative image', () => {
-		render(PersonFigure, { name: 'Ada' });
+	it('composes body, head and callout in one svg, decoratively', () => {
+		render(PersonFigure, { name: 'Ada', arms: 'raised', legs: 'walking', photo: '/ada.png' });
 
-		expect(svg()?.getAttribute('aria-hidden')).toBe('true');
-		expect(svg()?.getAttribute('role')).toBeNull();
-		expect(svg()?.querySelector('title')).toBeNull();
-		expect(bodyPaths()).toContain(DOWN);
-		expect(bodyPaths()).toContain(STANDING);
-	});
-
-	it('picks the arm and leg paths from the pose props', () => {
-		render(PersonFigure, { name: 'Ada', arms: 'raised', legs: 'walking' });
-
-		expect(bodyPaths().some((d) => d?.startsWith('M7 25L32.9376'))).toBe(true);
-		expect(bodyPaths().some((d) => d?.startsWith('M69 7L85 129.857'))).toBe(true);
-		expect(bodyPaths()).not.toContain(DOWN);
+		const art = svg();
+		expect(art?.getAttribute('aria-hidden')).toBe('true');
+		const strokes = [...(art?.querySelectorAll('.vit-figure-body__strokes path') ?? [])].map((p) =>
+			p.getAttribute('d')
+		);
+		expect(strokes).toEqual([ARMS.raised, LEGS.walking]);
+		expect(art?.querySelector('image')?.getAttribute('href')).toBe('/ada.png');
+		expect(art?.querySelector('.vit-figure__callout')).not.toBeNull();
+		expect(document.querySelectorAll('svg')).toHaveLength(1);
 	});
 
 	it('draws the head when there is no photo', () => {
-		render(PersonFigure, { name: 'Ada' });
+		render(PersonFigure, { name: 'Ada', head: 'd' });
 
-		expect(document.querySelector('image')).toBeNull();
-		expect(document.querySelector('.vit-figure__head')?.getAttribute('d')).toContain(
-			ROUND_HEAD_START
-		);
-	});
-
-	it('draws the head shape asked for', () => {
-		render(PersonFigure, { name: 'Ada', head: 'cup' });
-
-		expect(document.querySelector('.vit-figure__head')?.getAttribute('d')).toMatch(/^M8 8V24/);
-	});
-
-	it('sits a cut-out on the neck, bottom-anchored and unclipped', () => {
-		render(PersonFigure, { name: 'Ada', photo: '/ada.png' });
-
-		const image = document.querySelector('image');
-		expect(image?.getAttribute('href')).toBe('/ada.png');
-		expect(image?.getAttribute('preserveAspectRatio')).toBe('xMidYMax meet');
-		expect(image?.hasAttribute('clip-path')).toBe(false);
-		expect(document.querySelector('clipPath')).toBeNull();
-		expect(document.querySelector('.vit-figure__head')).toBeNull();
-	});
-
-	it('masks a portrait into a circle, with an id of its own per figure', () => {
-		render(PersonFigure, { name: 'Ada', photo: '/ada.jpg', photoShape: 'circle' });
-		render(PersonFigure, { name: 'Bea', photo: '/bea.jpg', photoShape: 'circle' });
-
-		const clips = [...document.querySelectorAll('clipPath')];
-		expect(clips).toHaveLength(2);
-		expect(clips[0]?.querySelector('circle')).not.toBeNull();
-		expect(clips[0]?.id).not.toBe(clips[1]?.id);
-
-		const images = [...document.querySelectorAll('image')];
-		expect(images[0]?.getAttribute('clip-path')).toBe(`url(#${clips[0]?.id})`);
-		expect(images[1]?.getAttribute('clip-path')).toBe(`url(#${clips[1]?.id})`);
-		expect(images[0]?.getAttribute('preserveAspectRatio')).toBe('xMidYMid slice');
-	});
-
-	it('scales the photo about the neck', () => {
-		render(PersonFigure, { name: 'Ada', photo: '/ada.png', headScale: 1.2 });
-
-		expect(document.querySelector('image')?.getAttribute('transform')).toBe(
-			'translate(76.5 84) scale(1.2) translate(-76.5 -84)'
-		);
-	});
-
-	it('falls back to the drawn head when the photo fails to load', () => {
-		render(PersonFigure, { name: 'Ada', photo: '/missing.png' });
-
-		document.querySelector('image')?.dispatchEvent(new Event('error'));
-		flushSync();
-
-		expect(document.querySelector('image')).toBeNull();
-		expect(document.querySelector('.vit-figure__head')).not.toBeNull();
+		expect(svg()?.querySelector('image')).toBeNull();
+		expect(svg()?.querySelector('.vit-figure-head')?.getAttribute('d')).toMatch(/^M27.571 8H38/);
 	});
 
 	it('runs the callout from the right shoulder to a label on the right, by default', () => {

@@ -15,12 +15,27 @@ export { default as IconButton } from './components/ui/IconButton.svelte';
 export { default as Link } from './components/ui/Link.svelte';
 export { default as Logo } from './components/ui/Logo.svelte';
 export { default as Modal } from './components/ui/Modal.svelte';
+// The figure, in parts: the drawing and the callout arithmetic, the line
+// body, the head's three modes, and the person that composes them.
+export { default as FigureBody } from './components/ui/figure/FigureBody.svelte';
+export { default as FigureHead } from './components/ui/figure/FigureHead.svelte';
+export { default as PersonFigure } from './components/ui/figure/PersonFigure.svelte';
 export {
-	default as PersonFigure,
-	type ArmsPose,
-	type HeadShape,
-	type LegsPose
-} from './components/ui/PersonFigure.svelte';
+	ARMS,
+	LEGS,
+	HEADS,
+	NECK,
+	SHOULDER,
+	FIGURE_VIEWBOX,
+	calloutPath
+} from './components/ui/figure/paths.js';
+export type {
+	ArmsPose,
+	HeadShape,
+	LabelAlign,
+	LabelSide,
+	LegsPose
+} from './components/ui/figure/paths.js';
 export { default as Pagination } from './components/ui/Pagination.svelte';
 export { default as RichText } from './components/ui/RichText.svelte';
 export { default as SearchInput } from './components/ui/SearchInput.svelte';

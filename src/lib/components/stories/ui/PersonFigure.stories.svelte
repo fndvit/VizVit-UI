@@ -1,7 +1,8 @@
 <script module lang="ts">
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import { sampleMember } from '../../../fixtures.js';
-	import PersonFigure, { type ArmsPose, type LegsPose } from '../../ui/PersonFigure.svelte';
+	import PersonFigure from '../../ui/figure/PersonFigure.svelte';
+	import { ARMS, LEGS, type ArmsPose, type LegsPose } from '../../ui/figure/paths.js';
 
 	const { Story } = defineMeta({
 		title: 'UI/PersonFigure',
@@ -13,9 +14,9 @@
 		}
 	});
 
-	// Typed lists, so a pose added to the component and not here fails `check`.
-	const ARMS: ArmsPose[] = ['down', 'raised', 'one-bent'];
-	const LEGS: LegsPose[] = ['standing', 'walking', 'stride', 'step', 'kneel', 'sit'];
+	// Every pose the closed sets hold — a pose added to paths.ts shows up here.
+	const ARM_POSES = Object.keys(ARMS) as ArmsPose[];
+	const LEG_POSES = Object.keys(LEGS) as LegsPose[];
 
 	/** The mockup's team section: seven figures at their own heights and sizes. */
 	const TEAM = [
@@ -105,8 +106,8 @@
 <Story name="Poses">
 	{#snippet template(args)}
 		<div style="display: flex; gap: 2rem 4rem; flex-wrap: wrap; --vit-figure-width: 8rem">
-			{#each ARMS as arms (arms)}
-				{#each LEGS as legs (legs)}
+			{#each ARM_POSES as arms (arms)}
+				{#each LEG_POSES as legs (legs)}
 					<PersonFigure {...args} {arms} {legs} role="{arms} / {legs}" />
 				{/each}
 			{/each}

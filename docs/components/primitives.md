@@ -103,30 +103,60 @@ Previous/next paging as real links (works without JS, crawlable). Renders
 nothing on a single page; recovers from out-of-range pages.
 Props: `page` (1-based), `total` (items), `pageSize`, `href(page) => string`.
 
-## PersonFigure
+## FigureBody, FigureHead, PersonFigure
 
-A person as a stick figure — a shoulder line with hanging arms and legs in a
-pose — topped by a head that is a cut-out photo sat on the neck (`photoShape:
-'cutout'`), a portrait masked into a circle (`'circle'`), or, with no photo, a
-drawn outline (`head`). Beside it the name and role over a short rule, joined
-to the shoulder by a diagonal callout; a `bio` reveals under the rule on hover,
-keyboard focus or tap. The body paths are the digital-gap survey's.
+A person drawn as a stick figure, in parts. `figure/paths.ts` holds the
+drawing — the digital-gap survey's stroke paths as closed sets (`ARMS`,
+`LEGS`, `HEADS`, with `ArmsPose`, `LegsPose`, `HeadShape`), where each part
+sits in the composed box (`FIGURE_VIEWBOX`, `NECK`, `SHOULDER`), and
+`calloutPath(side, align)` — so a chart or a decorative band can draw line
+people from the same set.
 
-| Prop          | Type                                                                             | Notes                                                              |
-| ------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| `name`        | `string`                                                                         | the figure's only accessible text — the drawing is `aria-hidden`   |
-| `role?`       | `string`                                                                         |                                                                    |
-| `bio?`        | `string \| null`                                                                 | present → the figure is a focus stop and the bio reveals           |
-| `photo?`      | `string \| null`                                                                 | absent, or failing to load, the head is drawn                      |
-| `photoShape?` | `'cutout' \| 'circle'`                                                           | default `cutout`                                                   |
-| `head?`       | `HeadShape` = `'round' \| 'cup' \| 'd'`                                          | the drawn head, default `round`                                    |
-| `arms?`       | `ArmsPose` = `'down' \| 'raised' \| 'one-bent'`                                  | default `down`                                                     |
-| `legs?`       | `LegsPose` = `'standing' \| 'walking' \| 'stride' \| 'step' \| 'kneel' \| 'sit'` | default `standing`                                                 |
-| `headScale?`  | `number`                                                                         | scales the photo about the neck, default `1`                       |
-| `labelSide?`  | `'left' \| 'right'`                                                              | default `right`                                                    |
-| `labelAlign?` | `'top' \| 'bottom'`                                                              | `top` = beside the head, `bottom` = beside the legs; default `top` |
-| `class?`      | `string`                                                                         |                                                                    |
-| `children?`   | `Snippet`                                                                        | an extra marker laid over the body — position it absolutely        |
+### FigureBody
+
+The line body: a shoulder line with hanging arms and legs in a pose, an
+`aria-hidden` svg sized by `--vit-figure-width`. No head — `children` render
+INSIDE the svg and share its coordinates, which is where a `FigureHead`, a
+marker or a callout goes.
+Props: `arms?` (`down`), `legs?` (`standing`), `class?`, `children?`.
+
+### FigureHead
+
+An svg fragment placed on the neck: a cut-out photo with a transparent
+background (`photoShape: 'cutout'`), a portrait masked into a circle
+(`'circle'`), or, with no photo or one that fails to load, the drawn outline
+(`head`). Renders inside a `FigureBody` or any svg in the figure box.
+Props: `photo?`, `photoShape?` (`cutout`), `head?` (`round`), `headScale?`
+(`1`, scales the photo about the neck so the chin stays put).
+
+```svelte
+<FigureBody legs="walking">
+	<FigureHead photo={member.cutoutUrl} />
+</FigureBody>
+```
+
+### PersonFigure
+
+The composition: body, head, and beside them the name and role over a short
+rule, joined to the shoulder by a diagonal callout; a `bio` reveals under the
+rule on hover, keyboard focus or tap. The drawing is `aria-hidden` and the
+name in the caption is the only text.
+
+| Prop          | Type                   | Notes                                                              |
+| ------------- | ---------------------- | ------------------------------------------------------------------ |
+| `name`        | `string`               | the figure's only accessible text                                  |
+| `role?`       | `string`               |                                                                    |
+| `bio?`        | `string \| null`       | present → the figure is a focus stop and the bio reveals           |
+| `photo?`      | `string \| null`       | absent, or failing to load, the head is drawn                      |
+| `photoShape?` | `'cutout' \| 'circle'` | default `cutout`                                                   |
+| `head?`       | `HeadShape`            | the drawn head, default `round`                                    |
+| `arms?`       | `ArmsPose`             | default `down`                                                     |
+| `legs?`       | `LegsPose`             | default `standing`                                                 |
+| `headScale?`  | `number`               | default `1`                                                        |
+| `labelSide?`  | `'left' \| 'right'`    | default `right`                                                    |
+| `labelAlign?` | `'top' \| 'bottom'`    | `top` = beside the head, `bottom` = beside the legs; default `top` |
+| `class?`      | `string`               |                                                                    |
+| `children?`   | `Snippet`              | an extra marker laid over the body — position it absolutely        |
 
 ```svelte
 <div style="--vit-figure-width: 9rem">
@@ -139,13 +169,13 @@ keyboard focus or tap. The body paths are the digital-gap survey's.
 </div>
 ```
 
-Size it with `--vit-figure-width` (default `10rem`): the art, the callout run
-and the rule's height above the caption all follow it, the text stays in rem.
-Below about 8rem the two caption lines outgrow the room above a top-aligned
-rule — lower `--vit-figure-name-size`/`--vit-figure-role-size` or align the
-label `bottom`. The callout leaves the art's box on purpose, so an ancestor
-with `overflow: hidden` clips it. Tokens: `--vit-figure-width`, `-ink`,
-`-stroke` (viewBox units), `-callout-ink`, `-name-size`, `-role-size`,
+Size the three with `--vit-figure-width` (default `10rem`): the art, the
+callout run and the rule's height above the caption all follow it, the text
+stays in rem. Below about 8rem the two caption lines outgrow the room above a
+top-aligned rule — lower `--vit-figure-name-size`/`--vit-figure-role-size` or
+align the label `bottom`. The callout leaves the art's box on purpose, so an
+ancestor with `overflow: hidden` clips it. Tokens: `--vit-figure-width`,
+`-ink`, `-stroke` (viewBox units), `-callout-ink`, `-name-size`, `-role-size`,
 `-bio-width` — see [tokens.md](../tokens.md).
 
 ## RichText
