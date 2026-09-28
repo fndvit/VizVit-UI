@@ -34,6 +34,11 @@
 
 <style>
 	.intro {
+		/* Its own spacing, not the host's paragraph reset: the mirror resets
+		   <p> to no margin and the site does not, so the gap between an intro
+		   and the section below it was a different number in each — zero in
+		   the CMS, where the next grid sat flush against the text. */
+		margin: 0 0 var(--space-4);
 		color: var(--color-ink-secondary);
 		max-width: 60ch;
 	}
