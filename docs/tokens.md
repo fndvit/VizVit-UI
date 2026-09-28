@@ -71,15 +71,17 @@ dialogs follow it — an admin theme wanting pills sets `999px` here);
 Read by `PersonFigure` (`./primitives`). Every one has a fallback in the
 component, so a theme may omit them.
 
-| Token                      | Website value      | Role                                                   |
-| -------------------------- | ------------------ | ------------------------------------------------------ |
-| `--vit-figure-width`       | `10rem`            | the drawing's width; body, callout run and rule follow |
-| `--vit-figure-ink`         | `var(--color-ink)` | body stroke                                            |
-| `--vit-figure-stroke`      | `4`                | body stroke width in viewBox units (153 across)        |
-| `--vit-figure-callout-ink` | `var(--color-ink)` | the label's callout line and rule                      |
-| `--vit-figure-name-size`   | `var(--text-base)` | the name                                               |
-| `--vit-figure-role-size`   | `var(--text-sm)`   | the role                                               |
-| `--vit-figure-bio-width`   | `14rem`            | the revealed bio's width                               |
+| Token                       | Website value      | Role                                                                          |
+| --------------------------- | ------------------ | ----------------------------------------------------------------------------- |
+| `--vit-figure-width`        | `10rem`            | the drawing's width; body, callout run and rule follow                        |
+| `--vit-figure-ink`          | `var(--color-ink)` | body stroke                                                                   |
+| `--vit-figure-stroke`       | `4`                | body stroke width in viewBox units (153 across)                               |
+| `--vit-figure-callout-ink`  | `var(--color-ink)` | the label's callout line and rule                                             |
+| `--vit-figure-name-size`    | `var(--text-base)` | the name                                                                      |
+| `--vit-figure-role-size`    | `var(--text-sm)`   | the role                                                                      |
+| `--vit-figure-bio-width`    | `14rem`            | the revealed bio's width                                                      |
+| `--vit-team-figure-base`    | `10rem`            | `TeamFigureField`: the width a member's size is a percent of                  |
+| `--vit-team-figure-offsets` | `1`                | `TeamFigureField`: multiplier on members' vertical offsets (0 collapses them) |
 
 ## Not part of the contract
 

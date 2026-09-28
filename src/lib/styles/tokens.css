@@ -127,4 +127,9 @@
 	--vit-figure-name-size: var(--text-base);
 	--vit-figure-role-size: var(--text-sm);
 	--vit-figure-bio-width: 14rem;
+	/* The team field (`TeamFigureField`): the width a member's `figureSize`
+	   is a percent of, and a multiplier on every member's vertical offset —
+	   the field sets 0 on a narrow viewport, where figures simply wrap. */
+	--vit-team-figure-base: 10rem;
+	--vit-team-figure-offsets: 1;
 }

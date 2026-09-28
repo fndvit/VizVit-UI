@@ -108,7 +108,8 @@ const CONTRACT_MODULES = [
 	'forms/transport.ts',
 	'forms/types.ts',
 	'utils/paths.ts',
-	'utils/document-title.ts'
+	'utils/document-title.ts',
+	'components/ui/figure/paths.ts'
 ] as const;
 
 describe('the contract subpath', () => {

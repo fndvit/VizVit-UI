@@ -24,13 +24,15 @@
 	import Editable from '../../edit/Editable.svelte';
 	import PageShell from '../layout/PageShell.svelte';
 	import CollaboratorList from '../team/CollaboratorList.svelte';
+	import TeamFigureField from '../team/TeamFigureField.svelte';
 	import TeamMemberCard from '../team/TeamMemberCard.svelte';
 	import CopyIntro from '../ui/CopyIntro.svelte';
 
 	/**
-	 * The team page: the featured members, the board, the collaborators. The
-	 * split into `featured` and `board` is the website's load's (one `isBoard`
-	 * filter each), so the module takes the two lists rather than re-deciding.
+	 * The team page: the featured members as figures, the board as cards, the
+	 * collaborators. The split into `featured` and `board` is the website's
+	 * load's (one `isBoard` filter each), so the module takes the two lists
+	 * rather than re-deciding; a member's `figure*` fields drive the drawing.
 	 */
 	interface Props {
 		content: PageCopy<'who-we-are'>;
@@ -58,11 +60,7 @@
 			{/snippet}
 		</Editable>
 		<CopyIntro text={content.team_intro} edit={edit?.copy?.('team_intro')} />
-		<div class="featured">
-			{#each featured as member (member.slug)}
-				<TeamMemberCard {member} variant="featured" edit={edit?.memberFor?.(member)} />
-			{/each}
-		</div>
+		<TeamFigureField class="featured" members={featured} editFor={edit?.memberFor} />
 	</section>
 
 	<section aria-labelledby="board-heading">
@@ -94,12 +92,6 @@
 </PageShell>
 
 <style>
-	.featured {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
-		gap: var(--space-4);
-	}
-
 	.board {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));

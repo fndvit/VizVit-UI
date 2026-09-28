@@ -4,6 +4,13 @@
  * package states them itself so consumers owe it no schema library.
  */
 import type { EditDescriptor } from '../edit/types.js';
+import type {
+	ArmsPose,
+	HeadMode,
+	LabelAlign,
+	LabelSide,
+	LegsPose
+} from '../components/ui/figure/paths.js';
 
 /** The bounds of one form field; Field turns them into length attributes. */
 export interface FieldConstraint {
@@ -147,6 +154,24 @@ export interface TeamMemberData {
 	bio: string | null;
 	photoUrl: string;
 	isBoard: boolean;
+	/**
+	 * How `TeamFigure` draws this member. All optional, with the defaults the
+	 * component applies, so a host that stores none renders the plain standing
+	 * figure. Integers and percents rather than factors, because a CMS number
+	 * field is integer-only and a property panel has no number row at all.
+	 */
+	figureArms?: ArmsPose;
+	figureLegs?: LegsPose;
+	/** `drawn` forces the outline even with a photo; an empty `photoUrl` draws anyway. */
+	figureHead?: HeadMode;
+	figureLabelSide?: LabelSide;
+	figureLabelAlign?: LabelAlign;
+	/** Vertical shift down, in px — `FIGURE_OFFSET`'s range. */
+	figureOffset?: number;
+	/** Percent — `FIGURE_PERCENT`'s range; 100 is the natural head. */
+	figureHeadScale?: number;
+	/** Percent of the base figure width — `FIGURE_PERCENT`'s range. */
+	figureSize?: number;
 }
 
 export interface CollaboratorData {

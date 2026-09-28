@@ -74,6 +74,30 @@ export type { Reaction, ReactionSummary, SortDirection } from './content/types.j
 export { MILESTONE_CATEGORIES, PROJECT_KINDS } from './content/types.js';
 export type { MilestoneCategory, ProjectKind } from './content/types.js';
 
+// The figure vocabulary a team member's row stores: the poses, the head mode,
+// where the label sits, and the bounds of its integers. The DRAWING stays off
+// this door (0.33.0 kept `figure/paths` on `./primitives` alone); what comes
+// through is the part a host's zod enum and CHECK constraint bind to, the way
+// `projects.kind` binds to PROJECT_KINDS above. The module is a zero-import
+// leaf, so the walk stays component-free.
+export {
+	ARM_POSES,
+	LEG_POSES,
+	HEAD_MODES,
+	LABEL_SIDES,
+	LABEL_ALIGNS,
+	FIGURE_OFFSET,
+	FIGURE_PERCENT
+} from './components/ui/figure/paths.js';
+export type {
+	ArmsPose,
+	HeadMode,
+	LabelAlign,
+	LabelSide,
+	LegsPose
+} from './components/ui/figure/paths.js';
+export type { TeamMemberData } from './content/types.js';
+
 // The weeklies URL contract, both halves: the values a param stands for when
 // absent, the names it travels as, and the parse that reads one back. The read
 // half had three spellings across two repositories and this package's own test,

@@ -33,7 +33,9 @@ describe('WhoWeArePage, read-only', () => {
 			content.collaborators_heading
 		]);
 		expect(textOf(page, '.intro')).toEqual([content.team_intro, content.board_intro]);
-		expect(page.querySelectorAll('.featured > article')).toHaveLength(featured.length);
+		// The featured members are figures now; the board stays cards.
+		expect(page.querySelectorAll('.featured figure')).toHaveLength(featured.length);
+		expect(page.querySelectorAll('.featured article')).toHaveLength(0);
 		expect(page.querySelectorAll('.board > article')).toHaveLength(board.length);
 		expect(page.querySelectorAll('ul > li')).toHaveLength(collaborators.length);
 	});

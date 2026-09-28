@@ -11,6 +11,20 @@
 		bio?: EditDescriptor;
 		name?: PropertyDescriptor;
 		photo?: PropertyDescriptor;
+		/**
+		 * The figure rows, read by `TeamFigure` only (the card ignores them).
+		 * Keys mirror `TeamMemberData`'s fields. The five selects carry the
+		 * HOST's worded `options`; the three numbers are `text` rows whose
+		 * value the component stringifies and the host parses.
+		 */
+		figureArms?: PropertyDescriptor;
+		figureLegs?: PropertyDescriptor;
+		figureHead?: PropertyDescriptor;
+		figureLabelSide?: PropertyDescriptor;
+		figureLabelAlign?: PropertyDescriptor;
+		figureOffset?: PropertyDescriptor;
+		figureHeadScale?: PropertyDescriptor;
+		figureSize?: PropertyDescriptor;
 		/** Accessible name for the frame — usually the member's name. */
 		label?: string;
 	}

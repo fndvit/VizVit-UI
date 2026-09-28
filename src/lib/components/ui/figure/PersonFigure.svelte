@@ -48,6 +48,7 @@
   @property labelSide - Which side of the figure the label sits on
   @property labelAlign - `top` puts the rule beside the head, `bottom` beside the legs
   @property class - Extra classes on the figure
+  @property caption - Replaces the default name/role/bio inside the figcaption; keep the `vit-figure__name/role/bio` classes for the styling
   @property children - An extra marker laid over the body (position it absolutely)
 -->
 <script lang="ts">
@@ -77,6 +78,13 @@
 		/** `top` puts the rule beside the head, `bottom` beside the legs. */
 		labelAlign?: LabelAlign;
 		class?: string;
+		/**
+		 * Replaces the default name, role and bio inside the figcaption — for a
+		 * host whose caption text is editable and so must own the elements.
+		 * Keep the `vit-figure__name/role/bio` classes: the styling (and the bio
+		 * reveal) is by class, reaching into the snippet.
+		 */
+		caption?: Snippet;
 		/** An extra marker over the body; position it absolutely inside the art's box. */
 		children?: Snippet;
 	}
@@ -94,6 +102,7 @@
 		labelSide = 'right',
 		labelAlign = 'top',
 		class: className = '',
+		caption,
 		children
 	}: Props = $props();
 
@@ -118,9 +127,13 @@
 		<div class="vit-figure__extra">{@render children()}</div>
 	{/if}
 	<figcaption class="vit-figure__label">
-		<strong class="vit-figure__name">{name}</strong>
-		{#if role}<span class="vit-figure__role">{role}</span>{/if}
-		{#if bio}<p class="vit-figure__bio">{bio}</p>{/if}
+		{#if caption}
+			{@render caption()}
+		{:else}
+			<strong class="vit-figure__name">{name}</strong>
+			{#if role}<span class="vit-figure__role">{role}</span>{/if}
+			{#if bio}<p class="vit-figure__bio">{bio}</p>{/if}
+		{/if}
 	</figcaption>
 </figure>
 
@@ -188,17 +201,19 @@
 		text-align: right;
 	}
 
-	.vit-figure__name {
+	/* The caption's children may be a host's snippet, which carries no scope
+	   hash — so they are reached by class under the scoped figcaption. */
+	.vit-figure__label :global(.vit-figure__name) {
 		font-size: var(--vit-figure-name-size, var(--text-base));
 		font-weight: 700;
 	}
 
-	.vit-figure__role {
+	.vit-figure__label :global(.vit-figure__role) {
 		font-size: var(--vit-figure-role-size, var(--text-sm));
 		color: var(--color-ink-secondary);
 	}
 
-	.vit-figure__bio {
+	.vit-figure__label :global(.vit-figure__bio) {
 		position: absolute;
 		top: 100%;
 		inset-inline-start: 0;
@@ -215,13 +230,13 @@
 			transform var(--transition-fast);
 	}
 
-	.vit-figure[data-side='left'] .vit-figure__bio {
+	.vit-figure[data-side='left'] .vit-figure__label :global(.vit-figure__bio) {
 		inset-inline-start: auto;
 		inset-inline-end: 0;
 	}
 
-	.vit-figure:hover .vit-figure__bio,
-	.vit-figure:focus-within .vit-figure__bio {
+	.vit-figure:hover .vit-figure__label :global(.vit-figure__bio),
+	.vit-figure:focus-within .vit-figure__label :global(.vit-figure__bio) {
 		opacity: 1;
 		transform: none;
 		pointer-events: auto;
@@ -245,7 +260,7 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.vit-figure__bio {
+		.vit-figure__label :global(.vit-figure__bio) {
 			transition: none;
 			transform: none;
 		}

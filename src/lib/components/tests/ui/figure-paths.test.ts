@@ -1,10 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import {
+	ARM_POSES,
 	ARMS,
 	CALLOUT_RULE,
 	CALLOUT_RUN,
 	FIGURE_WIDTH,
+	HEAD_MODES,
 	HEADS,
+	LABEL_ALIGNS,
+	LABEL_SIDES,
+	LEG_POSES,
 	LEGS,
 	RULE_Y,
 	SHOULDER,
@@ -49,5 +54,25 @@ describe('the closed pose sets', () => {
 
 	it('close every drawn head, so it can take a fill', () => {
 		for (const d of Object.values(HEADS)) expect(d.endsWith('Z')).toBe(true);
+	});
+});
+
+/**
+ * The tuples are what a host's enum and a select's options derive from; the
+ * maps are what the drawing reads. `satisfies` binds them at compile time,
+ * and this holds the ORDER too: a select lists poses in the tuple's order,
+ * which is the order the maps spell them in.
+ */
+describe('the figure vocabulary', () => {
+	it('names the pose maps, in display order', () => {
+		expect(Object.keys(ARMS)).toEqual([...ARM_POSES]);
+		expect(Object.keys(LEGS)).toEqual([...LEG_POSES]);
+		expect(Object.keys(RULE_Y)).toEqual([...LABEL_ALIGNS]);
+	});
+
+	it('is the head MODE, not the drawn outline set', () => {
+		expect([...HEAD_MODES]).toEqual(['cutout', 'circle', 'drawn']);
+		expect(Object.keys(HEADS)).not.toEqual([...HEAD_MODES]);
+		expect([...LABEL_SIDES]).toEqual(['left', 'right']);
 	});
 });

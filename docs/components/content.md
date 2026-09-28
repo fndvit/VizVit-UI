@@ -44,7 +44,38 @@ read-more (external URLs detected and rendered as bare anchors). Props:
 Portrait, name, role, optional bio. `variant: 'featured' | 'board'`.
 Props: `member: TeamMemberData`, `variant?`, `edit?: TeamMemberEditMap`
 (`role`, `bio` — `name` is a plain-text column, not localized, so the
-per-locale save contract doesn't apply to it).
+per-locale save contract doesn't apply to it; `name` and `photo` edit through
+the frame's panel). The map also carries the eight `figure*` rows, which the
+card ignores and `TeamFigure` reads.
+
+## TeamFigure
+
+One member as a `PersonFigure`, drawn from the row's optional `figure*`
+fields (`TeamMemberData`): `figureArms`, `figureLegs`, `figureHead`
+(`cutout` sits the photo on the neck, `circle` masks it, `drawn` uses the
+outline whatever the photo — as does an empty `photoUrl`), `figureLabelSide`,
+`figureLabelAlign`, `figureOffset` (px down, `FIGURE_OFFSET`'s range),
+`figureHeadScale` and `figureSize` (percents, `FIGURE_PERCENT`'s range). The
+vocabularies are `ARM_POSES`, `LEG_POSES`, `HEAD_MODES`, `LABEL_SIDES`,
+`LABEL_ALIGNS` on `./contract`, so a host's enum derives from them.
+Props: `member: TeamMemberData`, `edit?: TeamMemberEditMap`, `class?`.
+
+Editing: `name`, `photo` and the eight figure rows through the frame's panel
+(the five selects carry the HOST's worded `options`; the three numbers are
+`text` rows stringified by the component and parsed by the host), `role` and
+`bio` inline. The bio reveals on hover or focus before the caret lands in it.
+
+Sizing: `--vit-figure-width` is `--vit-team-figure-base` × `figureSize`, and
+the offset is an in-flow `margin-top` × `--vit-team-figure-offsets` (both in
+`tokens.css`; the field sets them per breakpoint).
+
+## TeamFigureField
+
+The featured team between the brand shapes: `DecorShapes` left and right on
+the home hero's grid, the figures in a wrapping row scattered by their own
+offsets and sizes. Below 900px the shapes go, the base width drops to 7rem and
+offsets collapse. Props: `members: TeamMemberData[]`,
+`editFor?: (member) => TeamMemberEditMap | undefined`, `class?`.
 
 ## CollaboratorList
 
@@ -73,7 +104,7 @@ byte-for-byte when no `edit` is passed and the provider has no `messageEdit`
 | Module             | Data props (the site's `+page.server.ts` shape)                        | Host adapters                                                  | `edit?`                                                                                   |
 | ------------------ | ---------------------------------------------------------------------- | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | `HomePage`         | `content: PageCopy<'home'>`, `milestones`, `weeklies`                  | `onsearch(query)` — the host navigates to its /weeklies        | `HomePageEdit { copy?, milestoneFor?, weeklyFor? }`                                       |
-| `WhoWeArePage`     | `content`, `featured`, `board`, `collaborators`                        | —                                                              | `WhoWeArePageEdit { copy?, memberFor?, collaboratorFor?, collaborators?: CollectionRef }` |
+| `WhoWeArePage`     | `content`, `featured` (as `TeamFigureField`), `board`, `collaborators` | —                                                              | `WhoWeArePageEdit { copy?, memberFor?, collaboratorFor?, collaborators?: CollectionRef }` |
 | `WhatWeDoPage`     | `content`, `latest?` (null = no showcase), `collaborations`, `passion` | —                                                              | `WhatWeDoPageEdit { copy?, projectFor? }`                                                 |
 | `GetInvolvedPage`  | `content`, `jobs`                                                      | `form: ContactFormInstance` (preflighted, or the testing mock) | `GetInvolvedPageEdit { copy?, jobFor?, jobs?: CollectionRef }`                            |
 | `TransparencyPage` | `content`, `milestones`                                                | `query: { q, category }` (server-parsed), `replaceUrl(path)`   | `TransparencyPageEdit { copy?, milestoneFor?, milestones?: CollectionRef }`               |

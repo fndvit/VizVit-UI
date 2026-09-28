@@ -106,11 +106,13 @@ Props: `page` (1-based), `total` (items), `pageSize`, `href(page) => string`.
 ## FigureBody, FigureHead, PersonFigure
 
 A person drawn as a stick figure, in parts. `figure/paths.ts` holds the
-drawing — the digital-gap survey's stroke paths as closed sets (`ARMS`,
-`LEGS`, `HEADS`, with `ArmsPose`, `LegsPose`, `HeadShape`), where each part
-sits in the composed box (`FIGURE_VIEWBOX`, `NECK`, `SHOULDER`), and
-`calloutPath(side, align)` — so a chart or a decorative band can draw line
-people from the same set.
+drawing — the digital-gap survey's stroke paths keyed by the closed tuples
+`ARM_POSES` and `LEG_POSES` (`ARMS`, `LEGS`, bound with `satisfies`; `HEADS`
+with `HeadShape`), the vocabularies a host row stores (`HEAD_MODES`,
+`LABEL_SIDES`, `LABEL_ALIGNS`, the `FIGURE_OFFSET`/`FIGURE_PERCENT` bounds —
+all on `./contract` too), where each part sits in the composed box
+(`FIGURE_VIEWBOX`, `NECK`, `SHOULDER`), and `calloutPath(side, align)` — so a
+chart or a decorative band can draw line people from the same set.
 
 ### FigureBody
 
@@ -142,21 +144,22 @@ rule, joined to the shoulder by a diagonal callout; a `bio` reveals under the
 rule on hover, keyboard focus or tap. The drawing is `aria-hidden` and the
 name in the caption is the only text.
 
-| Prop          | Type                   | Notes                                                              |
-| ------------- | ---------------------- | ------------------------------------------------------------------ |
-| `name`        | `string`               | the figure's only accessible text                                  |
-| `role?`       | `string`               |                                                                    |
-| `bio?`        | `string \| null`       | present → the figure is a focus stop and the bio reveals           |
-| `photo?`      | `string \| null`       | absent, or failing to load, the head is drawn                      |
-| `photoShape?` | `'cutout' \| 'circle'` | default `cutout`                                                   |
-| `head?`       | `HeadShape`            | the drawn head, default `round`                                    |
-| `arms?`       | `ArmsPose`             | default `down`                                                     |
-| `legs?`       | `LegsPose`             | default `standing`                                                 |
-| `headScale?`  | `number`               | default `1`                                                        |
-| `labelSide?`  | `'left' \| 'right'`    | default `right`                                                    |
-| `labelAlign?` | `'top' \| 'bottom'`    | `top` = beside the head, `bottom` = beside the legs; default `top` |
-| `class?`      | `string`               |                                                                    |
-| `children?`   | `Snippet`              | an extra marker laid over the body — position it absolutely        |
+| Prop          | Type                   | Notes                                                                                               |
+| ------------- | ---------------------- | --------------------------------------------------------------------------------------------------- |
+| `name`        | `string`               | the figure's only accessible text                                                                   |
+| `role?`       | `string`               |                                                                                                     |
+| `bio?`        | `string \| null`       | present → the figure is a focus stop and the bio reveals                                            |
+| `photo?`      | `string \| null`       | absent, or failing to load, the head is drawn                                                       |
+| `photoShape?` | `'cutout' \| 'circle'` | default `cutout`                                                                                    |
+| `head?`       | `HeadShape`            | the drawn head, default `round`                                                                     |
+| `arms?`       | `ArmsPose`             | default `down`                                                                                      |
+| `legs?`       | `LegsPose`             | default `standing`                                                                                  |
+| `headScale?`  | `number`               | default `1`                                                                                         |
+| `labelSide?`  | `'left' \| 'right'`    | default `right`                                                                                     |
+| `labelAlign?` | `'top' \| 'bottom'`    | `top` = beside the head, `bottom` = beside the legs; default `top`                                  |
+| `class?`      | `string`               |                                                                                                     |
+| `caption?`    | `Snippet`              | replaces the default name/role/bio in the figcaption — keep the `vit-figure__name/role/bio` classes |
+| `children?`   | `Snippet`              | an extra marker laid over the body — position it absolutely                                         |
 
 ```svelte
 <div style="--vit-figure-width: 9rem">
