@@ -70,7 +70,12 @@ export interface EditPanelProps {
 }
 
 export interface AddSlotProps {
-	op: Extract<EntityOp, { kind: 'create' }>;
+	/**
+	 * The create op that adds a seeded row in place. Optional where `record`
+	 * is the way in: a slot with neither, or whose adapter answers neither,
+	 * renders nothing.
+	 */
+	op?: Extract<EntityOp, { kind: 'create' }>;
 	/** The entity noun for the label, e.g. "una fita". */
 	label?: string;
 	/**

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import IconButton from '../../components/ui/IconButton.svelte';
 	import { getUiConfig } from '../../config/context.js';
-	import { getEditAdapter } from '../context.js';
+	import { getEditAdapter, getRecordFrame } from '../context.js';
 	import type { EditFrameProps } from '../chrome-props.js';
 	import ConfirmDialog from './ConfirmDialog.svelte';
 	import EditPopover from './EditPopover.svelte';
@@ -25,11 +25,12 @@
 	const config = getUiConfig();
 
 	const editing = $derived(spec !== undefined && (adapter?.isEditing ?? false));
+	const opensRecord = getRecordFrame();
 	// The pencil: the host's full form for this row, where a panel is the
-	// wrong shape (three languages of text, a photo, a slug).
-	const showPencil = $derived(
-		editing && spec?.record !== undefined && adapter?.openRecord !== undefined
-	);
+	// wrong shape (three languages of text, a photo, a slug). Whether this
+	// frame opens a record is the gate's answer — the one `Editable` reads to
+	// go inert inside it — so the two can never disagree.
+	const showPencil = $derived(opensRecord?.() ?? false);
 	// ONE door: the form holds everything the panel would, so where the
 	// form is offered the panel is not — two buttons for overlapping fields
 	// read as two things to learn. A host without a form keeps the panel.

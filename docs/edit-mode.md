@@ -224,8 +224,10 @@ optionally anchored before an existing row. Lists own identity and order, so
 collection wiring lives on the LIST component:
 A slot may name a `record` (`{ entity }`): with an adapter that implements
 `openRecord`, the click opens the host's form for a NEW row instead of creating
-a seeded one in place; without one, the op applies as ever. `TeamFigureField`
-does this — a new member is a whole person, not a blank to fill in after.
+a seeded one in place; without one, the op applies as ever. The `op` may be
+left out of such a slot: it is live wherever either way of adding is.
+`TeamFigureField` does this — a new member is a whole person, not a blank to
+fill in after.
 
 ```svelte
 <Timeline

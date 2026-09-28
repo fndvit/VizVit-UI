@@ -48,16 +48,6 @@
 		collection,
 		editFor
 	}));
-	// The op-less way in: a host whose adapter opens a form for a new row.
-	const addViaRecord = $derived(
-		collection !== undefined &&
-			(adapter?.isEditing ?? false) &&
-			adapter?.openRecord !== undefined &&
-			adapter?.applyOp === undefined
-			? { kind: 'create' as const, collection }
-			: undefined
-	);
-	const add = $derived(list.add ?? addViaRecord);
 
 	const placements = $derived(placeFigures(members));
 	const height = $derived(canvasHeight(placements));
@@ -83,9 +73,11 @@
 					layers={layersFor(index)}
 				/>
 			{/each}
-			{#if add && collection}
+			<!-- While editing, the field has a place for its add slot; the slot
+			     decides whether it is live — the op, or the host's form. -->
+			{#if collection && adapter?.isEditing}
 				<div class="add-slot">
-					<AddSlot op={add} record={{ entity: collection.entity }} />
+					<AddSlot op={list.add} record={{ entity: collection.entity }} />
 				</div>
 			{/if}
 		</div>
