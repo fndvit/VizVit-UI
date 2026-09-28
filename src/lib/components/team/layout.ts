@@ -1,19 +1,19 @@
 import type { TeamMemberData } from '../../content/types.js';
+import { PER_CANVAS, clampTo } from '../../edit/placement.js';
 import {
 	CALLOUT_RULE,
 	CALLOUT_RUN,
 	FIGURE_HEIGHT,
-	FIGURE_LAYER,
-	FIGURE_PERCENT,
 	FIGURE_POSITION,
 	FIGURE_WIDTH
 } from '../ui/figure/paths.js';
 
 /**
  * The arithmetic of `TeamFigureField`'s canvas, in node-testable form. Every
- * length is in THOUSANDTHS OF THE CANVAS WIDTH (‰) — the unit a row stores
- * its `figureX` / `figureY` in — so the field renders a length as
- * `calc(n * 0.1cqi)` and the collage scales as one piece.
+ * length is in THOUSANDTHS OF THE CANVAS WIDTH (‰, `PER_CANVAS` in
+ * `edit/placement`) — the unit a row stores its `figureX` / `figureY` in — so
+ * the field renders a length as `calc(n * 0.1cqi)` and the collage scales as
+ * one piece. What a gesture writes back is `edit/placement`'s to clamp.
  *
  * A member with a stored position keeps it. One without gets a place from the
  * field's own row layout — rows of `COLUMNS`, each row centred, the member's
@@ -54,9 +54,6 @@ export function figureFootprint(size: number): number {
 	return (figureWidth(size) * (FIGURE_WIDTH + CALLOUT_RUN + CALLOUT_RULE)) / FIGURE_WIDTH;
 }
 
-const clamp = (value: number, bounds: { min: number; max: number }): number =>
-	Math.min(bounds.max, Math.max(bounds.min, Math.round(value)));
-
 /** The place the row layout gives the member at `index` of `count`. */
 export function autoPlacement(
 	index: number,
@@ -67,12 +64,12 @@ export function autoPlacement(
 	const row = Math.floor(index / COLUMNS);
 	const inRow = index % COLUMNS;
 	const inThisRow = Math.min(COLUMNS, count - row * COLUMNS);
-	const column = 1000 / COLUMNS;
-	const start = (1000 - inThisRow * column) / 2;
+	const column = PER_CANVAS / COLUMNS;
+	const start = (PER_CANVAS - inThisRow * column) / 2;
 	const x = start + inRow * column + (column - figureFootprint(size)) / 2;
 	// An offset was px on a field about a thousand px wide; one px reads as one ‰.
 	const y = row * ROW_STEP + (member.figureOffset ?? 0);
-	return { x: clamp(x, FIGURE_POSITION.x), y: clamp(y, FIGURE_POSITION.y) };
+	return { x: clampTo(x, FIGURE_POSITION.x), y: clampTo(y, FIGURE_POSITION.y) };
 }
 
 /** Every member's resolved placement, in the members' order. */
@@ -98,14 +95,4 @@ export function placeFigures(
 export function canvasHeight(placements: readonly FigurePlacement[]): number {
 	const lowest = Math.max(0, ...placements.map((p) => p.y + figureHeight(p.size)));
 	return Math.max(CANVAS_MIN, Math.ceil(lowest + CANVAS_TAIL));
-}
-
-/** A placement brought inside the bounds a host's columns check — integers, in range. */
-export function clampPlacement(placement: Partial<FigurePlacement>): Partial<FigurePlacement> {
-	const out: Partial<FigurePlacement> = {};
-	if (placement.x !== undefined) out.x = clamp(placement.x, FIGURE_POSITION.x);
-	if (placement.y !== undefined) out.y = clamp(placement.y, FIGURE_POSITION.y);
-	if (placement.z !== undefined) out.z = clamp(placement.z, FIGURE_LAYER);
-	if (placement.size !== undefined) out.size = clamp(placement.size, FIGURE_PERCENT);
-	return out;
 }

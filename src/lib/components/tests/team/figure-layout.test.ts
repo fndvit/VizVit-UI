@@ -5,18 +5,17 @@ import {
 	ROW_STEP,
 	autoPlacement,
 	canvasHeight,
-	clampPlacement,
 	figureFootprint,
 	figureHeight,
 	placeFigures
 } from '../../team/layout.js';
-import { FIGURE_POSITION } from '../../ui/figure/paths.js';
 
 /**
  * The canvas arithmetic. What has to hold: a stored position is kept as
  * stored, an unplaced figure's place depends only on its index (so moving one
- * figure never moves another), and everything written back is an integer
- * inside the bounds the host's CHECK constraints share.
+ * figure never moves another), and an automatic place is an integer inside
+ * the bounds the host's CHECK constraints share. What a gesture writes back
+ * is `edit/placement.test.ts`'s.
  */
 describe('team canvas layout', () => {
 	it('keeps a stored position and fills the rest from the row layout', () => {
@@ -58,15 +57,5 @@ describe('team canvas layout', () => {
 		expect(canvasHeight(placements)).toBeGreaterThan(1000 + figureHeight(200));
 		expect(canvasHeight([])).toBeGreaterThan(0);
 		expect(figureHeight(100)).toBeGreaterThan(FIGURE_BASE);
-	});
-
-	it('clamps and rounds what it writes back, and leaves out what it was not given', () => {
-		expect(clampPlacement({ x: -5, y: 99_999, z: 150, size: 12.6 })).toEqual({
-			x: 0,
-			y: FIGURE_POSITION.y.max,
-			z: 99,
-			size: 50
-		});
-		expect(clampPlacement({ x: 412.4 })).toEqual({ x: 412 });
 	});
 });

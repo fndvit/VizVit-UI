@@ -3,8 +3,9 @@
 	import Icon from '../../components/ui/Icon.svelte';
 	import IconButton from '../../components/ui/IconButton.svelte';
 	import { getUiConfig } from '../../config/context.js';
-	import type { PlaceableProps, PlacementBounds } from '../chrome-props.js';
+	import type { PlaceableProps } from '../chrome-props.js';
 	import { getEditAdapter } from '../context.js';
+	import { UNIT_CQI, clampTo, dragTo, layerMoves, nudgeTo, resizeTo } from '../placement.js';
 	import type { Placement } from '../types.js';
 
 	/**
@@ -18,7 +19,8 @@
 	 * fallen back to a flowing list — a narrow viewport — shows no handles and
 	 * takes no gesture, and its touch scrolling is left alone. Lengths come
 	 * back as thousandths of the width of the `[data-vit-placement-canvas]`
-	 * element around the item.
+	 * element around the item — the arithmetic is `../placement.ts`'s; this
+	 * component measures, previews and saves.
 	 *
 	 * While a gesture runs and until the host's refresh brings the stored
 	 * placement back, the item is PREVIEWED where it will land: a translate
@@ -60,10 +62,6 @@
 	} | null = null;
 	let keyTimer: ReturnType<typeof setTimeout> | undefined;
 
-	const clamp = (value: number, bounds: PlacementBounds): number =>
-		Math.min(bounds.max, Math.max(bounds.min, Math.round(value)));
-	const snap = (value: number, step: number): number => Math.round(value / step) * step;
-
 	// The stored placement moved (the host refreshed after a save, or another
 	// editor's change arrived): the preview has landed, drop it — unless a
 	// gesture is still running.
@@ -90,16 +88,6 @@
 	function isPlacing(): boolean {
 		if (!root) return false;
 		return getComputedStyle(root).getPropertyValue('--vit-placement').trim() === 'on';
-	}
-
-	/** How far right the item may go and still fit: the canvas less its own width. */
-	function xBounds(width: number, canvas: number): PlacementBounds {
-		if (!spec) return { min: 0, max: 0 };
-		const fit = 1000 - (width / canvas) * 1000;
-		return {
-			min: spec.bounds.x.min,
-			max: Math.max(spec.bounds.x.min, Math.min(spec.bounds.x.max, fit))
-		};
 	}
 
 	function onpointerdown(event: PointerEvent): void {
@@ -149,17 +137,12 @@
 		const step = event.altKey ? FINE : STEP;
 		const { placement, bounds } = spec;
 		if (gesture.kind === 'move') {
-			const toThousandths = 1000 / gesture.canvas;
-			const x = clamp(
-				snap(placement.x + moveX * toThousandths, step),
-				xBounds(gesture.width, gesture.canvas)
-			);
-			const y = clamp(snap(placement.y + moveY * toThousandths, step), bounds.y);
-			dx = x - placement.x;
-			dy = y - placement.y;
+			const to = dragTo(placement, { x: moveX, y: moveY }, gesture, bounds, step);
+			dx = to.x - placement.x;
+			dy = to.y - placement.y;
 		} else {
-			const scaled = (placement.size * (gesture.width + moveX)) / gesture.width;
-			size = clamp(snap(scaled, event.altKey ? FINE : SIZE_STEP), bounds.size);
+			const resizeStep = event.altKey ? FINE : SIZE_STEP;
+			size = resizeTo(placement.size, gesture.width, moveX, bounds.size, resizeStep);
 		}
 	}
 
@@ -186,15 +169,18 @@
 		if (!canvas) return;
 		const step = event.shiftKey ? BIG_STEP : STEP;
 		const { placement, bounds } = spec;
-		const width = root.getBoundingClientRect().width;
+		const geometry = {
+			width: root.getBoundingClientRect().width,
+			canvas: canvas.getBoundingClientRect().width
+		};
 		const move = (byX: number, byY: number) => {
-			dx =
-				clamp(placement.x + dx + byX, xBounds(width, canvas.getBoundingClientRect().width)) -
-				placement.x;
-			dy = clamp(placement.y + dy + byY, bounds.y) - placement.y;
+			const at = { x: placement.x + dx, y: placement.y + dy };
+			const to = nudgeTo(at, { x: byX, y: byY }, geometry, bounds);
+			dx = to.x - placement.x;
+			dy = to.y - placement.y;
 		};
 		const resize = (by: number) => {
-			size = clamp((size ?? placement.size) + by, bounds.size);
+			size = clampTo((size ?? placement.size) + by, bounds.size);
 		};
 		switch (event.key) {
 			case 'ArrowLeft':
@@ -259,16 +245,11 @@
 		}
 	}
 
-	const front = $derived(
-		spec ? clamp(Math.max(spec.layers.max + 1, spec.placement.z), spec.bounds.z) : 0
-	);
-	const back = $derived(
-		spec ? clamp(Math.min(spec.layers.min - 1, spec.placement.z), spec.bounds.z) : 0
-	);
 	// Already above every other item, or below: the button has nothing to do.
-	const onTop = $derived(!spec || spec.placement.z > spec.layers.max || front === spec.placement.z);
-	const atBottom = $derived(
-		!spec || spec.placement.z < spec.layers.min || back === spec.placement.z
+	const layer = $derived(
+		spec
+			? layerMoves(spec.placement.z, spec.layers, spec.bounds.z)
+			: { front: 0, back: 0, onTop: true, atBottom: true }
 	);
 
 	const scale = $derived(spec && size !== null ? size / spec.placement.size : 1);
@@ -282,7 +263,9 @@
 		class="vit-placeable"
 		class:active
 		bind:this={root}
-		style:translate={dx !== 0 || dy !== 0 ? `calc(${dx} * 0.1cqi) calc(${dy} * 0.1cqi)` : undefined}
+		style:translate={dx !== 0 || dy !== 0
+			? `calc(${dx} * ${UNIT_CQI}) calc(${dy} * ${UNIT_CQI})`
+			: undefined}
 		style:scale={scale !== 1 ? String(scale) : undefined}
 		{onpointerdown}
 		{onpointermove}
@@ -304,14 +287,14 @@
 			<IconButton
 				icon="layer-front"
 				label={config.editMessages.edit_bringFront()}
-				disabled={onTop}
-				onclick={() => void commit({ z: front })}
+				disabled={layer.onTop}
+				onclick={() => void commit({ z: layer.front })}
 			/>
 			<IconButton
 				icon="layer-back"
 				label={config.editMessages.edit_sendBack()}
-				disabled={atBottom}
-				onclick={() => void commit({ z: back })}
+				disabled={layer.atBottom}
+				onclick={() => void commit({ z: layer.back })}
 			/>
 		</div>
 		<span class="resize" title={config.editMessages.edit_resize()} aria-hidden="true"></span>

@@ -120,8 +120,9 @@ describe('TeamFigureField canvas', () => {
 		expect(host(container).querySelector('.vit-placeable')).toBeNull();
 	});
 
-	function placing() {
-		const savePlacement = vi.fn(async () => {});
+	function placing(
+		savePlacement = vi.fn<NonNullable<EditAdapter['savePlacement']>>(async () => {})
+	) {
 		const adapter: EditAdapter = { ...fullAdapter(), savePlacement };
 		const { container } = mountPage(TeamFigureField, {
 			props: { members: placed, editFor: record },
@@ -199,6 +200,60 @@ describe('TeamFigureField canvas', () => {
 			(b) => b.getAttribute('aria-label') === 'Porta al davant'
 		);
 		expect(onTop.disabled).toBe(true);
+	});
+
+	it('a refused save drops the preview, so the figure returns where it is stored, and says so', async () => {
+		const { savePlacement, items } = placing(
+			vi.fn(async () => {
+				throw new Error('refused');
+			})
+		);
+		const width = canvas()?.getBoundingClientRect().width ?? 0;
+		const item = items[0];
+		const box = item.getBoundingClientRect();
+		const at = { clientX: box.left + 20, clientY: box.top + 60, pointerId: 1, bubbles: true };
+		const moved = { ...at, clientX: at.clientX + width * 0.1 + 2 };
+
+		item.dispatchEvent(new PointerEvent('pointerdown', { ...at, button: 0 }));
+		item.dispatchEvent(new PointerEvent('pointermove', moved));
+		await expect.poll(() => item.style.translate).not.toBe('');
+		item.dispatchEvent(new PointerEvent('pointerup', moved));
+
+		await expect.poll(() => savePlacement.mock.calls.length).toBe(1);
+		await expect
+			.poll(() => item.querySelector('[role="status"]')?.textContent)
+			.toBe('Error en desar');
+		await expect.poll(() => item.style.translate).toBe('');
+	});
+
+	it('Escape drops a nudge the keys have not saved yet', async () => {
+		const { savePlacement, items } = placing();
+		const grip = items[0].querySelector<HTMLButtonElement>('.grip');
+		grip?.focus();
+		grip?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+		await expect.poll(() => items[0].style.translate).not.toBe('');
+		grip?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+
+		await expect.poll(() => items[0].style.translate).toBe('');
+		// Past the keys' settle: nothing was saved.
+		await new Promise((resolve) => setTimeout(resolve, 600));
+		expect(savePlacement).not.toHaveBeenCalled();
+	});
+
+	it('+ and − resize from the grip, settling into one size patch', async () => {
+		const { savePlacement, items } = placing();
+		const grip = items[0].querySelector<HTMLButtonElement>('.grip');
+		grip?.focus();
+		for (const key of ['+', '=', '+', '-']) {
+			grip?.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+		}
+
+		await expect.poll(() => savePlacement.mock.calls.length, { timeout: 2000 }).toBe(1);
+		// Three steps up and one down: two SIZE_STEPs of 5 %.
+		expect(savePlacement).toHaveBeenCalledWith(
+			{ entity: 'team_members', id: placed[0].id },
+			{ size: (placed[0].figureSize ?? 100) + 10 }
+		);
 	});
 
 	it('a narrow canvas takes no drag', async () => {
