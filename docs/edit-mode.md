@@ -206,7 +206,8 @@ with zero wrapper element.
 A spec may also name a `record` (`{ entity, id }`): with an adapter that
 implements `openRecord`, the toolbar gains a pencil that opens the host's full
 form for that row — for what a panel of scalar rows cannot hold, such as text
-in three languages. `TeamFigure` edits nothing inline for that reason.
+in three languages. `TeamFigure` edits nothing inline and opens no panel for
+that reason; every card's map takes the same `record`.
 
 `AddSlot` is the "+" of an editable collection; it applies a `create` op,
 optionally anchored before an existing row. Lists own identity and order, so

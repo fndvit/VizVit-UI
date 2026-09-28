@@ -60,13 +60,11 @@ vocabularies are `ARM_POSES`, `LEG_POSES`, `HEAD_MODES`, `LABEL_SIDES`,
 `LABEL_ALIGNS` on `./contract`, so a host's enum derives from them.
 Props: `member: TeamMemberData`, `edit?: TeamMemberEditMap`, `class?`.
 
-Editing has two doors and no inline text. The gear's panel holds what is
-visual: `photo` and the nine figure rows (`figureHeadShape` joins the eight;
-the six selects carry the HOST's worded `options`, the three numbers are
-`text` rows stringified by the component and parsed by the host). The pencil
-opens the host's full form for the row — `edit.record` with an adapter that
-implements `openRecord` — for the name, the role and bio in every language,
-the slug.
+Editing is one door and no inline text: the frame's pencil opens the host's
+full form for the row (`edit.record`, with an adapter that implements
+`openRecord`) — the name, the role and bio in every language, the photo and
+the nine figure settings together. No panel: it would repeat the figure rows
+behind a second button. With a `collection` on the field, the trash removes.
 
 Sizing: `--vit-figure-width` is `--vit-team-figure-base` × `figureSize`, and
 the offset is an in-flow `margin-top` × `--vit-team-figure-offsets` (both in
