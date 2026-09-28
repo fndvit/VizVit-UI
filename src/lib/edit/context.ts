@@ -66,3 +66,19 @@ export function getEditAdapter(): EditAdapter | undefined {
 export function getEditChrome(): EditChrome | undefined {
 	return getContext<Installed | undefined>(KEY)?.chrome;
 }
+
+const RECORD_KEY = Symbol('vit-edit-record-frame');
+
+/**
+ * Set by a frame whose row opens the host's record editor: inside it, nothing
+ * edits inline — ONE door per card. A thunk, so the answer follows the
+ * adapter's `isEditing` and the spec without re-mounting the subtree.
+ */
+export function setRecordFrame(opensRecord: () => boolean): void {
+	setContext<() => boolean>(RECORD_KEY, opensRecord);
+}
+
+/** Whether the nearest enclosing frame opens a record; false outside any. */
+export function getRecordFrame(): (() => boolean) | undefined {
+	return getContext<(() => boolean) | undefined>(RECORD_KEY);
+}

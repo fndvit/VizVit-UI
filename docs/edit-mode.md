@@ -207,8 +207,12 @@ A spec may also name a `record` (`{ entity, id }`): with an adapter that
 implements `openRecord`, the toolbar shows a pencil that opens the host's full
 form for that row — for what a panel of scalar rows cannot hold, such as text
 in three languages — and the gear goes: the form holds everything the panel
-would, and two buttons for overlapping fields read as two things to learn. A
-host without `openRecord` keeps the gear. `TeamFigure` edits nothing inline and opens no panel for
+would, and two buttons for overlapping fields read as two things to learn.
+Inside such a frame `Editable` is inert too: one door per card, the same door
+for every field — a caption edited in place beside a form that edits it was
+two ways to change one thing, and the inline way reached only the localized
+columns. A host without `openRecord` keeps the gear and the inline editing.
+Page copy and chrome wording, which have no record, edit inline as ever. `TeamFigure` edits nothing inline and opens no panel for
 that reason; every card's map takes the same `record`.
 
 `AddSlot` is the "+" of an editable collection; it applies a `create` op,

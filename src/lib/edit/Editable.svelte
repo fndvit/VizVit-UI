@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { EditableProps } from './chrome-props.js';
-	import { getEditAdapter, getEditChrome } from './context.js';
+	import { getEditAdapter, getEditChrome, getRecordFrame } from './context.js';
 
 	/**
 	 * The inline-edit primitive's GATE. It renders no element of its own: the
@@ -27,8 +27,13 @@
 
 	const adapter = getEditAdapter();
 	const chrome = getEditChrome();
+	// Inside a frame that opens the host's record editor, the text is the
+	// form's to edit: one door per card, and the same door for every field.
+	const inRecordFrame = getRecordFrame();
 
-	const active = $derived(edit !== undefined && (adapter?.isEditing ?? false));
+	const active = $derived(
+		edit !== undefined && (adapter?.isEditing ?? false) && !(inRecordFrame?.() ?? false)
+	);
 </script>
 
 {#if active && chrome}
