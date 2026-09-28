@@ -89,20 +89,24 @@
  * by the consuming component's own markup (Editable hands it attributes
  * through a snippet), which scoped styles inside Editable can never reach. */
 [data-vit-editing] {
-	/* Quiet until pointed at: a permanent dashed box on every editable text
-	   weighed on the whole page and, offset outward, walked over its
-	   neighbours. The outline sits ON the element's own edge now (no
-	   offset), and only while hovered or focused. */
-	outline: 1px solid transparent;
-	outline-offset: 0;
+	/* Quiet until pointed at, and drawn INSIDE the element's box: an outline
+	   paints outside it, where the next sibling (a card grid, a positioned
+	   frame) paints over it and cuts the highlight off. An inset ring is the
+	   element's own paint and nothing below can cover it. */
 	border-radius: 2px;
+	box-shadow: inset 0 0 0 1px transparent;
+	outline: none;
 	cursor: text;
-	transition: outline-color var(--transition-fast);
+	transition: box-shadow var(--transition-fast);
 }
 
 [data-vit-editing]:hover,
 [data-vit-editing]:focus-visible {
-	outline-color: var(--color-brand);
+	box-shadow: inset 0 0 0 1px var(--color-brand);
+}
+
+[data-vit-editing]:focus-visible {
+	box-shadow: inset 0 0 0 2px var(--color-brand);
 }
 
 [data-vit-editing='saving'] {
@@ -111,5 +115,5 @@
 
 /* A failed save must be seen without pointing at it. */
 [data-vit-editing='error'] {
-	outline-color: var(--series-8);
+	box-shadow: inset 0 0 0 2px var(--series-8);
 }

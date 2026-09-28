@@ -129,16 +129,26 @@
 	.vit-edit-frame {
 		position: relative;
 		border-radius: var(--radius);
-		/* On the frame's own edge, not offset outward: an outline that grew
-		   past the box walked over neighbouring cards and captions. */
-		outline: 1px solid transparent;
-		outline-offset: 0;
-		transition: outline-color var(--transition-fast);
 	}
 
-	.vit-edit-frame:hover,
-	.vit-edit-frame:focus-within {
-		outline-color: var(--color-brand);
+	/* The ring is a layer ABOVE the frame's own content and inside its box:
+	   an outline paints outside the box, where the next card or section
+	   painted over it, and an inset shadow on the frame itself would sit
+	   under its image. */
+	.vit-edit-frame::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		box-shadow: inset 0 0 0 1px transparent;
+		pointer-events: none;
+		z-index: var(--z-raised);
+		transition: box-shadow var(--transition-fast);
+	}
+
+	.vit-edit-frame:hover::after,
+	.vit-edit-frame:focus-within::after {
+		box-shadow: inset 0 0 0 1px var(--color-brand);
 	}
 
 	.toolbar {
@@ -148,7 +158,7 @@
 		right: var(--space-1);
 		display: flex;
 		gap: 2px;
-		z-index: var(--z-raised);
+		z-index: calc(var(--z-raised) + 1);
 		background: var(--color-surface);
 		border: 1px solid var(--color-hairline);
 		border-radius: var(--radius);
