@@ -302,13 +302,13 @@
 				<Icon name="move" size={18} />
 			</button>
 			<IconButton
-				icon="arrow-up"
+				icon="layer-front"
 				label={config.editMessages.edit_bringFront()}
 				disabled={onTop}
 				onclick={() => void commit({ z: front })}
 			/>
 			<IconButton
-				icon="arrow-down"
+				icon="layer-back"
 				label={config.editMessages.edit_sendBack()}
 				disabled={atBottom}
 				onclick={() => void commit({ z: back })}
