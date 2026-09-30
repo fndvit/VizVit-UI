@@ -24,8 +24,24 @@
 		// glyph here. Named `user` rather than `person` or `account` because the
 		// consuming rails label the entry themselves — the glyph says who, not
 		// which page.
-		user: 'M12 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM5.5 20a6.5 6.5 0 0 1 13 0'
+		user: 'M12 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM5.5 20a6.5 6.5 0 0 1 13 0',
+		// The canvas handles: a four-way grip, and two stacked sheets for the
+		// layer — the same outlines both ways; FILLS below marks which sheet
+		// moves, the way design tools draw «bring to front» / «send to back».
+		move: 'M12 3v18M3 12h18M9 6l3-3 3 3M9 18l3 3 3-3M6 9l-3 3 3 3M18 9l3 3-3 3',
+		'layer-front': 'M14 10V4H4v10h6M10 10h10v10H10z',
+		'layer-back': 'M14 10V4H4v10h6M10 10h10v10H10z'
 	} as const;
+
+	/**
+	 * A solid area under the strokes, for the few glyphs that need one to
+	 * mean anything. The layer pair differ ONLY here: the filled sheet is the
+	 * one that moves — the front one comes forward, the back one goes behind.
+	 */
+	const FILLS: Partial<Record<keyof typeof PATHS, string>> = {
+		'layer-front': 'M10 10h10v10H10z',
+		'layer-back': 'M4 4h10v6h-4v4H4z'
+	};
 
 	export type IconName = keyof typeof PATHS;
 </script>
@@ -51,5 +67,8 @@
 	aria-hidden="true"
 	focusable="false"
 >
+	{#if FILLS[name]}
+		<path d={FILLS[name]} fill="currentColor" stroke="none" />
+	{/if}
 	<path d={PATHS[name]} />
 </svg>

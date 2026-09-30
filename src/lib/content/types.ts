@@ -4,6 +4,14 @@
  * package states them itself so consumers owe it no schema library.
  */
 import type { EditDescriptor } from '../edit/types.js';
+import type {
+	ArmsPose,
+	HeadMode,
+	HeadShape,
+	LabelAlign,
+	LabelSide,
+	LegsPose
+} from '../components/ui/figure/paths.js';
 
 /** The bounds of one form field; Field turns them into length attributes. */
 export interface FieldConstraint {
@@ -147,6 +155,36 @@ export interface TeamMemberData {
 	bio: string | null;
 	photoUrl: string;
 	isBoard: boolean;
+	/**
+	 * How `TeamFigure` draws this member. All optional, with the defaults the
+	 * component applies, so a host that stores none renders the plain standing
+	 * figure. Integers and percents rather than factors, because a CMS number
+	 * field is integer-only and a property panel has no number row at all.
+	 */
+	figureArms?: ArmsPose;
+	figureLegs?: LegsPose;
+	/** `drawn` forces the outline even with a photo; an empty `photoUrl` draws anyway. */
+	figureHead?: HeadMode;
+	/** Which outline a drawn head wears. */
+	figureHeadShape?: HeadShape;
+	figureLabelSide?: LabelSide;
+	figureLabelAlign?: LabelAlign;
+	/** Vertical shift down, in px — `FIGURE_OFFSET`'s range. */
+	figureOffset?: number;
+	/** Percent — `FIGURE_PERCENT`'s range; 100 is the natural head. */
+	figureHeadScale?: number;
+	/** Percent of the base figure width — `FIGURE_PERCENT`'s range. */
+	figureSize?: number;
+	/**
+	 * Where the figure stands on the field's canvas, in thousandths of its
+	 * width (`FIGURE_POSITION`). Null or absent is unplaced: the field gives it
+	 * the next place of its own row layout. A narrow field ignores both and
+	 * flows the figures in order.
+	 */
+	figureX?: number | null;
+	figureY?: number | null;
+	/** The figure's layer on the canvas (`FIGURE_LAYER`); a higher one draws above. */
+	figureZ?: number;
 }
 
 export interface CollaboratorData {

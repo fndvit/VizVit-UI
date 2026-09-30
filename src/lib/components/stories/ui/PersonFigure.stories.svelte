@@ -2,7 +2,7 @@
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import { sampleMember } from '../../../fixtures.js';
 	import PersonFigure from '../../ui/figure/PersonFigure.svelte';
-	import { ARMS, LEGS, type ArmsPose, type LegsPose } from '../../ui/figure/paths.js';
+	import { ARM_POSES, LEG_POSES } from '../../ui/figure/paths.js';
 
 	const { Story } = defineMeta({
 		title: 'UI/PersonFigure',
@@ -13,10 +13,6 @@
 			photo: '/images/placeholders/cutout.svg'
 		}
 	});
-
-	// Every pose the closed sets hold — a pose added to paths.ts shows up here.
-	const ARM_POSES = Object.keys(ARMS) as ArmsPose[];
-	const LEG_POSES = Object.keys(LEGS) as LegsPose[];
 
 	/** The mockup's team section: seven figures at their own heights and sizes. */
 	const TEAM = [

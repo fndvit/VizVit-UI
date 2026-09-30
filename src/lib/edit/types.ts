@@ -169,4 +169,42 @@ export interface EditAdapter {
 	applyOp?(op: EntityOp): Promise<{ id?: string | number } | void>;
 	/** Image upload; resolves to the stored path an `image` property saves. */
 	uploadImage?(descriptor: PropertyDescriptor, file: File): Promise<string>;
+	/**
+	 * Opens the host's own record editor — its full form for one row, or for
+	 * a new row when `id` is absent — where a panel of scalar rows is the
+	 * wrong shape: localized text in three languages, a photo to upload, a
+	 * name, a slug. The host owns the form and the refresh after its save;
+	 * the frame only offers the door.
+	 */
+	openRecord?(target: RecordTarget): void;
+	/**
+	 * Where one row's item stands on a canvas — a figure dragged, nudged with
+	 * the arrow keys, resized or sent to another layer. ONE patch per gesture,
+	 * so a drag is one write and one revision rather than a save per axis; only
+	 * the keys that changed are present. Implement it and the `Placeable`
+	 * chrome gives each canvas item its handles; leave it off and a canvas
+	 * renders exactly as it does for a read-only host.
+	 */
+	savePlacement?(
+		target: RecordTarget & { id: string | number },
+		placement: Placement
+	): Promise<void>;
+}
+
+/**
+ * A canvas item's placement as a host stores it — integers, in the units the
+ * canvas names (a team figure: thousandths of the canvas width for `x`/`y`,
+ * a layer for `z`, a percent for `size`). Every key optional: a patch.
+ */
+export interface Placement {
+	x?: number;
+	y?: number;
+	z?: number;
+	size?: number;
+}
+
+/** One row of an entity, or a new one of it (no `id`), for `openRecord`. */
+export interface RecordTarget {
+	entity: EditableEntity;
+	id?: string | number;
 }

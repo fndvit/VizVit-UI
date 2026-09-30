@@ -100,6 +100,59 @@ describe('EditFrame gating', () => {
 		expect(trashOnly.container.querySelectorAll('.toolbar button')).toHaveLength(1);
 	});
 
+	it('shows the pencil only with a record and openRecord, and hands it the row', () => {
+		const openRecord = vi.fn<(target: { entity: string; id?: string | number }) => void>();
+		const record = { entity: 'milestones' as const, id: 5 };
+		const { container } = render(ChromeProbe, {
+			props: {
+				adapter: fullAdapter({ saveProperty: undefined, applyOp: undefined, openRecord }),
+				spec: { label: 'Fita', record }
+			}
+		});
+		const buttons = [...container.querySelectorAll<HTMLButtonElement>('.toolbar button')];
+		expect(buttons.map((b) => b.getAttribute('aria-label'))).toEqual(['Edita la fitxa: Fita']);
+		buttons[0]?.click();
+		expect(openRecord).toHaveBeenCalledWith(record);
+
+		const noDoor = render(ChromeProbe, {
+			props: {
+				adapter: fullAdapter({ saveProperty: undefined, applyOp: undefined }),
+				spec: { label: 'Fita', record }
+			}
+		});
+		expect(noDoor.container.querySelector('.vit-edit-frame')).toBeNull();
+	});
+
+	it('the pencil supersedes the gear: one door where the host opens records', () => {
+		const record = { entity: 'milestones' as const, id: 5 };
+		const { container } = render(ChromeProbe, {
+			props: {
+				adapter: fullAdapter({ openRecord: vi.fn() }),
+				spec: { label: 'Fita', hasPanel: true, record },
+				rows: [{ descriptor: dateDescriptor, value: '2026-01-01' }]
+			}
+		});
+		expect(
+			[...container.querySelectorAll<HTMLButtonElement>('.toolbar button')].map((b) =>
+				b.getAttribute('aria-label')
+			)
+		).toEqual(['Edita la fitxa: Fita']);
+
+		// Without a form to open, the same spec keeps its gear.
+		const gearOnly = render(ChromeProbe, {
+			props: {
+				adapter: fullAdapter(),
+				spec: { label: 'Fita', hasPanel: true, record },
+				rows: [{ descriptor: dateDescriptor, value: '2026-01-01' }]
+			}
+		});
+		expect(
+			[...gearOnly.container.querySelectorAll<HTMLButtonElement>('.toolbar button')].map((b) =>
+				b.getAttribute('aria-label')
+			)
+		).toEqual(['Edita: Fita']);
+	});
+
 	it('confirming the trash applies the remove op', async () => {
 		const applyOp = vi.fn(async () => {});
 		const { container } = render(ChromeProbe, {

@@ -2,15 +2,12 @@
 	import { defineMeta } from '@storybook/addon-svelte-csf';
 	import FigureBody from '../../ui/figure/FigureBody.svelte';
 	import FigureHead from '../../ui/figure/FigureHead.svelte';
-	import { ARMS, LEGS, type ArmsPose, type LegsPose } from '../../ui/figure/paths.js';
+	import { ARM_POSES, LEG_POSES } from '../../ui/figure/paths.js';
 
 	const { Story } = defineMeta({
 		title: 'UI/FigureBody',
 		component: FigureBody
 	});
-
-	const ARM_POSES = Object.keys(ARMS) as ArmsPose[];
-	const LEG_POSES = Object.keys(LEGS) as LegsPose[];
 </script>
 
 <!-- The survey's look: a body with no head at all. -->

@@ -55,6 +55,82 @@ export const sampleMember: TeamMemberData = {
 	isBoard: false
 };
 
+/**
+ * Seven featured members with their figure settings set, the way the team
+ * page's mockup scatters them. `sampleMember` above deliberately sets none,
+ * so the defaults stay exercised.
+ */
+export const sampleTeam: TeamMemberData[] = [
+	{ ...sampleMember, photoUrl: '/images/placeholders/cutout.svg', figureLegs: 'walking' },
+	{
+		...sampleMember,
+		slug: 'pere-vidal',
+		name: 'Pere Vidal',
+		role: 'Editor',
+		photoUrl: '/images/placeholders/cutout.svg',
+		figureLegs: 'step',
+		figureOffset: 40,
+		figureSize: 110
+	},
+	{
+		...sampleMember,
+		slug: 'joana-mas',
+		name: 'Joana Mas',
+		role: 'Dissenyadora',
+		photoUrl: '/images/placeholders/portrait.svg',
+		figureHead: 'circle',
+		figureLabelSide: 'left',
+		figureLabelAlign: 'bottom',
+		figureOffset: 120,
+		figureSize: 95
+	},
+	{
+		...sampleMember,
+		slug: 'marc-roca',
+		name: 'Marc Roca',
+		role: 'Desenvolupador',
+		photoUrl: '/images/placeholders/cutout.svg',
+		figureArms: 'one-bent',
+		figureLegs: 'walking',
+		figureHeadScale: 115
+	},
+	{
+		...sampleMember,
+		slug: 'laia-font',
+		name: 'Laia Font',
+		role: 'Periodista',
+		photoUrl: '',
+		figureHead: 'drawn',
+		figureHeadShape: 'cup',
+		figureArms: 'raised',
+		figureLegs: 'stride',
+		figureLabelSide: 'left',
+		figureLabelAlign: 'bottom',
+		figureOffset: 80,
+		figureSize: 85
+	},
+	{
+		...sampleMember,
+		slug: 'anna-serra',
+		name: 'Anna Serra',
+		role: 'Analista',
+		photoUrl: '/images/placeholders/cutout.svg',
+		figureLegs: 'kneel',
+		figureOffset: 60
+	},
+	{
+		...sampleMember,
+		slug: 'oriol-pla',
+		name: 'Oriol Pla',
+		role: 'President',
+		photoUrl: '/images/placeholders/cutout.svg',
+		figureLabelSide: 'left',
+		figureLabelAlign: 'bottom',
+		figureOffset: 100,
+		figureSize: 105
+	}
+];
+
 export const sampleMilestones: MilestoneData[] = [
 	{
 		id: 1,

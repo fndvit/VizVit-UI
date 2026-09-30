@@ -5,7 +5,8 @@ import type {
 	EditableProps,
 	EditFrameProps,
 	EditPanelProps,
-	LinkEditProps
+	LinkEditProps,
+	PlaceableProps
 } from './chrome-props.js';
 import type { EditAdapter } from './types.js';
 
@@ -33,6 +34,12 @@ export interface EditChrome {
 	EditPanel: Component<EditPanelProps>;
 	AddSlot: Component<AddSlotProps>;
 	LinkEdit: Component<LinkEditProps>;
+	/**
+	 * The canvas handles: drag, arrow keys, resize, layer. Optional, so a host
+	 * that composed its own table before it existed still type-checks; without
+	 * it a canvas item renders as it does read-only.
+	 */
+	Placeable?: Component<PlaceableProps>;
 }
 
 interface Installed {
@@ -65,4 +72,20 @@ export function getEditAdapter(): EditAdapter | undefined {
 /** The chrome installed beside the nearest adapter, or undefined in a read-only app. */
 export function getEditChrome(): EditChrome | undefined {
 	return getContext<Installed | undefined>(KEY)?.chrome;
+}
+
+const RECORD_KEY = Symbol('vit-edit-record-frame');
+
+/**
+ * Set by a frame whose row opens the host's record editor: inside it, nothing
+ * edits inline — ONE door per card. A thunk, so the answer follows the
+ * adapter's `isEditing` and the spec without re-mounting the subtree.
+ */
+export function setRecordFrame(opensRecord: () => boolean): void {
+	setContext<() => boolean>(RECORD_KEY, opensRecord);
+}
+
+/** Whether the nearest enclosing frame opens a record; false outside any. */
+export function getRecordFrame(): (() => boolean) | undefined {
+	return getContext<(() => boolean) | undefined>(RECORD_KEY);
 }

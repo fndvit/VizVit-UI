@@ -32,11 +32,11 @@ export const messageEdit: NonNullable<UiConfig['messageEdit']> = (key) =>
 
 /**
  * Every affordance edit mode can add to a page: the contenteditable and its
- * state hook, the frame, the add slot, the link-modal button and the
- * ActionLabel swap. A read-only render must match NONE of them.
+ * state hook, the frame, the add slot, the link-modal button, the
+ * ActionLabel swap and the canvas handles. A read-only render must match NONE of them.
  */
 export const AFFORDANCES =
-	'[contenteditable], [data-vit-editing], .vit-edit-frame, button.add, .link-swap, .action-label';
+	'[contenteditable], [data-vit-editing], .vit-edit-frame, button.add, .link-swap, .action-label, .vit-placeable';
 
 export function host(container: ParentNode): HTMLElement {
 	const found = container.querySelector<HTMLElement>('[data-testid="page-host"]');

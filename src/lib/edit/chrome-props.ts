@@ -1,8 +1,15 @@
 import type { Snippet } from 'svelte';
-import type { EditDescriptor, EntityOp, PropertyDescriptor, PropertyValue } from './types.js';
+import type {
+	EditDescriptor,
+	EntityOp,
+	Placement,
+	PropertyDescriptor,
+	PropertyValue,
+	RecordTarget
+} from './types.js';
 
 /**
- * The props of the five edit-chrome modules, in one component-free file.
+ * The props of the six edit-chrome modules, in one component-free file.
  *
  * Each of these modules is TWO components with one interface: a GATE at the
  * name every renderer imports (`edit/Editable.svelte`, `edit/chrome/*`), and
@@ -47,6 +54,8 @@ export interface EditFrameSpec {
 	hasPanel?: boolean;
 	/** Gates the trash: removing this item from its collection. */
 	removeOp?: Extract<EntityOp, { kind: 'remove' }>;
+	/** Gates the pencil: the host's full record editor for this row (`adapter.openRecord`). */
+	record?: RecordTarget & { id: string | number };
 }
 
 export interface EditFrameProps {
@@ -61,9 +70,20 @@ export interface EditPanelProps {
 }
 
 export interface AddSlotProps {
-	op: Extract<EntityOp, { kind: 'create' }>;
+	/**
+	 * The create op that adds a seeded row in place. Optional where `record`
+	 * is the way in: a slot with neither, or whose adapter answers neither,
+	 * renders nothing.
+	 */
+	op?: Extract<EntityOp, { kind: 'create' }>;
 	/** The entity noun for the label, e.g. "una fita". */
 	label?: string;
+	/**
+	 * Where the host's record editor should open a NEW row instead of the op
+	 * creating a seeded one in place. With an adapter that implements
+	 * `openRecord`, the click opens the form; without, the op applies as ever.
+	 */
+	record?: RecordTarget;
 }
 
 export interface LinkEditProps {
@@ -85,4 +105,29 @@ export interface LinkEditProps {
 	/** Accessible name for the modal, e.g. the link's current text. */
 	label?: string;
 	control: Snippet;
+}
+
+/** The range one placement key may take, inclusive. */
+export interface PlacementBounds {
+	min: number;
+	max: number;
+}
+
+/** What one canvas item tells the `Placeable` chrome about itself. */
+export interface PlaceableSpec {
+	/** Human name of the thing, e.g. the member's name. */
+	label: string;
+	/** The row `savePlacement` writes. */
+	target: RecordTarget & { id: string | number };
+	/** Where it stands now — resolved, so an unplaced item passes its automatic place. */
+	placement: Required<Placement>;
+	/** The lowest and highest layer the OTHER items use: «to the front» is one above them. */
+	layers: PlacementBounds;
+	/** What each key may be written as — the host's CHECK constraints. */
+	bounds: Record<keyof Placement, PlacementBounds>;
+}
+
+export interface PlaceableProps {
+	spec?: PlaceableSpec;
+	children: Snippet;
 }

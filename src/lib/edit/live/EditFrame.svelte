@@ -1,15 +1,17 @@
 <script lang="ts">
 	import IconButton from '../../components/ui/IconButton.svelte';
 	import { getUiConfig } from '../../config/context.js';
-	import { getEditAdapter } from '../context.js';
+	import { getEditAdapter, getRecordFrame } from '../context.js';
 	import type { EditFrameProps } from '../chrome-props.js';
 	import ConfirmDialog from './ConfirmDialog.svelte';
 	import EditPopover from './EditPopover.svelte';
 
 	/**
 	 * The page-builder wrapper: a corner toolbar (revealed on hover AND
-	 * :focus-within — never hover-only) with a gear that opens the property
-	 * panel and a trash that confirms, then applies the remove op.
+	 * :focus-within — never hover-only) with ONE door to the row — a pencil
+	 * that opens the host's record editor, or, for a host without one, a gear
+	 * that opens the property panel — and a trash that confirms, then applies
+	 * the remove op.
 	 *
 	 * Triple-gated per affordance: spec present ∧ adapter editing ∧ the
 	 * capability method present. With nothing to offer it renders the children
@@ -23,13 +25,28 @@
 	const config = getUiConfig();
 
 	const editing = $derived(spec !== undefined && (adapter?.isEditing ?? false));
+	const opensRecord = getRecordFrame();
+	// The pencil: the host's full form for this row, where a panel is the
+	// wrong shape (three languages of text, a photo, a slug). Whether this
+	// frame opens a record is the gate's answer — the one `Editable` reads to
+	// go inert inside it — so the two can never disagree.
+	const showPencil = $derived(opensRecord?.() ?? false);
+	// ONE door: the form holds everything the panel would, so where the
+	// form is offered the panel is not — two buttons for overlapping fields
+	// read as two things to learn. A host without a form keeps the panel.
+	// Both doors wear the same pencil: to the person editing, either one is
+	// "edit this", and a second icon only asked what the difference was.
 	const showGear = $derived(
-		editing && spec?.hasPanel === true && panel !== undefined && adapter?.saveProperty !== undefined
+		!showPencil &&
+			editing &&
+			spec?.hasPanel === true &&
+			panel !== undefined &&
+			adapter?.saveProperty !== undefined
 	);
 	const showTrash = $derived(
 		editing && spec?.removeOp !== undefined && adapter?.applyOp !== undefined
 	);
-	const framed = $derived(showGear || showTrash);
+	const framed = $derived(showGear || showTrash || showPencil);
 
 	let panelOpen = $state(false);
 	let confirming = $state(false);
@@ -65,9 +82,17 @@
 		<div class="toolbar" bind:this={toolbar}>
 			{#if showGear}
 				<IconButton
-					icon="gear"
+					icon="pencil"
 					label={config.editMessages.edit_properties({ label: spec.label })}
 					onclick={() => (panelOpen = !panelOpen)}
+				/>
+			{/if}
+			{#if showPencil && spec.record}
+				{@const record = spec.record}
+				<IconButton
+					icon="pencil"
+					label={config.editMessages.edit_editRecord({ label: spec.label })}
+					onclick={() => adapter?.openRecord?.(record)}
 				/>
 			{/if}
 			{#if showTrash}
@@ -107,23 +132,36 @@
 	.vit-edit-frame {
 		position: relative;
 		border-radius: var(--radius);
-		outline: 1px dashed transparent;
-		outline-offset: 4px;
-		transition: outline-color var(--transition-fast);
 	}
 
-	.vit-edit-frame:hover,
-	.vit-edit-frame:focus-within {
-		outline-color: var(--color-brand);
+	/* The ring is a layer ABOVE the frame's own content and inside its box:
+	   an outline paints outside the box, where the next card or section
+	   painted over it, and an inset shadow on the frame itself would sit
+	   under its image. */
+	.vit-edit-frame::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		box-shadow: inset 0 0 0 1px transparent;
+		pointer-events: none;
+		z-index: var(--z-raised);
+		transition: box-shadow var(--transition-fast);
+	}
+
+	.vit-edit-frame:hover::after,
+	.vit-edit-frame:focus-within::after {
+		box-shadow: inset 0 0 0 1px var(--color-brand);
 	}
 
 	.toolbar {
+		/* Inside the frame's corner, so it never floats over what sits above. */
 		position: absolute;
-		top: calc(-1 * var(--space-2));
-		right: 0;
+		top: var(--space-1);
+		right: var(--space-1);
 		display: flex;
 		gap: 2px;
-		z-index: var(--z-raised);
+		z-index: calc(var(--z-raised) + 1);
 		background: var(--color-surface);
 		border: 1px solid var(--color-hairline);
 		border-radius: var(--radius);

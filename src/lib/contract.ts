@@ -55,14 +55,15 @@ export { localize } from './edit/types.js';
 export type {
 	CollectionRef,
 	ContentRef,
-	EditableEntity,
 	EditDescriptor,
+	EditableEntity,
 	EntityOp,
 	LocalizedText,
 	PropertyDescriptor,
 	PropertyOption,
 	PropertyType,
-	PropertyValue
+	PropertyValue,
+	RecordTarget
 } from './edit/types.js';
 
 export { REACTIONS } from './content/types.js';
@@ -73,6 +74,34 @@ export type { Reaction, ReactionSummary, SortDirection } from './content/types.j
 // a type cannot be the source of an enum.
 export { MILESTONE_CATEGORIES, PROJECT_KINDS } from './content/types.js';
 export type { MilestoneCategory, ProjectKind } from './content/types.js';
+
+// The figure vocabulary a team member's row stores: the poses, the head mode,
+// where the label sits, and the bounds of its integers. The DRAWING stays off
+// this door (0.33.0 kept `figure/paths` on `./primitives` alone); what comes
+// through is the part a host's zod enum and CHECK constraint bind to, the way
+// `projects.kind` binds to PROJECT_KINDS above. The module is a zero-import
+// leaf, so the walk stays component-free.
+export {
+	ARM_POSES,
+	LEG_POSES,
+	HEAD_MODES,
+	HEAD_SHAPES,
+	LABEL_SIDES,
+	LABEL_ALIGNS,
+	FIGURE_OFFSET,
+	FIGURE_PERCENT,
+	FIGURE_POSITION,
+	FIGURE_LAYER
+} from './components/ui/figure/paths.js';
+export type {
+	ArmsPose,
+	HeadMode,
+	HeadShape,
+	LabelAlign,
+	LabelSide,
+	LegsPose
+} from './components/ui/figure/paths.js';
+export type { TeamMemberData } from './content/types.js';
 
 // The weeklies URL contract, both halves: the values a param stands for when
 // absent, the names it travels as, and the parse that reads one back. The read

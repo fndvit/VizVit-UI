@@ -1,5 +1,5 @@
 <script module lang="ts">
-	import type { EntityOp, PropertyDescriptor } from '../../edit/types.js';
+	import type { EntityOp, PropertyDescriptor, RecordTarget } from '../../edit/types.js';
 
 	/**
 	 * A collaborator is three plain (non-localized) columns, so everything
@@ -10,6 +10,8 @@
 		personName?: PropertyDescriptor;
 		affiliation?: PropertyDescriptor;
 		url?: PropertyDescriptor;
+		/** The host's full form for this row: the frame's pencil, where the adapter opens records. */
+		record?: RecordTarget & { id: string | number };
 		/** Accessible name for the frame — usually the person's name. */
 		label?: string;
 		/** Set by the list from its `collection` — removal of this row. */
@@ -62,11 +64,12 @@
 		<li>
 			<!-- Inside the li, so the list's own layout never gains a child. -->
 			<EditFrame
-				spec={map && (rows.length > 0 || map.removeOp)
+				spec={map && (rows.length > 0 || map.removeOp || map.record)
 					? {
 							label: map.label ?? collaborator.personName,
 							hasPanel: rows.length > 0,
-							removeOp: map.removeOp
+							removeOp: map.removeOp,
+							record: map.record
 						}
 					: undefined}
 			>

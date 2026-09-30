@@ -1,5 +1,10 @@
 <script module lang="ts">
-	import type { EditDescriptor, PropertyDescriptor } from '../../edit/types.js';
+	import type {
+		EditDescriptor,
+		EntityOp,
+		PropertyDescriptor,
+		RecordTarget
+	} from '../../edit/types.js';
 
 	/**
 	 * Which of the card's fields are editable at this render site. `name` and
@@ -11,6 +16,15 @@
 		bio?: EditDescriptor;
 		name?: PropertyDescriptor;
 		photo?: PropertyDescriptor;
+		/**
+		 * The host's full form for this row — name, role and bio in every
+		 * language, the photo, the figure. The frame's pencil, on the card and
+		 * on `TeamFigure`, which edits nothing else: a caption is too small a
+		 * place for three languages.
+		 */
+		record?: RecordTarget & { id: string | number };
+		/** Set by `TeamFigureField` from its `collection` — removal of this row. */
+		removeOp?: Extract<EntityOp, { kind: 'remove' }>;
 		/** Accessible name for the frame — usually the member's name. */
 		label?: string;
 	}
@@ -40,7 +54,9 @@
 		].filter((row) => row !== undefined)
 	);
 	const frameSpec = $derived(
-		edit && panelRows.length > 0 ? { label: edit.label ?? member.name, hasPanel: true } : undefined
+		edit && (panelRows.length > 0 || edit.record)
+			? { label: edit.label ?? member.name, hasPanel: panelRows.length > 0, record: edit.record }
+			: undefined
 	);
 </script>
 

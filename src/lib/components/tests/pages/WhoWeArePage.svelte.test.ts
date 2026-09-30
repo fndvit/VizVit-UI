@@ -33,7 +33,9 @@ describe('WhoWeArePage, read-only', () => {
 			content.collaborators_heading
 		]);
 		expect(textOf(page, '.intro')).toEqual([content.team_intro, content.board_intro]);
-		expect(page.querySelectorAll('.featured > article')).toHaveLength(featured.length);
+		// The featured members are figures now; the board stays cards.
+		expect(page.querySelectorAll('.featured figure')).toHaveLength(featured.length);
+		expect(page.querySelectorAll('.featured article')).toHaveLength(0);
 		expect(page.querySelectorAll('.board > article')).toHaveLength(board.length);
 		expect(page.querySelectorAll('ul > li')).toHaveLength(collaborators.length);
 	});
@@ -64,7 +66,8 @@ describe('WhoWeArePage, editing', () => {
 					copy: copyEditFor('who-we-are'),
 					memberFor,
 					collaboratorFor,
-					collaborators: { entity: 'collaborators' }
+					collaborators: { entity: 'collaborators' },
+					members: { entity: 'team_members' }
 				}
 			},
 			adapter: fullAdapter(),
@@ -77,8 +80,10 @@ describe('WhoWeArePage, editing', () => {
 		expect(labelOf(page, '#collaborators-heading')).toBe('Bloc collaborators_heading');
 		expect(memberFor.mock.calls.map(([m]) => m)).toEqual([...featured, ...board]);
 		expect(collaboratorFor.mock.calls.map(([c]) => c)).toEqual(collaborators);
-		// The collection ref reaches the list: one trailing add slot, one remove per identified row.
-		expect(page.querySelectorAll('button.add')).toHaveLength(1);
+		// The collection refs reach the lists: one trailing add slot each (the
+		// figures' and the collaborators'), one remove per identified row.
+		expect(page.querySelectorAll('button.add')).toHaveLength(2);
+		expect(page.querySelectorAll('.featured button.add')).toHaveLength(1);
 		expect(page.querySelectorAll('ul .vit-edit-frame')).toHaveLength(collaborators.length);
 	});
 });

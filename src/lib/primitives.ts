@@ -27,10 +27,21 @@ export {
 	NECK,
 	SHOULDER,
 	FIGURE_VIEWBOX,
-	calloutPath
+	calloutPath,
+	ARM_POSES,
+	LEG_POSES,
+	HEAD_MODES,
+	HEAD_SHAPES,
+	LABEL_SIDES,
+	LABEL_ALIGNS,
+	FIGURE_OFFSET,
+	FIGURE_PERCENT,
+	FIGURE_POSITION,
+	FIGURE_LAYER
 } from './components/ui/figure/paths.js';
 export type {
 	ArmsPose,
+	HeadMode,
 	HeadShape,
 	LabelAlign,
 	LabelSide,

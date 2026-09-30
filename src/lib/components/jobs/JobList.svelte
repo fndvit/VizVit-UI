@@ -1,5 +1,10 @@
 <script module lang="ts">
-	import type { EditDescriptor, EntityOp, PropertyDescriptor } from '../../edit/types.js';
+	import type {
+		EditDescriptor,
+		EntityOp,
+		PropertyDescriptor,
+		RecordTarget
+	} from '../../edit/types.js';
 
 	/**
 	 * Which of one opening's fields are editable at this render site:
@@ -11,6 +16,8 @@
 		postedOn?: PropertyDescriptor;
 		/** Editorial-state `flag` row; on while the opening is not a draft. */
 		status?: PropertyDescriptor;
+		/** The host's full form for this row: the frame's pencil, where the adapter opens records. */
+		record?: RecordTarget & { id: string | number };
 		/** Accessible name for the frame — usually the opening's title. */
 		label?: string;
 		/** Set by the list from its `collection` — removal of this opening. */
@@ -76,11 +83,12 @@
 			<li>
 				<!-- Inside the li — see CollaboratorList. -->
 				<EditFrame
-					spec={edit && (rows.length > 0 || edit.removeOp)
+					spec={edit && (rows.length > 0 || edit.removeOp || edit.record)
 						? {
 								label: edit.label ?? job.title,
 								hasPanel: rows.length > 0,
-								removeOp: edit.removeOp
+								removeOp: edit.removeOp,
+								record: edit.record
 							}
 						: undefined}
 				>

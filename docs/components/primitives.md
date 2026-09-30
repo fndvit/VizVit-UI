@@ -106,11 +106,12 @@ Props: `page` (1-based), `total` (items), `pageSize`, `href(page) => string`.
 ## FigureBody, FigureHead, PersonFigure
 
 A person drawn as a stick figure, in parts. `figure/paths.ts` holds the
-drawing — the digital-gap survey's stroke paths as closed sets (`ARMS`,
-`LEGS`, `HEADS`, with `ArmsPose`, `LegsPose`, `HeadShape`), where each part
-sits in the composed box (`FIGURE_VIEWBOX`, `NECK`, `SHOULDER`), and
-`calloutPath(side, align)` — so a chart or a decorative band can draw line
-people from the same set.
+drawing — the digital-gap survey's stroke paths keyed by the closed tuples
+`ARM_POSES` and `LEG_POSES` (`ARMS`, `LEGS`, `HEADS`, bound with `satisfies`; `HEAD_SHAPES`), the vocabularies a host row stores (`HEAD_MODES`,
+`LABEL_SIDES`, `LABEL_ALIGNS`, the `FIGURE_OFFSET`/`FIGURE_PERCENT` bounds —
+all on `./contract` too), where each part sits in the composed box
+(`FIGURE_VIEWBOX`, `NECK`, `SHOULDER`), and `calloutPath(side, align)` — so a
+chart or a decorative band can draw line people from the same set.
 
 ### FigureBody
 

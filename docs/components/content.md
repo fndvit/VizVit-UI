@@ -44,7 +44,58 @@ read-more (external URLs detected and rendered as bare anchors). Props:
 Portrait, name, role, optional bio. `variant: 'featured' | 'board'`.
 Props: `member: TeamMemberData`, `variant?`, `edit?: TeamMemberEditMap`
 (`role`, `bio` — `name` is a plain-text column, not localized, so the
-per-locale save contract doesn't apply to it).
+per-locale save contract doesn't apply to it; `name` and `photo` edit through
+the frame's panel). The map also carries the eight `figure*` rows, which the
+card ignores and `TeamFigure` reads.
+
+## TeamFigure
+
+One member as a `PersonFigure`, drawn from the row's optional `figure*`
+fields (`TeamMemberData`): `figureArms`, `figureLegs`, `figureHead`
+(`cutout` sits the photo on the neck, `circle` masks it, `drawn` uses the
+outline whatever the photo — as does an empty `photoUrl`), `figureLabelSide`,
+`figureLabelAlign`, `figureOffset` (px down, `FIGURE_OFFSET`'s range),
+`figureHeadScale` and `figureSize` (percents, `FIGURE_PERCENT`'s range). The
+vocabularies are `ARM_POSES`, `LEG_POSES`, `HEAD_MODES`, `LABEL_SIDES`,
+`LABEL_ALIGNS` on `./contract`, so a host's enum derives from them.
+Props: `member: TeamMemberData`, `edit?: TeamMemberEditMap`, `class?`.
+
+Editing is one door and no inline text: the frame's pencil opens the host's
+full form for the row (`edit.record`, with an adapter that implements
+`openRecord`) — the name, the role and bio in every language, the photo and
+the nine figure settings together. No panel: it would repeat the figure rows
+behind a second button. With a `collection` on the field, the trash removes.
+
+Sizing: `--vit-figure-width` is `--vit-team-figure-base` × `figureSize`, and
+the offset is an in-flow `margin-top` × `--vit-team-figure-offsets` (both in
+`tokens.css`; the field sets them per breakpoint). On the field's canvas it
+also takes `placement` (the field's resolved x, y, layer and size) and
+`layers` (the other figures' lowest and highest layer), which it sets as
+`--vit-team-figure-x` / `-y` / `-z` and hands to the `Placeable` handles.
+
+## TeamFigureField
+
+The featured team between the brand shapes: `DecorShapes` left and right on
+the home hero's grid, the figures on a CANVAS between them. Each member stands
+at its row's `figureX` / `figureY` on its `figureZ` layer — thousandths of the
+canvas WIDTH, both axes (`FIGURE_POSITION`, `FIGURE_LAYER` on `./contract`),
+so the collage scales as one piece and the base width is `12cqi`. A member
+with no position takes the next place of a centred row layout of four, its
+`figureOffset` nudging it down, keyed on its index among ALL the members, so
+moving one figure never moves another (`layout.ts`: `placeFigures`,
+`canvasHeight`). The canvas grows to the lowest figure.
+
+Narrow — the field's container under 40rem — the positions are ignored and the
+figures flow in order (`sort_order`), wrapping like any list; below 900px the
+shapes go, the base width drops to 6.5rem and offsets collapse. The switch is a
+container query: the server renders both and no script decides.
+
+Props: `members: TeamMemberData[]`,
+`editFor?: (member) => TeamMemberEditMap | undefined`, `collection?:
+CollectionRef` (turns on the add slot — which prefers the host's `openRecord`
+form for a new member over a seeded row — and each figure's remove), `class?`.
+Where the adapter implements `savePlacement`, each figure on the canvas takes
+the `Placeable` handles through its `record` (see the edit-mode guide).
 
 ## CollaboratorList
 
@@ -70,17 +121,17 @@ its interface wording from `UiMessages`, and renders the site's markup
 byte-for-byte when no `edit` is passed and the provider has no `messageEdit`
 — the inert `Editable`/`EditFrame`/`ActionLabel` path adds nothing.
 
-| Module             | Data props (the site's `+page.server.ts` shape)                        | Host adapters                                                  | `edit?`                                                                                   |
-| ------------------ | ---------------------------------------------------------------------- | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `HomePage`         | `content: PageCopy<'home'>`, `milestones`, `weeklies`                  | `onsearch(query)` — the host navigates to its /weeklies        | `HomePageEdit { copy?, milestoneFor?, weeklyFor? }`                                       |
-| `WhoWeArePage`     | `content`, `featured`, `board`, `collaborators`                        | —                                                              | `WhoWeArePageEdit { copy?, memberFor?, collaboratorFor?, collaborators?: CollectionRef }` |
-| `WhatWeDoPage`     | `content`, `latest?` (null = no showcase), `collaborations`, `passion` | —                                                              | `WhatWeDoPageEdit { copy?, projectFor? }`                                                 |
-| `GetInvolvedPage`  | `content`, `jobs`                                                      | `form: ContactFormInstance` (preflighted, or the testing mock) | `GetInvolvedPageEdit { copy?, jobFor?, jobs?: CollectionRef }`                            |
-| `TransparencyPage` | `content`, `milestones`                                                | `query: { q, category }` (server-parsed), `replaceUrl(path)`   | `TransparencyPageEdit { copy?, milestoneFor?, milestones?: CollectionRef }`               |
-| `LegalPage`        | `content: PageCopy<'legal'>`                                           | —                                                              | `LegalPageEdit { copy? }`                                                                 |
-| `WeekliesPage`     | `content`, `themes: ThemeData[]`, `server: WeeklyListServerData`       | `fetchPage`, `replaceUrl(path)` — see `createWeeklyList`       | `WeekliesPageEdit { copy?, weeklyFor?, themeFor? }`                                       |
-| `ProjectPage`      | `project: ProjectArticleData`                                          | —                                                              | `ArticleEdit { title?, excerpt?, body? }`                                                 |
-| `WeeklyPage`       | `weekly: WeeklyArticleData`, `related`, `comments`, `reactions`        | `isLoggedIn`, `commentForm`, `replyFormFor`, `reactionForms`   | `ArticleEdit`                                                                             |
+| Module             | Data props (the site's `+page.server.ts` shape)                        | Host adapters                                                  | `edit?`                                                                                             |
+| ------------------ | ---------------------------------------------------------------------- | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `HomePage`         | `content: PageCopy<'home'>`, `milestones`, `weeklies`                  | `onsearch(query)` — the host navigates to its /weeklies        | `HomePageEdit { copy?, milestoneFor?, weeklyFor? }`                                                 |
+| `WhoWeArePage`     | `content`, `featured` (as `TeamFigureField`), `board`, `collaborators` | —                                                              | `WhoWeArePageEdit { copy?, memberFor?, collaboratorFor?, collaborators?, members?: CollectionRef }` |
+| `WhatWeDoPage`     | `content`, `latest?` (null = no showcase), `collaborations`, `passion` | —                                                              | `WhatWeDoPageEdit { copy?, projectFor? }`                                                           |
+| `GetInvolvedPage`  | `content`, `jobs`                                                      | `form: ContactFormInstance` (preflighted, or the testing mock) | `GetInvolvedPageEdit { copy?, jobFor?, jobs?: CollectionRef }`                                      |
+| `TransparencyPage` | `content`, `milestones`                                                | `query: { q, category }` (server-parsed), `replaceUrl(path)`   | `TransparencyPageEdit { copy?, milestoneFor?, milestones?: CollectionRef }`                         |
+| `LegalPage`        | `content: PageCopy<'legal'>`                                           | —                                                              | `LegalPageEdit { copy? }`                                                                           |
+| `WeekliesPage`     | `content`, `themes: ThemeData[]`, `server: WeeklyListServerData`       | `fetchPage`, `replaceUrl(path)` — see `createWeeklyList`       | `WeekliesPageEdit { copy?, weeklyFor?, themeFor? }`                                                 |
+| `ProjectPage`      | `project: ProjectArticleData`                                          | —                                                              | `ArticleEdit { title?, excerpt?, body? }`                                                           |
+| `WeeklyPage`       | `weekly: WeeklyArticleData`, `related`, `comments`, `reactions`        | `isLoggedIn`, `commentForm`, `replyFormFor`, `reactionForms`   | `ArticleEdit`                                                                                       |
 
 The page-copy vocabulary — `PAGE_COPY_KEYS` (which section keys each page
 reads), `GET_INVOLVED_REASON_KEYS` (the five reasons, in order), and the types

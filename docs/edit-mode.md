@@ -52,7 +52,11 @@ setEditAdapter({
 
 	// Image upload; resolves to the stored path an 'image' property saves.
 	// Leave it off and image rows fall back to a plain path input.
-	uploadImage: async (descriptor, file) => path
+	uploadImage: async (descriptor, file) => path,
+	// Optional: the host's own full form for one row, or a new one (no id).
+	openRecord: (target) => { … },
+	// Optional: one patch per canvas gesture — { x?, y?, z?, size? }.
+	savePlacement: async (target, placement) => { … }
 }, EDIT_CHROME);
 ```
 
@@ -197,14 +201,33 @@ attrs bag carries `contenteditable`, the textbox role, and the state hooks.
 
 `EditFrame` is the page-builder wrapper a component mounts INSIDE its own
 root element: while editing it outlines the block on hover/focus and shows a
-corner toolbar — a gear opening the property panel (an `EditPopover` holding
+corner toolbar — a pencil opening the property panel (an `EditPopover` holding
 an `EditPanel` of rows), and a trash that confirms (`ConfirmDialog`, over
 Modal) before applying a remove op. Inactive it renders its children alone,
 with zero wrapper element.
+A spec may also name a `record` (`{ entity, id }`): with an adapter that
+implements `openRecord`, the toolbar shows a pencil that opens the host's full
+form for that row — for what a panel of scalar rows cannot hold, such as text
+in three languages — and the panel's door goes: the form holds everything the panel
+would, and two buttons for overlapping fields read as two things to learn.
+Inside such a frame `Editable` is inert too: one door per card, the same door
+for every field — a caption edited in place beside a form that edits it was
+two ways to change one thing, and the inline way reached only the localized
+columns. A host without `openRecord` keeps the panel and the inline editing;
+both doors wear the same pencil, since to the person editing either is «edit
+this».
+Page copy and chrome wording, which have no record, edit inline as ever. `TeamFigure` edits nothing inline and opens no panel for
+that reason; every card's map takes the same `record`.
 
 `AddSlot` is the "+" of an editable collection; it applies a `create` op,
 optionally anchored before an existing row. Lists own identity and order, so
 collection wiring lives on the LIST component:
+A slot may name a `record` (`{ entity }`): with an adapter that implements
+`openRecord`, the click opens the host's form for a NEW row instead of creating
+a seeded one in place; without one, the op applies as ever. The `op` may be
+left out of such a slot: it is live wherever either way of adding is.
+`TeamFigureField` does this — a new member is a whole person, not a blank to
+fill in after.
 
 ```svelte
 <Timeline
@@ -225,6 +248,24 @@ Timeline injects each milestone's remove op from `collection` and renders add
 slots between and after the cards. It offers NO reorder: order derives from
 `occurredOn`, so editing the date IS the reorder. The category select fills
 its options from the same labels the category chip renders.
+
+`Placeable` is the canvas item's wrapper, the sixth chrome module: with a
+`PlaceableSpec` (`label`, the row `target`, its resolved `placement`, the other
+items' `layers`, the `bounds` each key may be written as) and an adapter that
+implements `savePlacement`, it gives the item a drag surface, a grip whose
+arrow keys nudge it (Shift for big steps, + and − resize, Escape drops an
+unsaved nudge), a corner that resizes it and two layer buttons. Every gesture
+ends in ONE `savePlacement(target, patch)` holding only what changed — a move
+writes both axes, since an unplaced item's automatic place is not stored — so
+a drag is one write and one revision. The item is previewed where it will land
+until the host's refresh brings the stored placement back; a rejected save
+drops the preview. The canvas decides whether it is one: the handles show and
+take gestures only where it sets `--vit-placement: on` (and the
+`--vit-placement-*` tokens) around a `[data-vit-placement-canvas]` element,
+which is what its lengths are thousandths of. `TeamFigureField` is the one
+canvas. `EditChrome.Placeable` is optional, so a host's own chrome table still
+type-checks; without it, or without `savePlacement`, the item renders
+read-only.
 
 Every list with a `collection` prop — Timeline, CollaboratorList, JobList,
 Nav, Footer — reads its structural half through one helper,

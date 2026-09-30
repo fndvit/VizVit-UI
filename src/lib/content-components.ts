@@ -11,6 +11,9 @@ export type { ProjectEditMap } from './components/projects/ProjectCard.svelte';
 export { default as SortSelect } from './components/weeklies/SortSelect.svelte';
 export { default as TeamMemberCard } from './components/team/TeamMemberCard.svelte';
 export type { TeamMemberEditMap } from './components/team/TeamMemberCard.svelte';
+// The featured team as figures: one member, and the scattered field of them.
+export { default as TeamFigure } from './components/team/TeamFigure.svelte';
+export { default as TeamFigureField } from './components/team/TeamFigureField.svelte';
 // The sixth `*EditMap`: its five siblings were exported and this one was not,
 // so a host typing a collaborator's rows had to restate the shape.
 export type { CollaboratorEditMap } from './components/team/CollaboratorList.svelte';
