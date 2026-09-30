@@ -1,20 +1,22 @@
 <script module lang="ts">
 	import type { CopyEditFor } from '../../content/pages.js';
 	import type { ThemeData, WeeklyCardData } from '../../content/types.js';
-	import type { EditDescriptor } from '../../edit/types.js';
 	import type { WeeklyEditMap } from '../weeklies/WeeklieCard.svelte';
+	import type { ThemeEditMap } from '../weeklies/ThemeCollage.svelte';
 
 	/**
 	 * What a CMS may open on /weeklies. A theme chip's wording is a THEME's
 	 * localized name — an entity, unlike the category chips — so the host
-	 * answers `themeFor` per theme. The search placeholder and the sort
-	 * options edit through their panels over `config.messageEdit`; the h1
-	 * and the empty state inline over the same gate.
+	 * answers `themeFor` per theme with the theme's one edit map (the home
+	 * collage asks the same question of the same map; the chip reads its
+	 * `name`). The search placeholder and the sort options edit through
+	 * their panels over `config.messageEdit`; the h1 and the empty state
+	 * inline over the same gate.
 	 */
 	export interface WeekliesPageEdit {
 		copy?: CopyEditFor<'weeklies'>;
 		weeklyFor?: (weekly: WeeklyCardData) => WeeklyEditMap | undefined;
-		themeFor?: (theme: ThemeData) => EditDescriptor | undefined;
+		themeFor?: (theme: ThemeData) => ThemeEditMap | undefined;
 	}
 </script>
 
@@ -74,7 +76,7 @@
 	const chips = $derived(themes.map((theme) => ({ value: theme.slug, label: theme.name })));
 	const themeEdit = (chip: { value: string }) => {
 		const theme = themes.find((candidate) => candidate.slug === chip.value);
-		return theme ? edit?.themeFor?.(theme) : undefined;
+		return theme ? edit?.themeFor?.(theme)?.name : undefined;
 	};
 
 	// Wording that cannot hold a caret — the placeholder, the two <option>

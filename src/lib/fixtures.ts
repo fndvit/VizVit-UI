@@ -12,6 +12,7 @@ import type {
 	CommentThreadData,
 	JobOpeningData,
 	MilestoneData,
+	TimelineAreaData,
 	ProjectArticleData,
 	ProjectCardData,
 	ReactionSummary,
@@ -158,6 +159,64 @@ export const sampleMilestones: MilestoneData[] = [
 		body: 'Un espai per prototipar visualitzacions amb dades públiques.',
 		imageUrls: [],
 		linkUrl: null
+	},
+	{
+		id: 4,
+		occurredOn: '2026-04-08',
+		category: 'tools',
+		title: 'Publiquem la primera eina oberta',
+		body: null,
+		imageUrls: ['/images/placeholders/square.svg'],
+		linkUrl: null
+	}
+];
+
+/** The home timeline's three areas, with the collage sizes the mock shows. */
+export const sampleAreas: TimelineAreaData[] = [
+	{
+		id: 1,
+		category: 'lab',
+		href: null,
+		title: 'Laboratori',
+		body: 'Prototipem visualitzacions amb dades públiques i les publiquem perquè **qualsevol** les pugui reutilitzar.',
+		images: [
+			{
+				url: '/images/placeholders/wide.svg',
+				href: '/what-we-do/air-quality-life-index',
+				label: 'Air Quality Life Index'
+			},
+			{ url: '/images/placeholders/square.svg', href: 'https://example.org/story', label: null },
+			{ url: '/images/placeholders/portrait.svg', href: null, label: null },
+			{ url: '/images/placeholders/photo-strip.svg', href: null, label: null }
+		]
+	},
+	{
+		id: 2,
+		category: 'education',
+		href: null,
+		title: 'Educació',
+		body: 'Tallers a instituts i universitats per llegir el món amb dades.',
+		images: [
+			{ url: '/images/placeholders/photo-strip.svg', href: null, label: null },
+			{ url: '/images/placeholders/square.svg', href: null, label: null },
+			{ url: '/images/placeholders/wide.svg', href: null, label: null }
+		]
+	},
+	{
+		id: 3,
+		category: 'tools',
+		href: null,
+		title: 'Eines',
+		body: 'Programari obert per a redaccions i administracions.',
+		images: []
+	},
+	{
+		id: 4,
+		category: null,
+		href: '/what-we-do/observatori',
+		title: 'Observatori',
+		body: 'Una secció que no és cap categoria de la cronologia: enllaça on diu.',
+		images: []
 	}
 ];
 
@@ -208,8 +267,10 @@ export const sampleWeeklyArticle: WeeklyArticleData = {
 };
 
 export const sampleThemes: ThemeData[] = [
-	{ slug: 'ciencia', name: 'Ciència' },
-	{ slug: 'salut', name: 'Salut' }
+	{ id: 1, slug: 'ciencia', name: 'Ciència', imageUrl: '/images/placeholders/square.svg' },
+	{ id: 2, slug: 'salut', name: 'Salut', imageUrl: '/images/placeholders/portrait.svg' },
+	{ id: 3, slug: 'medi-ambient', name: 'Medi ambient', imageUrl: '/images/placeholders/wide.svg' },
+	{ id: 4, slug: 'altres', name: 'Altres', imageUrl: null }
 ];
 
 /** The weeklies index as its server load renders it: one page, no filters. */

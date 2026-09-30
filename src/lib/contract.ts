@@ -73,7 +73,12 @@ export type { Reaction, ReactionSummary, SortDirection } from './content/types.j
 // contact form already derives from CONTACT_CATEGORIES below. Values, because
 // a type cannot be the source of an enum.
 export { MILESTONE_CATEGORIES, PROJECT_KINDS } from './content/types.js';
-export type { MilestoneCategory, ProjectKind } from './content/types.js';
+export type {
+	MilestoneCategory,
+	ProjectKind,
+	TimelineAreaData,
+	TimelineAreaImage
+} from './content/types.js';
 
 // The figure vocabulary a team member's row stores: the poses, the head mode,
 // where the label sits, and the bounds of its integers. The DRAWING stays off
@@ -108,10 +113,19 @@ export type { TeamMemberData } from './content/types.js';
 // half had three spellings across two repositories and this package's own test,
 // and the round-trip case guarding them crossed against the test's copy.
 export {
+	WEEKLIES_PATH,
 	WEEKLY_LIST_DEFAULTS,
 	WEEKLY_LIST_PARAMS,
-	parseWeeklyListUrl
+	parseWeeklyListUrl,
+	weekliesHref
 } from './utils/weekly-list-contract.js';
+export { MEDIA_PREFIX, foldMediaUrl, resolveMediaReference } from './utils/media-reference.js';
+export {
+	MILESTONE_LIST_PARAMS,
+	TRANSPARENCY_PATH,
+	transparencyHref
+} from './utils/milestone-list-contract.js';
+export type { MilestoneListFilters } from './utils/milestone-list-contract.js';
 export type {
 	WeeklyListFilters,
 	WeeklyListPage,

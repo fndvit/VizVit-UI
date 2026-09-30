@@ -24,6 +24,7 @@
 	import Editable from '../../edit/Editable.svelte';
 	import { chromeProperty } from '../../edit/helpers.js';
 	import { matchesMilestoneFilter, milestoneCategoryLabel } from '../../utils/milestones.js';
+	import { transparencyHref } from '../../utils/milestone-list-contract.js';
 	import { createUrlFilters } from '../../utils/url-filters.svelte.js';
 	import PageShell from '../layout/PageShell.svelte';
 	import Timeline from '../timeline/Timeline.svelte';
@@ -56,9 +57,8 @@
 	const msg = $derived(config.messages);
 
 	const filters = createUrlFilters<TimelineFilters>({
-		path: '/transparency',
 		initial: () => ({ q: query.q, category: query.category }),
-		toQuery: (values) => ({ q: values.q, category: values.category }),
+		href: (values) => transparencyHref(values),
 		replaceUrl: (path) => replaceUrl(path)
 	});
 

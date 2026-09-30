@@ -1,0 +1,77 @@
+/* The SITE's element rules — what a page of the foundation's website reads
+ * for its body text, its headings and its images, scoped to `.vit-site` so a
+ * host that is not the site (the CMS, whose mirror of the site applies the
+ * class to the mirror alone) keeps its own. One owner: the website used to
+ * hold these in its global.css and the CMS mirror restated them, with a
+ * specificity that beat the components' own sizes (`SplashHero`'s h1).
+ *
+ *   import '@vit-foundation/ui/site.css';   // then class="vit-site" on <body>, or on the mirror
+ *
+ * `:where()` adds nothing to the one class `.vit-site` contributes, so every
+ * rule here weighs (0,1,0) and a component's scoped rule — an element plus
+ * its scoping class, (0,1,1) — wins. */
+
+.vit-site {
+	margin: 0;
+	font-family: var(--font-sans);
+	font-size: var(--text-base);
+	line-height: var(--leading-body);
+	color: var(--color-ink);
+	background: var(--color-surface);
+}
+
+/* THE PAGE HEADING — the h1 that names a page — at the editorial scale, and
+   a step down for the chrome variants (account, admin, legal, the auth
+   pages). Declared as the element so a page written without a class still
+   has a size someone chose. */
+.vit-site :where(h1, h2, h3, h4) {
+	line-height: var(--leading-tight);
+	margin: 0 0 var(--space-3);
+}
+
+.vit-site :where(h1) {
+	font-size: var(--text-2xl);
+}
+
+/* THE SECTION HEADING — the h2 that opens a band — and the step below it
+   for a band within one. */
+.vit-site :where(h2) {
+	font-size: var(--text-xl);
+}
+
+.vit-site :where(.page.chrome h1) {
+	font-size: var(--text-xl);
+}
+
+.vit-site :where(.section-heading) {
+	margin-block: var(--space-5) var(--space-3);
+}
+
+.vit-site :where(.subsection-heading) {
+	font-size: var(--text-lg);
+	margin-block: var(--space-4) var(--space-2);
+}
+
+.vit-site :where(p) {
+	margin: 0 0 var(--space-3);
+}
+
+.vit-site :where(img) {
+	max-width: 100%;
+	height: auto;
+	display: block;
+}
+
+.vit-site :where(a) {
+	color: inherit;
+}
+
+.vit-site :where(button, input, select, textarea) {
+	font: inherit;
+	color: inherit;
+}
+
+.vit-site :where(:focus-visible) {
+	outline: 2px solid var(--color-brand);
+	outline-offset: 2px;
+}

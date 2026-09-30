@@ -43,10 +43,17 @@ export interface WeeklyCardData {
 	imageUrl: string;
 }
 
-/** A theme a weekly is filed under, as the /weeklies filter chips render it. */
+/**
+ * A theme a weekly is filed under, as the /weeklies filter chips render it
+ * and the home page's collage pictures it; `imageUrl` is null for a theme
+ * without a picture, which the collage draws as a flat tint.
+ */
 export interface ThemeData {
+	/** The row's id, like every editable datum's: an edit producer takes it, no lookup by slug. */
+	id: number;
 	slug: string;
 	name: string;
+	imageUrl: string | null;
 }
 
 /** One cited source of a weekly. */
@@ -129,7 +136,11 @@ export const MILESTONE_CATEGORIES = [
 	'lab',
 	'education',
 	'collaboration',
-	'press'
+	'press',
+	// The third area of the home page's timeline (lab, education, tools): a
+	// category, so «To our tools timeline» is the same filtered history as
+	// the other two, and so an area row can be keyed by it.
+	'tools'
 ] as const;
 export type MilestoneCategory = (typeof MILESTONE_CATEGORIES)[number];
 
@@ -144,6 +155,42 @@ export interface MilestoneData {
 	body: string | null;
 	imageUrls: string[];
 	linkUrl: string | null;
+}
+
+/**
+ * One AREA of the home page's timeline — lab, education, tools, or any
+ * section an editor adds — as the scrolly presents it: a heading, a
+ * paragraph and a collage. Not a milestone: it has no date. Where its «To
+ * our … timeline» link goes is ONE rule (`areaDestination`): the area's own
+ * `href` when it has one, else the full timeline filtered by its `category`
+ * when it has one, else no link — so a section need not be a milestone
+ * category at all (the website's `timeline_areas` table holds any number of
+ * rows, at most one per category).
+ */
+export interface TimelineAreaData {
+	id: number;
+	/** CMS-only: true renders the «Esborrany» badge. The public site never sets it. */
+	draft?: boolean;
+	/** The milestone category whose history this area opens; null for a free section. */
+	category: MilestoneCategory | null;
+	/** The area's own destination, which wins over the category's history; null for none of its own. */
+	href: string | null;
+	title: string;
+	body: string | null;
+	/** The collage: `ImageCollage` renders the first four. */
+	images: TimelineAreaImage[];
+}
+
+/**
+ * One picture of an area's collage and where it leads — a project's page, a
+ * story on another site — or nowhere (`null`): then it is a picture and no
+ * link. The website stores the list as one jsonb column (`timeline_areas.images`).
+ */
+export interface TimelineAreaImage {
+	url: string;
+	href: string | null;
+	/** What it shows — the project's name — for the hover's «To the … project». Localized in the store. */
+	label: string | null;
 }
 
 export interface TeamMemberData {

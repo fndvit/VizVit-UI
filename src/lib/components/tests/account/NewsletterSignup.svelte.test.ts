@@ -27,6 +27,16 @@ beforeEach(() => {
 });
 
 describe('NewsletterSignup', () => {
+	it('is a card over the mosaic: heading and blurb, the way in, the privacy line', async () => {
+		const { container } = renderBand(null);
+
+		expect(container.querySelector('.newsletter .mosaic svg')).not.toBeNull();
+		expect(container.querySelector('.card h2')?.id).toBe('newsletter-title');
+		expect(container.querySelector('.card .privacy')?.textContent).toBe(
+			'Tranquil·litat: respectem la teva privacitat.'
+		);
+	});
+
 	it('routes logged-out visitors to the auth pages with the newsletter intent', async () => {
 		renderBand(null);
 

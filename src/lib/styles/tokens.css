@@ -1,13 +1,34 @@
 /* Fundació VIT design tokens. Series slots come from the validated
  * fv-chart-style palette (light mode) — fixed order, never reassigned. */
 :root {
-	/* Brand & wireframe hues */
-	--color-brand: #0899b1;
-	--color-brand-light: #5ac7d2;
+	/* Brand & wireframe hues. The brand is the ViT mark's pink, a shade
+	   deeper than the mark itself so white text on it and the hue on white
+	   both read at AA (4.9:1); the tint is the mark at half strength. */
+	--color-brand: #e0005c;
+	--color-brand-light: #ff80b5;
 	--color-navy: #1f2a5e;
 	--color-orange: #eb6834;
 	--color-magenta: #e87ba4;
 	--color-cream: #f6f1e7;
+	/* The splash mosaic's fourth hue, beside navy, magenta and cream. */
+	--color-wine: #9b2f5c;
+	/* The design's plum — the wine deepened with ink — under a tinted photo
+	   (`ThemeCollage`) and the collage's hover mask (`ImageCollage`). */
+	--color-plum: #662542;
+	/* The ViT mark's pink (`BrandMark`): the nav's logo and the splash's wordmark. */
+	--vit-brand-mark: #ff006a;
+	/* What sits above the splash (`SplashHero`), so it can be one screen tall:
+	   the website nav's height. A host with a taller header sets it. */
+	--vit-splash-offset: 3.75rem;
+	/* The timeline rail (`TimelineAreas`), in rem: the current node's row from
+	   the top, the step between parked nodes, where the passed stack starts
+	   from the top and the upcoming stack ends from the bottom. The CSS places
+	   the nodes by these and the JS reads the same values to decide the
+	   places — one owner. */
+	--vit-rail-top: 4rem;
+	--vit-rail-step: 2.5rem;
+	--vit-rail-stack: 1.5rem;
+	--vit-rail-bottom: 5.5rem;
 	--color-band-grey: #ececec;
 
 	/* Ink & surfaces */
@@ -18,7 +39,8 @@
 	--color-axis: #c5cbcf;
 	--color-surface: #ffffff;
 
-	/* Dataviz series — validated palette, fixed slot order (1 = brand teal) */
+	/* Dataviz series — validated palette, fixed slot order (1 = the teal that
+	   was the brand before the ViT mark; the slots never move) */
 	--series-1: #0899b1;
 	--series-2: #eb6834;
 	--series-3: #4a3aa7;

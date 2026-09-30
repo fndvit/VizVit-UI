@@ -2,6 +2,8 @@
  * Generic UI atoms: buttons, cards, text, media, list controls. Domain-free —
  * everything here renders whatever it is handed.
  */
+export { default as ArrowLink } from './components/ui/ArrowLink.svelte';
+export { default as BrandMark } from './components/ui/BrandMark.svelte';
 export { default as Button } from './components/ui/Button.svelte';
 export { default as CardMedia } from './components/ui/CardMedia.svelte';
 export { default as CardTitle } from './components/ui/CardTitle.svelte';
@@ -12,6 +14,9 @@ export { default as FilterChips } from './components/ui/FilterChips.svelte';
 export { default as GhostButton } from './components/ui/GhostButton.svelte';
 export { default as Icon, type IconName } from './components/ui/Icon.svelte';
 export { default as IconButton } from './components/ui/IconButton.svelte';
+// The collage and the brand mosaic: décor and composition, no domain.
+export { default as ImageCollage } from './components/ui/ImageCollage.svelte';
+export { default as InlineText } from './components/ui/InlineText.svelte';
 export { default as Link } from './components/ui/Link.svelte';
 export { default as Logo } from './components/ui/Logo.svelte';
 export { default as Modal } from './components/ui/Modal.svelte';
@@ -51,3 +56,4 @@ export { default as Pagination } from './components/ui/Pagination.svelte';
 export { default as RichText } from './components/ui/RichText.svelte';
 export { default as SearchInput } from './components/ui/SearchInput.svelte';
 export { default as ShareRow } from './components/ui/ShareRow.svelte';
+export { default as TileMosaic } from './components/ui/TileMosaic.svelte';

@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { MilestoneData, WeeklyCardData } from '../../../content/types.js';
-import { sampleMilestones, samplePageCopy, sampleWeekly } from '../../../fixtures.js';
+import type { ThemeData, TimelineAreaData } from '../../../content/types.js';
+import { sampleAreas, samplePageCopy, sampleThemes } from '../../../fixtures.js';
 import HomePage from '../../pages/HomePage.svelte';
+import { areaDestination } from '../../timeline/area-link.js';
 import {
 	AFFORDANCES,
 	copyEditFor,
@@ -15,11 +16,7 @@ import {
 } from './helpers.js';
 
 const content = samplePageCopy('home');
-const weeklies = [
-	sampleWeekly,
-	{ ...sampleWeekly, id: 13, number: 13, slug: 'tretze', title: 'Tretze' }
-];
-const props = { content, milestones: sampleMilestones, weeklies, onsearch: () => {} };
+const props = { content, areas: sampleAreas, themes: sampleThemes, onsearch: () => {} };
 
 describe('HomePage, read-only', () => {
 	it('titles the document from the hero and renders every copy block where it belongs', async () => {
@@ -28,25 +25,47 @@ describe('HomePage, read-only', () => {
 
 		await expect.poll(() => document.title).toBe(`${content.hero_title} — ViT`);
 		expect(textOf(page, 'h1')).toEqual([content.hero_title]);
-		expect(textOf(page, '.hero-text p')).toEqual([content.hero_subtitle]);
-		expect(textOf(page, 'h2')).toEqual([
-			content.milestones_heading,
-			content.weeklies_heading,
-			content.know_more_heading
-		]);
-		expect(textOf(page, '.intro')).toEqual([content.weeklies_intro]);
+		expect(textOf(page, '.tagline')).toEqual([content.hero_subtitle]);
+		expect(textOf(page, 'h2')).toEqual([content.weeklies_heading, content.know_more_heading]);
+		expect(textOf(page, '.intro')).toEqual([content.weeklies_intro, content.know_more_intro]);
 	});
 
-	it('renders the milestone slice, the weekly grid, the see-all link and both CTAs from the catalog', () => {
+	it('renders the three areas with their own timeline links, the themes as pictures leading to their weeklies, and every arrow link from the catalog', () => {
 		const { container } = mountPage(HomePage, { props });
 		const page = host(container);
 
-		expect(page.querySelectorAll('.timeline article')).toHaveLength(sampleMilestones.length);
-		expect(page.querySelectorAll('.grid > article')).toHaveLength(weeklies.length);
+		expect(textOf(page, 'section.area h3')).toEqual(sampleAreas.map((area) => area.title));
+		expect(
+			[...page.querySelectorAll('section.area .more a')].map((a) => a.getAttribute('href'))
+		).toEqual(
+			sampleAreas.flatMap((area) => {
+				const to = areaDestination(area, '/transparency');
+				return to ? [to] : [];
+			})
+		);
 		expect(page.querySelector('.see-all a')?.getAttribute('href')).toBe('/transparency');
+
+		// The themes, in the weeklies band under its lead, each a link to its weeklies.
+		const themes = [...page.querySelectorAll<HTMLAnchorElement>('.weeklies-band .theme a')];
+		expect(themes.map((a) => a.getAttribute('href'))).toEqual(
+			sampleThemes.map((theme) => `/weeklies?theme=${theme.slug}`)
+		);
+		expect(textOf(page, '.weeklies-band .theme .label')).toEqual(
+			sampleThemes.map((theme) => theme.name)
+		);
+		expect(page.querySelector('.weeklies-band .lead h2')?.id).toBe('weeklies-heading');
+		expect(page.querySelector('.go a')?.getAttribute('href')).toBe('/weeklies');
+		expect(textOf(page, '.go strong')).toEqual(['weeklies']);
+
+		// «Meet our **team** ⟶», «Contact **us** ⟶»: the bold run and the drawn arrow.
 		const ctas = [...page.querySelectorAll<HTMLAnchorElement>('.ctas a')];
 		expect(ctas.map((a) => a.getAttribute('href'))).toEqual(['/who-we-are', '/get-involved']);
-		expect(ctas.map((a) => a.textContent?.trim())).toEqual(["Coneix l'equip", "Contacta'ns"]);
+		expect(ctas.map((a) => a.textContent?.replace(/\s+/g, ' ').trim())).toEqual([
+			'Coneix el nostre equip',
+			'Contacta amb nosaltres'
+		]);
+		expect(textOf(page, '.ctas strong')).toEqual(['equip', 'amb nosaltres']);
+		expect(page.querySelectorAll('.ctas .arrow')).toHaveLength(2);
 	});
 
 	it('hands the search box the query and nothing else — the host navigates', async () => {
@@ -75,24 +94,24 @@ describe('HomePage, read-only', () => {
 
 describe('HomePage, editing', () => {
 	it('routes each copy descriptor to its element and asks the row maps once per row', () => {
-		const milestoneFor = rowSpy<MilestoneData>();
-		const weeklyFor = rowSpy<WeeklyCardData>();
+		const areaFor = rowSpy<TimelineAreaData>();
+		const themeFor = rowSpy<ThemeData>();
 		const { container } = mountPage(HomePage, {
-			props: { ...props, edit: { copy: copyEditFor('home'), milestoneFor, weeklyFor } },
+			props: { ...props, edit: { copy: copyEditFor('home'), areaFor, themeFor } },
 			adapter: fullAdapter()
 		});
 		const page = host(container);
 
 		expect(labelOf(page, 'h1')).toBe('Bloc hero_title');
-		expect(labelOf(page, '.hero-text p')).toBe('Bloc hero_subtitle');
-		expect(labelOf(page, '#milestones-heading')).toBe('Bloc milestones_heading');
-		expect(labelOf(page, '.intro')).toBe('Bloc weeklies_intro');
+		expect(labelOf(page, '.tagline')).toBe('Bloc hero_subtitle');
+		expect(labelOf(page, '.weeklies-band .intro')).toBe('Bloc weeklies_intro');
+		expect(labelOf(page, '.know-more .intro')).toBe('Bloc know_more_intro');
 		expect(labelOf(page, '#know-more-heading')).toBe('Bloc know_more_heading');
-		expect(milestoneFor.mock.calls.map(([m]) => m)).toEqual(sampleMilestones);
-		expect(weeklyFor.mock.calls.map(([w]) => w)).toEqual(weeklies);
+		expect(areaFor.mock.calls.map(([a]) => a)).toEqual(sampleAreas);
+		expect(themeFor.mock.calls.map(([t]) => t)).toEqual(sampleThemes);
 	});
 
-	it('opens the chrome wording through messageEdit: the explore line inline, the three links as modals, the placeholder as a panel', () => {
+	it('opens the chrome wording through messageEdit: the explore line inline, the four links as modals, the placeholder as a panel', () => {
 		const { container } = mountPage(HomePage, {
 			props,
 			adapter: fullAdapter(),
@@ -101,10 +120,13 @@ describe('HomePage, editing', () => {
 		const page = host(container);
 
 		expect(labelOf(page, '.explore')).toBe('Text weeklies_exploreOne');
-		expect(textOf(page, '.link-swap').map((t) => t.replace(/\s+/g, ' '))).toEqual([
-			'Mostra-ho tot',
-			"Coneix l'equip",
-			"Contacta'ns"
+		expect(labelOf(page, '.hint')).toBe('Text hero_scrollHint');
+		// The live swap shows the wording RAW — the `**` are what the editor edits.
+		expect(textOf(page, '.link-swap').map((t) => t.replace(/\s+/g, ' ').trim())).toEqual([
+			'A la cronologia completa',
+			'A les **weeklies**',
+			'Coneix el nostre **equip**',
+			'Contacta **amb nosaltres**'
 		]);
 		// The search box is framed (gear → placeholder row) only under messageEdit.
 		expect(page.querySelector('form[role="search"] .vit-edit-frame')).not.toBeNull();

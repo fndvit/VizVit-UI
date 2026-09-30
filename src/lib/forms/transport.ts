@@ -18,6 +18,13 @@ export const HONEYPOT_FIELD = 'website';
  * is what the host app's schema accepts (`z.literal(NEWSLETTER_INTENT_VALUE)`);
  * the param is the query key the auth pages read.
  */
+/**
+ * The auth pages' built-in paths — what the comments and newsletter links
+ * fall back to where a host catalog lacks the `comments_*LinkHref` keys,
+ * which predate those links.
+ */
+export const AUTH_PATHS = { login: '/login', signup: '/signup' } as const;
+
 export const NEWSLETTER_INTENT_PARAM = 'newsletter';
 export const NEWSLETTER_INTENT_VALUE = '1';
 

@@ -20,8 +20,14 @@ export type { CollaboratorEditMap } from './components/team/CollaboratorList.sve
 export { default as Timeline } from './components/timeline/Timeline.svelte';
 export { default as TimelineMilestone } from './components/timeline/TimelineMilestone.svelte';
 export type { MilestoneEditMap } from './components/timeline/TimelineMilestone.svelte';
+// The home timeline: the three areas as a scrolly, and one area of it.
+export { default as TimelineAreas } from './components/timeline/TimelineAreas.svelte';
+export { default as TimelineArea } from './components/timeline/TimelineArea.svelte';
+export type { TimelineAreaEditMap } from './components/timeline/TimelineArea.svelte';
 export { default as WeeklieCard } from './components/weeklies/WeeklieCard.svelte';
 export type { WeeklyEditMap } from './components/weeklies/WeeklieCard.svelte';
+export { default as ThemeCollage } from './components/weeklies/ThemeCollage.svelte';
+export type { ThemeEditMap } from './components/weeklies/ThemeCollage.svelte';
 // The nine PAGE modules: a website route is one tag over the site's read
 // projection, and a CMS opens it with the module's `*PageEdit` map. Same door
 // as the cards they compose — a page is content that renders, not chrome.
@@ -43,8 +49,8 @@ export { default as ProjectPage } from './components/pages/ProjectPage.svelte';
 export { default as WeeklyPage } from './components/pages/WeeklyPage.svelte';
 // The content vocabularies and data shapes, beside the renderers that consume
 // them. `./contract` names the component-free ones a second time, by design.
-export { renderBody } from './content/richtext.js';
-export type { RichTextBlock } from './content/richtext.js';
+export { plainInline, renderBody, renderInline } from './content/richtext.js';
+export type { InlineRun, RichTextBlock } from './content/richtext.js';
 export { GET_INVOLVED_REASON_KEYS, PAGE_COPY_KEYS } from './content/pages.js';
 export type { CopyEditFor, CopyKey, PageCopy, PageId } from './content/pages.js';
 export {
@@ -75,6 +81,8 @@ export type {
 	SortDirection,
 	TeamMemberData,
 	ThemeData,
+	TimelineAreaData,
+	TimelineAreaImage,
 	WeeklyArticleData,
 	WeeklyCardData,
 	WeeklySourceData
@@ -92,10 +100,19 @@ export type { WeeklyList, WeeklyListConfig } from './utils/weekly-list.svelte.js
 // The list's contract is component-free on purpose, so ./contract carries it
 // too — a host's +page.server.ts reads these without loading the grid.
 export {
+	parseWeeklyListUrl,
+	WEEKLIES_PATH,
+	weekliesHref,
 	WEEKLY_LIST_DEFAULTS,
-	WEEKLY_LIST_PARAMS,
-	parseWeeklyListUrl
+	WEEKLY_LIST_PARAMS
 } from './utils/weekly-list-contract.js';
+export { MEDIA_PREFIX, foldMediaUrl, resolveMediaReference } from './utils/media-reference.js';
+export {
+	MILESTONE_LIST_PARAMS,
+	TRANSPARENCY_PATH,
+	transparencyHref
+} from './utils/milestone-list-contract.js';
+export type { MilestoneListFilters } from './utils/milestone-list-contract.js';
 export type {
 	WeeklyListFilters,
 	WeeklyListPage,

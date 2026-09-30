@@ -41,10 +41,10 @@ export const PAGE_COPY_KEYS = {
 	home: [
 		'hero_title',
 		'hero_subtitle',
-		'milestones_heading',
 		'weeklies_heading',
 		'weeklies_intro',
-		'know_more_heading'
+		'know_more_heading',
+		'know_more_intro'
 	],
 	'what-we-do': [
 		'latest_heading',

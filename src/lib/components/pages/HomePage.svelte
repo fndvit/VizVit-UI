@@ -1,71 +1,95 @@
 <script module lang="ts">
 	import type { CopyEditFor } from '../../content/pages.js';
-	import type { MilestoneData, WeeklyCardData } from '../../content/types.js';
-	import type { MilestoneEditMap } from '../timeline/TimelineMilestone.svelte';
-	import type { WeeklyEditMap } from '../weeklies/WeeklieCard.svelte';
+	import type { CollectionRef } from '../../edit/types.js';
+	import type { ThemeData, TimelineAreaData } from '../../content/types.js';
+	import type { TimelineAreaEditMap } from '../timeline/TimelineArea.svelte';
+	import type { ThemeEditMap } from '../weeklies/ThemeCollage.svelte';
 
 	/**
 	 * What a CMS may open on the home page. Every member optional: a read-only
 	 * host passes no `edit` at all, and the render is byte-identical to the
-	 * website's route. The chrome wording (the «Mostra-ho tot» link, the CTAs,
-	 * the search placeholder, «…o explora'n un») needs no member here — the
-	 * module reads `config.messageEdit`, like every component does for its
-	 * own message sites.
+	 * website's route. The chrome wording (the full-timeline and weeklies
+	 * links, the CTAs, the search placeholder, «…o explora'n un») needs no
+	 * member here — the module reads `config.messageEdit`, like every
+	 * component does for its own message sites.
 	 */
 	export interface HomePageEdit {
 		copy?: CopyEditFor<'home'>;
-		milestoneFor?: (milestone: MilestoneData) => MilestoneEditMap | undefined;
-		weeklyFor?: (weekly: WeeklyCardData) => WeeklyEditMap | undefined;
+		areaFor?: (area: TimelineAreaData) => TimelineAreaEditMap | undefined;
+		/** Names the areas' collection: with it, a host adds and removes sections in place. */
+		areas?: CollectionRef;
+		themeFor?: (theme: ThemeData) => ThemeEditMap | undefined;
 	}
 </script>
 
 <script lang="ts">
 	import { getUiConfig } from '../../config/context.js';
 	import type { PageCopy } from '../../content/pages.js';
-	import LinkEdit from '../../edit/chrome/LinkEdit.svelte';
+	import { plainInline } from '../../content/richtext.js';
+	import WordedLink from '../../edit/chrome/WordedLink.svelte';
 	import Editable from '../../edit/Editable.svelte';
 	import { chromeProperty } from '../../edit/helpers.js';
+	import { areaDestination } from '../timeline/area-link.js';
+	import { weekliesHref } from '../../utils/weekly-list-contract.js';
 	import PageShell from '../layout/PageShell.svelte';
-	import Timeline from '../timeline/Timeline.svelte';
+	import SplashHero from '../layout/SplashHero.svelte';
+	import TimelineAreas from '../timeline/TimelineAreas.svelte';
+	import ArrowLink from '../ui/ArrowLink.svelte';
 	import CopyIntro from '../ui/CopyIntro.svelte';
-	import DecorShapes from '../ui/DecorShapes.svelte';
-	import Link from '../ui/Link.svelte';
 	import SearchInput from '../ui/SearchInput.svelte';
-	import WeeklieCard from '../weeklies/WeeklieCard.svelte';
+	import TileMosaic from '../ui/TileMosaic.svelte';
+	import ThemeCollage from '../weeklies/ThemeCollage.svelte';
 
 	/**
-	 * The landing page: hero, the latest milestones, a weeklies band with a
-	 * search box, and two CTAs. Takes the website's read projection — its
-	 * `+page.server.ts` returns exactly these three — plus the one thing the
-	 * hosts do differently: where a search goes. The package has no router,
-	 * so the host navigates to its own /weeklies with the query.
+	 * The landing page: the splash, the three areas of the timeline as a
+	 * scrolly, the weeklies band — a search box and the themes as labelled
+	 * pictures — and «Want to know more?» with its two arrow links. Takes
+	 * the website's read projection — its `+page.server.ts` returns exactly
+	 * these three — plus the one thing the hosts do differently: where a
+	 * search goes. The package has no router, so the host navigates to its
+	 * own /weeklies with the query.
+	 *
+	 * Edge to edge (`variant="full"`): the splash is one screen under the nav
+	 * with nothing between, and each section below centres itself at the
+	 * content measure and keeps its own gutter. Tile clusters sit at the
+	 * page's left edge beside the bands, as the design draws them.
 	 */
 	interface Props {
 		content: PageCopy<'home'>;
-		milestones: MilestoneData[];
-		weeklies: WeeklyCardData[];
+		areas: TimelineAreaData[];
+		themes: ThemeData[];
 		/** Called with the trimmed query after the search box's debounce. */
 		onsearch: (query: string) => void;
+		/** How the timeline moves: one slide at a time (`swipe`, the default) or as sections the page scrolls through. */
+		timelineMotion?: 'swipe' | 'scroll';
+		/** How the reader enters it from the splash: a swipe (default) or the page's own scroll. */
+		timelineEntry?: 'swipe' | 'scroll';
+		/** How the reader leaves it for the weeklies: a swipe (default) or the page's own scroll. */
+		timelineExit?: 'swipe' | 'scroll';
 		edit?: HomePageEdit;
 	}
 
-	let { content, milestones, weeklies, onsearch, edit }: Props = $props();
+	let {
+		content,
+		areas,
+		themes,
+		onsearch,
+		timelineMotion = 'swipe',
+		timelineEntry = 'swipe',
+		timelineExit = 'swipe',
+		edit
+	}: Props = $props();
 
 	const config = getUiConfig();
 	const msg = $derived(config.messages);
 
-	// A link is configurable whole: clicking it while editing opens ONE modal
-	// with Text and Adreça — the label saves as wording, the destination as
-	// its *Href key. Both halves undefined without `messageEdit`, so the
-	// control stays inert (the CommentSection rule).
-	const hrefProperty = (key: string) =>
-		config.messageEdit
-			? chromeProperty(key, {
-					type: 'text',
-					locale: config.locale(),
-					label: config.editMessages.edit_linkUrl()
-				})
-			: undefined;
+	/** Where an area leads (`areaDestination`): its own href, else its category's history on «See all»'s editable path. */
+	const areaHref = (area: TimelineAreaData): string | null =>
+		areaDestination(area, msg.common_seeAllHref());
+
+	/** A theme's weeklies: the index the «Go to weeklies» link opens, filtered by it. */
+	const themeHref = (theme: ThemeData): string =>
+		weekliesHref({ theme: theme.slug }, msg.weeklies_goHref());
 	// A placeholder cannot hold a caret, so it edits through the search box's
 	// panel — only where the host exposes `messageEdit` (the ContactForm rule).
 	const placeholderProperty = $derived(
@@ -79,178 +103,203 @@
 	);
 </script>
 
-<PageShell title={content.hero_title} description={content.hero_subtitle}>
-	<section class="hero">
-		<div class="shapes left" aria-hidden="true"><DecorShapes /></div>
-		<div class="hero-text">
-			<Editable edit={edit?.copy?.('hero_title')} value={content.hero_title}>
-				{#snippet children(text, attrs)}<h1 {...attrs}>{text}</h1>{/snippet}
-			</Editable>
-			<Editable edit={edit?.copy?.('hero_subtitle')} value={content.hero_subtitle}>
-				{#snippet children(text, attrs)}<p {...attrs}>{text}</p>{/snippet}
-			</Editable>
-		</div>
-		<div class="shapes right" aria-hidden="true"><DecorShapes flip /></div>
-	</section>
+<PageShell
+	title={plainInline(content.hero_title)}
+	description={plainInline(content.hero_subtitle)}
+	variant="full"
+>
+	<SplashHero
+		title={content.hero_title}
+		tagline={content.hero_subtitle}
+		titleEdit={edit?.copy?.('hero_title')}
+		taglineEdit={edit?.copy?.('hero_subtitle')}
+	/>
 
-	<section aria-labelledby="milestones-heading">
-		<Editable edit={edit?.copy?.('milestones_heading')} value={content.milestones_heading}>
-			{#snippet children(text, attrs)}
-				<h2 class="section-heading" id="milestones-heading" {...attrs}>{text}</h2>
+	<!-- Everything after the splash, on the page's ground. -->
+	<div class="after-splash">
+		<TimelineAreas
+			{areas}
+			{areaHref}
+			editFor={edit?.areaFor}
+			collection={edit?.areas}
+			motion={timelineMotion}
+			entry={timelineEntry}
+			exit={timelineExit}
+		>
+			{#snippet seeAll()}
+				<WordedLink text="timeline_toFull" href="common_seeAllHref">
+					{#snippet link(href, text)}<ArrowLink {href} {text} />{/snippet}
+				</WordedLink>
 			{/snippet}
-		</Editable>
-		<Timeline {milestones} variant="compact" editFor={edit?.milestoneFor} />
-		<p class="see-all">
-			<LinkEdit
-				text={{ edit: config.messageEdit?.('common_seeAll'), value: msg.common_seeAll() }}
-				href={{ descriptor: hrefProperty('common_seeAllHref'), value: msg.common_seeAllHref() }}
-			>
-				{#snippet control()}
-					<Link href={msg.common_seeAllHref()}>{msg.common_seeAll()} →</Link>
-				{/snippet}
-			</LinkEdit>
-		</p>
-	</section>
+		</TimelineAreas>
 
-	<section class="weeklies-band" aria-labelledby="weeklies-heading">
-		<Editable edit={edit?.copy?.('weeklies_heading')} value={content.weeklies_heading}>
-			{#snippet children(text, attrs)}
-				<h2 class="section-heading" id="weeklies-heading" {...attrs}>{text}</h2>
-			{/snippet}
-		</Editable>
-		<CopyIntro text={content.weeklies_intro} edit={edit?.copy?.('weeklies_intro')} />
-		<SearchInput
-			placeholder={msg.weeklies_searchPlaceholder()}
-			label={msg.weeklies_searchPlaceholder()}
-			onsearch={(query) => onsearch(query)}
-			debounceMs={800}
-			placeholderEdit={placeholderProperty}
-		/>
-		<Editable edit={config.messageEdit?.('weeklies_exploreOne')} value={msg.weeklies_exploreOne()}>
-			{#snippet children(text, attrs)}<p class="explore" {...attrs}>{text}</p>{/snippet}
-		</Editable>
-		<div class="grid">
-			{#each weeklies as weekly (weekly.slug)}
-				<WeeklieCard {weekly} edit={edit?.weeklyFor?.(weekly)} />
-			{/each}
-		</div>
-	</section>
+		<section class="weeklies-band" aria-labelledby="weeklies-heading">
+			<div class="cluster cluster-top" aria-hidden="true">
+				<TileMosaic cols={3} rows={1} seed={53} density={1} />
+			</div>
+			<div class="inner">
+				<ThemeCollage {themes} {themeHref} editFor={edit?.themeFor}>
+					{#snippet lead()}
+						<Editable edit={edit?.copy?.('weeklies_heading')} value={content.weeklies_heading}>
+							{#snippet children(text, attrs)}
+								<h2 class="band-heading" id="weeklies-heading" {...attrs}>{text}</h2>
+							{/snippet}
+						</Editable>
+						<CopyIntro
+							text={content.weeklies_intro}
+							edit={edit?.copy?.('weeklies_intro')}
+							role="lede"
+						/>
+						<SearchInput
+							placeholder={msg.weeklies_searchPlaceholder()}
+							label={msg.weeklies_searchPlaceholder()}
+							onsearch={(query) => onsearch(query)}
+							debounceMs={800}
+							placeholderEdit={placeholderProperty}
+							shape="pill"
+						/>
+						<Editable
+							edit={config.messageEdit?.('weeklies_exploreOne')}
+							value={msg.weeklies_exploreOne()}
+						>
+							{#snippet children(text, attrs)}<p class="explore" {...attrs}>{text}</p>{/snippet}
+						</Editable>
+					{/snippet}
+				</ThemeCollage>
+				<p class="go">
+					<WordedLink text="weeklies_go" href="weeklies_goHref">
+						{#snippet link(href, text)}<ArrowLink {href} {text} />{/snippet}
+					</WordedLink>
+				</p>
+			</div>
+		</section>
 
-	<section class="know-more" aria-labelledby="know-more-heading">
-		<Editable edit={edit?.copy?.('know_more_heading')} value={content.know_more_heading}>
-			{#snippet children(text, attrs)}<h2 id="know-more-heading" {...attrs}>{text}</h2>{/snippet}
-		</Editable>
-		<div class="ctas">
-			<LinkEdit
-				text={{ edit: config.messageEdit?.('cta_meetTeam'), value: msg.cta_meetTeam() }}
-				href={{ descriptor: hrefProperty('cta_meetTeamHref'), value: msg.cta_meetTeamHref() }}
-			>
-				{#snippet control()}
-					<Link href={msg.cta_meetTeamHref()} class="cta">{msg.cta_meetTeam()}</Link>
-				{/snippet}
-			</LinkEdit>
-			<LinkEdit
-				text={{ edit: config.messageEdit?.('cta_contactUs'), value: msg.cta_contactUs() }}
-				href={{ descriptor: hrefProperty('cta_contactUsHref'), value: msg.cta_contactUsHref() }}
-			>
-				{#snippet control()}
-					<Link href={msg.cta_contactUsHref()} class="cta primary">{msg.cta_contactUs()}</Link>
-				{/snippet}
-			</LinkEdit>
-		</div>
-	</section>
+		<section class="know-more" aria-labelledby="know-more-heading">
+			<div class="cluster cluster-know" aria-hidden="true">
+				<TileMosaic cols={2} rows={1} seed={59} density={1} />
+			</div>
+			<div class="inner">
+				<Editable edit={edit?.copy?.('know_more_heading')} value={content.know_more_heading}>
+					{#snippet children(text, attrs)}
+						<h2 class="band-heading" id="know-more-heading" {...attrs}>{text}</h2>
+					{/snippet}
+				</Editable>
+				<CopyIntro
+					text={content.know_more_intro}
+					edit={edit?.copy?.('know_more_intro')}
+					role="lede"
+				/>
+				<ul class="ctas">
+					<li>
+						<WordedLink text="cta_meetTeam" href="cta_meetTeamHref">
+							{#snippet link(href, text)}<ArrowLink {href} {text} />{/snippet}
+						</WordedLink>
+					</li>
+					<li>
+						<WordedLink text="cta_contactUs" href="cta_contactUsHref">
+							{#snippet link(href, text)}<ArrowLink {href} {text} />{/snippet}
+						</WordedLink>
+					</li>
+				</ul>
+			</div>
+		</section>
+	</div>
 </PageShell>
 
 <style>
-	.hero {
-		display: grid;
-		grid-template-columns: auto 1fr auto;
-		align-items: center;
-		gap: var(--space-4);
-		padding-block: var(--space-6);
+	.after-splash {
+		position: relative;
+		background: var(--color-surface);
 	}
 
-	.hero-text {
-		text-align: center;
+	/* The shell is full width for the splash: each band runs edge to edge
+	   for the clusters at its left, and centres its content at the measure
+	   with its own gutter. */
+	.weeklies-band,
+	.know-more {
+		position: relative;
 	}
 
-	/* The one heading in the library that sets its own size: --text-hero is a
-	 * deliberate decision about the landing page. Every other page module
-	 * takes the h1/h2 scale from the host's global rules. */
-	h1 {
-		font-size: var(--text-hero);
-		margin-bottom: var(--space-3);
-	}
-
-	.hero-text p {
-		font-size: var(--text-lg);
-		color: var(--color-ink-secondary);
-		max-width: 44ch;
+	.inner {
+		position: relative;
+		max-width: var(--content-max);
 		margin-inline: auto;
+		padding-inline: var(--space-3);
+		box-sizing: border-box;
 	}
 
-	.see-all :global(a) {
-		color: var(--color-brand);
-		font-weight: 600;
-		text-decoration: none;
-	}
-
+	/* Room above the lead for the cluster at the band's top-left corner. */
 	.weeklies-band {
-		background: var(--color-band-grey);
-		border-radius: var(--radius-lg);
-		padding: var(--space-4);
-		margin-block: var(--space-5);
+		padding-block: calc(6rem + var(--space-4)) var(--space-5);
+	}
+
+	/* The bands' headings: large and light, in navy, like the design. */
+	.band-heading {
+		margin: 0 0 var(--space-2);
+		font-size: var(--text-2xl);
+		font-weight: 300;
+		line-height: 1.1;
+		color: var(--color-navy);
 	}
 
 	.explore {
-		color: var(--color-ink-secondary);
+		margin: var(--space-2) 0 0;
 		max-width: 60ch;
+		font-size: var(--text-sm);
+		font-weight: 300;
+		color: var(--color-navy);
 	}
 
-	.explore {
-		margin-top: var(--space-3);
+	.go {
+		margin: var(--space-4) 0 0;
+		text-align: right;
 	}
 
-	.grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
-		gap: var(--space-4);
+	/* The clusters: a few tiles flush with the page's left edge. */
+	.cluster {
+		position: absolute;
+		left: 0;
+		pointer-events: none;
+	}
+
+	.cluster-top {
+		top: 0;
+		width: 18rem;
+		height: 6rem;
+	}
+
+	/* Level with the «know more» heading, at the page's edge. */
+	.cluster-know {
+		top: var(--space-5);
+		width: 12rem;
+		height: 6rem;
 	}
 
 	.know-more {
-		text-align: center;
-		padding-block: var(--space-6);
+		padding-block: var(--space-5) var(--space-6);
+	}
+
+	/* The design indents this block past the cluster beside it. */
+	.know-more .inner {
+		padding-inline-start: calc(var(--space-3) + 12rem);
 	}
 
 	.ctas {
 		display: flex;
-		justify-content: center;
+		flex-direction: column;
 		gap: var(--space-3);
-		flex-wrap: wrap;
-	}
-
-	.ctas :global(a.cta) {
-		padding: var(--space-2) var(--space-5);
-		border: 2px solid var(--color-ink);
-		border-radius: var(--radius);
-		text-decoration: none;
-		font-weight: 600;
-		color: var(--color-ink);
-	}
-
-	.ctas :global(a.cta.primary) {
-		background: var(--color-brand);
-		border-color: var(--color-brand);
-		color: var(--color-surface);
+		margin: 0;
+		padding: 0;
+		list-style: none;
 	}
 
 	@media (max-width: 900px) {
-		.shapes {
+		.cluster {
 			display: none;
 		}
 
-		.hero {
-			grid-template-columns: 1fr;
+		.know-more .inner {
+			padding-inline-start: var(--space-3);
 		}
 	}
 </style>

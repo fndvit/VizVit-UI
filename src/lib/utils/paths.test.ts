@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { buildQueryString, isExternalUrl, isInternalPath, isPathUnder } from './paths.js';
+import {
+	buildQueryString,
+	isExternalUrl,
+	isInternalPath,
+	isPathUnder,
+	currentPage,
+	linkDoor
+} from './paths.js';
 
 /**
  * The four path helpers, and in particular the two DESTINATION CLASSIFIERS
@@ -89,5 +96,27 @@ describe('buildQueryString', () => {
 
 	it('encodes the values it is given', () => {
 		expect(buildQueryString({ q: 'a b&c' })).toBe('?q=a+b%26c');
+	});
+});
+
+describe('currentPage', () => {
+	it('marks a section current on its own path and under it, and Home on the root alone', () => {
+		const onWeekly = currentPage('/weeklies/una');
+		expect(onWeekly.isCurrent('/weeklies')).toBe(true);
+		expect(onWeekly.isCurrent('/')).toBe(false);
+		expect(onWeekly.isCurrent('/who-we-are')).toBe(false);
+		expect(currentPage('/').isCurrent('/')).toBe(true);
+		expect(currentPage('').isCurrent('/')).toBe(true);
+	});
+});
+
+describe('linkDoor', () => {
+	it('sends a site path through Link, an external URL out, and nothing else anywhere', () => {
+		expect(linkDoor('/what-we-do')).toBe('internal');
+		expect(linkDoor('https://example.org')).toBe('external');
+		expect(linkDoor('javascript:alert(1)')).toBe('none');
+		expect(linkDoor('data:text/html,x')).toBe('none');
+		expect(linkDoor(null)).toBe('none');
+		expect(linkDoor('')).toBe('none');
 	});
 });

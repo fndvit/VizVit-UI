@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { renderBody } from './richtext.js';
+import { renderBody, renderInline } from './richtext.js';
 
 describe('renderBody', () => {
 	it('splits paragraphs on blank lines', () => {
@@ -31,5 +31,33 @@ describe('renderBody', () => {
 
 	it('returns an empty list for empty input', () => {
 		expect(renderBody('')).toEqual([]);
+	});
+});
+
+describe('renderInline', () => {
+	it('turns a **pair** into a strong run between plain ones', () => {
+		expect(renderInline('La visualització pot **transformar** les dades.')).toEqual([
+			{ text: 'La visualització pot ', strong: false },
+			{ text: 'transformar', strong: true },
+			{ text: ' les dades.', strong: false }
+		]);
+	});
+
+	it('handles several pairs, including one at the very start and end', () => {
+		expect(renderInline('**A** i **B**')).toEqual([
+			{ text: 'A', strong: true },
+			{ text: ' i ', strong: false },
+			{ text: 'B', strong: true }
+		]);
+	});
+
+	it('keeps an unmatched or empty marker literal', () => {
+		expect(renderInline('un ** sol')).toEqual([{ text: 'un ** sol', strong: false }]);
+		expect(renderInline('buit **** aquí')).toEqual([{ text: 'buit **** aquí', strong: false }]);
+	});
+
+	it('returns one plain run for text without markers, and none for empty text', () => {
+		expect(renderInline('pla')).toEqual([{ text: 'pla', strong: false }]);
+		expect(renderInline('')).toEqual([]);
 	});
 });

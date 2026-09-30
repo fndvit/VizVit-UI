@@ -30,7 +30,9 @@ export type EditableEntity =
 	// ⚠ widening this union is a coordinated break for hosts with exhaustive
 	// maps over it (the CMS's editable-fields whitelist) — note the changelog.
 	| 'collaborators'
-	| 'site_links';
+	| 'site_links'
+	// 0.35.0: the home page's timeline areas (lab, education, tools).
+	| 'timeline_areas';
 
 /**
  * The identity of one editable string in the content model: a page copy

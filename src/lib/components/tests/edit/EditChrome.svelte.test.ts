@@ -198,6 +198,44 @@ describe('EditPanel rows', () => {
 		expect(input.getAttribute('data-vit-editing')).toBe('idle');
 	});
 
+	it('a nullable select offers «—» in its own list, choosing it saves null, and shows no second clear button', async () => {
+		const saveProperty = vi.fn(async () => {});
+		const nullableSelect: PropertyDescriptor = { ...selectDescriptor, nullable: true };
+		const { container } = render(ChromeProbe, {
+			props: {
+				adapter: fullAdapter({ saveProperty }),
+				spec: { label: 'Àrea', hasPanel: true },
+				rows: [{ descriptor: nullableSelect, value: 'lab' }]
+			}
+		});
+		openPanel(container);
+		await settle();
+
+		const select = container.querySelector<HTMLSelectElement>('select')!;
+		expect(select.options[0]?.value).toBe('');
+		expect(select.options[0]?.textContent).toBe('—');
+		expect(container.querySelector('button.aux')).toBeNull();
+		select.value = '';
+		select.dispatchEvent(new Event('change', { bubbles: true }));
+		await settle();
+		expect(saveProperty).toHaveBeenCalledWith(nullableSelect, null);
+	});
+
+	it('a select that is not nullable has no empty option', async () => {
+		const { container } = render(ChromeProbe, {
+			props: {
+				adapter: fullAdapter({}),
+				spec: { label: 'Àrea', hasPanel: true },
+				rows: [{ descriptor: selectDescriptor, value: 'lab' }]
+			}
+		});
+		openPanel(container);
+		await settle();
+		expect(
+			[...container.querySelectorAll('select option')].map((o) => o.getAttribute('value'))
+		).not.toContain('');
+	});
+
 	it('emptying a nullable row saves null; the clear affordance does too', async () => {
 		const saveProperty = vi.fn(async () => {});
 		const { container } = render(ChromeProbe, {

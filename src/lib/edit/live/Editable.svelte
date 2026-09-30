@@ -58,6 +58,20 @@
 
 	const active = $derived(edit !== undefined && (adapter?.isEditing ?? false));
 	const multiline = $derived(edit?.format === 'multiline' || edit?.format === 'richtext');
+	/**
+	 * Whether a caret is in the element. Exposed on the attrs as
+	 * `data-vit-caret` so a renderer of `**runs**` shows the source raw
+	 * exactly while the reader types — and the runs otherwise, edit mode or
+	 * not. Keyed on focus, not on `contenteditable`: that is on for as long
+	 * as edit mode is, and every run on the mirror showed its markers.
+	 */
+	let focused = $state(false);
+	/**
+	 * Bumped by Escape to rebuild the element from the saved value. Writing
+	 * `textContent` back would replace the text nodes the child's markup owns
+	 * (an `InlineText`'s runs), and they would not come back on blur.
+	 */
+	let generation = $state(0);
 
 	/** contenteditable text, innerText keeps line breaks; NBSPs become spaces. */
 	function textOf(element: HTMLElement): string {
@@ -99,7 +113,12 @@
 		await commit_.commit(draft, () => adapter.save(edit, draft));
 	}
 
+	function handleFocus(): void {
+		focused = true;
+	}
+
 	function handleBlur(event: FocusEvent): void {
+		focused = false;
 		const status = commit_.status;
 		if (status === 'dirty' || status === 'error') void commit(event.currentTarget as HTMLElement);
 	}
@@ -107,11 +126,13 @@
 	function handleKeydown(event: KeyboardEvent): void {
 		const element = event.currentTarget as HTMLElement;
 		if (event.key === 'Escape') {
-			// Svelte's cached text still equals renderText, so a state write
-			// alone cannot repaint a node the reader has mutated: restore the
-			// DOM directly, then settle.
-			element.textContent = commit_.saved;
+			// The reader has mutated the node; a state write alone cannot
+			// repaint it, so the element is rebuilt from the saved value — the
+			// runs with it — and the caret leaves.
 			commit_.revert();
+			renderText = commit_.saved;
+			focused = false;
+			generation += 1;
 			element.blur();
 			return;
 		}
@@ -132,6 +153,8 @@
 					'aria-label': edit?.label,
 					'aria-multiline': multiline ? 'true' : undefined,
 					'data-vit-editing': commit_.status,
+					...(focused ? { 'data-vit-caret': '' as const } : {}),
+					onfocus: handleFocus,
 					onbeforeinput: handleBeforeInput,
 					oninput: handleInput,
 					onblur: handleBlur,
@@ -142,7 +165,7 @@
 	);
 </script>
 
-{@render children(renderText, attrs)}
+{#key generation}{@render children(renderText, attrs)}{/key}
 {#if active}
 	<span class="status" role="status">{commit_.announcement}</span>
 {/if}

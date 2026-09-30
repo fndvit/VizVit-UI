@@ -117,6 +117,10 @@
 				commit();
 			}}
 		>
+			<!-- A nullable select says so in its own list: «—» shows an empty
+			     value truthfully and choosing it clears — one way to clear, so the
+			     separate clear button below is not offered for a select. -->
+			{#if descriptor.nullable}<option value="">—</option>{/if}
 			{#each descriptor.options ?? [] as option (option.value)}
 				<option value={option.value}>{option.label}</option>
 			{/each}
@@ -174,7 +178,7 @@
 		/>
 	{/if}
 
-	{#if descriptor.nullable && commit_.saved !== ''}
+	{#if descriptor.nullable && descriptor.type !== 'select' && commit_.saved !== ''}
 		<button
 			type="button"
 			class="aux"

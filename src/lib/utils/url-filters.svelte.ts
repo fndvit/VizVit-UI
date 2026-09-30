@@ -1,16 +1,16 @@
-import { buildQueryString } from './paths.js';
-
 export interface UrlFiltersConfig<T extends Record<string, unknown>> {
-	/** Unlocalized path the query string is appended to. */
-	path: string;
 	/**
 	 * The server-rendered values. A thunk so callers reference props in a
 	 * closure; read inside an effect, so it tracks them and re-seeds when a
 	 * navigation changes what the server sent.
 	 */
 	initial: () => T;
-	/** Which values ride the URL. Null/undefined/empty entries are dropped. */
-	toQuery: (values: T) => Record<string, string | null | undefined>;
+	/**
+	 * The URL for a set of values — the list's own contract builder
+	 * (`weekliesHref`, `transparencyHref`), so the params have one spelling
+	 * and this module never learns a path.
+	 */
+	href: (values: T) => string;
 	/** Runs after the URL is mirrored; omit for purely client-side filtering. */
 	onChange?: () => void;
 	/**
@@ -25,13 +25,6 @@ export interface UrlFiltersConfig<T extends Record<string, unknown>> {
 export interface UrlFilters<T extends Record<string, unknown>> {
 	/** Current filter values, for the controls to render. */
 	readonly values: T;
-	/**
-	 * The params riding the URL for the current values. Exposed so a caller
-	 * can build a URL that carries the filters plus something of its own —
-	 * the weeklies index adds a page number. What that extra means, and when
-	 * it survives a filter change, is the caller's rule.
-	 */
-	readonly query: Record<string, string | null | undefined>;
 	/** Applies a change, mirrors it into the URL, then notifies. */
 	update(patch: Partial<T>): void;
 }
@@ -76,12 +69,9 @@ export function createUrlFilters<T extends Record<string, unknown>>(
 		get values(): T {
 			return values;
 		},
-		get query(): Record<string, string | null | undefined> {
-			return config.toQuery(values);
-		},
 		update(patch: Partial<T>): void {
 			Object.assign(values, patch);
-			config.replaceUrl(`${config.path}${buildQueryString(config.toQuery(values))}`);
+			config.replaceUrl(config.href(values));
 			config.onChange?.();
 		}
 	};

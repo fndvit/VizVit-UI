@@ -5,10 +5,11 @@
 	import type { EditDescriptor } from '../../edit/types.js';
 	import Button from './Button.svelte';
 	import GhostButton from './GhostButton.svelte';
+	import InlineText from './InlineText.svelte';
 
 	/**
-	 * Renders the block mini-format (`## ` subheadings, blank-line paragraphs)
-	 * with real elements — never `{@html}`.
+	 * Renders the block mini-format (`## ` subheadings, blank-line paragraphs,
+	 * `**strong**` runs) with real elements — never `{@html}`.
 	 *
 	 * With an `edit` descriptor and an active adapter it offers a source
 	 * editor: the mini-format *is* the stored format, so a textarea over the
@@ -95,9 +96,9 @@
 		<div class="richtext preview" aria-label={config.editMessages.edit_preview()}>
 			{#each preview as block, index (index)}
 				{#if block.type === 'h2'}
-					<h2>{block.text}</h2>
+					<h2><InlineText text={block.text} /></h2>
 				{:else}
-					<p>{block.text}</p>
+					<p><InlineText text={block.text} /></p>
 				{/if}
 			{/each}
 		</div>
@@ -106,9 +107,9 @@
 	<div class="richtext">
 		{#each blocks as block, index (index)}
 			{#if block.type === 'h2'}
-				<h2>{block.text}</h2>
+				<h2><InlineText text={block.text} /></h2>
 			{:else}
-				<p>{block.text}</p>
+				<p><InlineText text={block.text} /></p>
 			{/if}
 		{/each}
 		{#if canEdit}

@@ -1,16 +1,12 @@
 import type { Locale } from '../config/types.js';
 import type { SortDirection, WeeklyCardData } from '../content/types.js';
-import { buildQueryString } from './paths.js';
 import { createUrlFilters } from './url-filters.svelte.js';
-import { WEEKLY_LIST_DEFAULTS } from './weekly-list-contract.js';
+import { weekliesHref } from './weekly-list-contract.js';
 import type {
 	WeeklyListFilters,
 	WeeklyListPage,
 	WeeklyListServerData
 } from './weekly-list-contract.js';
-
-/** The index's path, shared by the mirrored URL and the paging hrefs. */
-const WEEKLIES_PATH = '/weeklies';
 
 export interface WeeklyListConfig {
 	/** Reads the route's `data`; called inside an effect, so it tracks it. */
@@ -72,18 +68,14 @@ export function createWeeklyList(config: WeeklyListConfig): WeeklyList {
 	let loadError = $state(false);
 
 	const filters = createUrlFilters<WeeklyListFilters>({
-		path: WEEKLIES_PATH,
 		initial: () => ({ ...config.server().query }),
-		// A param is left out exactly when it holds the value the parse would
-		// have supplied anyway, so both sides read the same declaration —
-		// otherwise "oldest first" builds a link that reloads as newest-first.
-		toQuery: (values) => ({
-			q: values.q,
-			theme: values.theme,
-			sort: values.sort !== WEEKLY_LIST_DEFAULTS.sort ? values.sort : null
-		}),
-		onChange: () => void refresh(),
-		replaceUrl: config.replaceUrl
+		// The contract's builder leaves a param out exactly when it holds the
+		// value the parse would supply anyway, so both sides read the same
+		// declaration — otherwise "oldest first" builds a link that reloads
+		// as newest-first.
+		href: (values) => weekliesHref(values),
+		replaceUrl: config.replaceUrl,
+		onChange: () => void refresh()
 	});
 
 	$effect(() => {
@@ -149,10 +141,7 @@ export function createWeeklyList(config: WeeklyListConfig): WeeklyList {
 		 * the position within the old result set.
 		 */
 		hrefFor(page: number): string {
-			return `${WEEKLIES_PATH}${buildQueryString({
-				...filters.query,
-				page: page > WEEKLY_LIST_DEFAULTS.page ? String(page) : null
-			})}`;
+			return weekliesHref({ ...filters.values, page });
 		},
 		update(patch: Partial<WeeklyListFilters>): void {
 			filters.update(patch);
