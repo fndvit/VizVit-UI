@@ -8,6 +8,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 | Version                       | Released   | What it is                                                                               |
 | ----------------------------- | ---------- | ---------------------------------------------------------------------------------------- |
 | [Unreleased](./unreleased.md) | —          | On `main`, not yet in a tagged version                                                   |
+| [0.35.0](./0.35.0.md)         | 2026-09-30 | `SplashHero` and the `TimelineAreas` scrolly on the home page; `tools` category          |
 | [0.34.0](./0.34.0.md)         | 2026-09-28 | `TeamFigure` on the team page: eight per-member settings, the vocabulary on `./contract` |
 | [0.33.0](./0.33.0.md)         | 2026-09-28 | `FigureBody`, `FigureHead`, `PersonFigure`: a stick figure with a photo head             |
 | [0.32.2](./0.32.2.md)         | 2026-09-25 | `./madlib` metrics match the selector it was extracted from                              |
