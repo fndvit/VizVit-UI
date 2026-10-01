@@ -18,11 +18,14 @@
 		 * (a chrome key on the foundation site). Inert without an adapter.
 		 */
 		placeholderEdit?: PropertyDescriptor;
+		/** The box's shape: the control's corners, or a pill (the home page's). */
+		shape?: 'box' | 'pill';
 	}
 
 	const DEFAULT_DEBOUNCE_MS = 300;
 
 	let {
+		shape = 'box',
 		id = 'search-input',
 		value = '',
 		placeholder,
@@ -94,6 +97,7 @@
 		<input
 			{id}
 			class="control"
+			class:pill={shape === 'pill'}
 			type="search"
 			{placeholder}
 			bind:value={query}
@@ -107,5 +111,10 @@
 		width: 100%;
 		max-width: 24rem;
 		padding: var(--space-2) var(--space-3);
+	}
+
+	input.pill {
+		border-radius: 999px;
+		padding-inline: var(--space-3);
 	}
 </style>

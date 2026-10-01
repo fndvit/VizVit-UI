@@ -20,6 +20,8 @@
 		| 'content'
 		/** Full width, for content that is deliberately wider (the timeline). */
 		| 'wide'
+		/** Edge to edge with no gutter and no top rhythm: the home splash. */
+		| 'full'
 		/** A single editorial piece at the standard column width (a project). */
 		| 'article'
 		/** A single editorial piece at a long-form reading measure (a weekly). */
@@ -73,6 +75,7 @@
 	class="page"
 	class:reading={variant === 'reading'}
 	class:wide={variant === 'wide'}
+	class:full={variant === 'full'}
 	class:chrome={variant === 'chrome' || variant === 'form'}
 	class:stack={variant === 'form'}
 >
@@ -94,6 +97,13 @@
 	.wide {
 		max-width: none;
 		margin: 0;
+	}
+
+	/* The splash owns the top of the page: nothing between the nav and it. */
+	.full {
+		max-width: none;
+		margin: 0;
+		padding: 0;
 	}
 
 	.chrome {

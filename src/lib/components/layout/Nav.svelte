@@ -5,7 +5,8 @@
 	import LinkEdit from '../../edit/chrome/LinkEdit.svelte';
 	import { collectionEditing } from '../../edit/collection.svelte.js';
 	import type { CollectionRef, EditDescriptor } from '../../edit/types.js';
-	import { isPathUnder } from '../../utils/paths.js';
+	import { currentPage } from '../../utils/paths.js';
+	import BrandMark from '../ui/BrandMark.svelte';
 	import GhostButton from '../ui/GhostButton.svelte';
 	import Link from '../ui/Link.svelte';
 	import type { SiteLinkEditMap } from './site-link-edit.js';
@@ -61,9 +62,8 @@
 	// test) standing: nothing highlights, nothing crashes.
 	const currentUrl = $derived(url ?? config.url() ?? new URL('http://localhost/'));
 	const currentPath = $derived(config.canonicalPathname(currentUrl));
-
-	// /what-we-do stays current on /what-we-do/<slug>.
-	const isCurrent = (href: string): boolean => isPathUnder(currentPath, href);
+	const current = $derived(currentPage(currentPath));
+	const isCurrent = (href: string): boolean => current.isCurrent(href);
 
 	const MENU_TOGGLE_ID = 'site-menu-toggle';
 
@@ -92,7 +92,10 @@
 <header class="header">
 	<nav class="band-bar" aria-label={msg.nav_mainLabel()}>
 		<span class="logo">
-			<Link href="/" aria-label={msg.nav_home()}>{config.siteName}</Link>
+			<Link href="/" aria-label={msg.nav_home()}>
+				<BrandMark />
+				<span class="visually-hidden">{config.siteName}</span>
+			</Link>
 		</span>
 
 		<GhostButton
@@ -165,7 +168,13 @@
 </header>
 
 <style>
+	/* Always at the top: the page scrolls under it. Its height is what
+	   `--vit-splash-offset` names, so the splash and the timeline's stage
+	   size themselves under it. */
 	.header {
+		position: sticky;
+		top: 0;
+		z-index: var(--z-raised);
 		border-bottom: 1px solid var(--color-hairline);
 		background: var(--color-surface);
 	}
@@ -177,12 +186,11 @@
 		flex-wrap: wrap;
 	}
 
+	/* The mark at the nav's height; the name is in the link for screen readers. */
 	.logo :global(a) {
-		font-size: var(--text-xl);
-		font-weight: 700;
-		letter-spacing: 0.04em;
+		display: block;
+		width: 3rem;
 		text-decoration: none;
-		color: var(--color-ink);
 	}
 
 	.menu {

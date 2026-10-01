@@ -195,7 +195,8 @@ describe('Editable', () => {
 		type(element, 'Descartat');
 		element.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
 
-		await expect.poll(() => element.textContent).toBe('Hola');
+		// Escape rebuilds the element from the saved value: ask the page again.
+		await expect.poll(() => target(container).textContent).toBe('Hola');
 		expect(calls).toEqual([]);
 	});
 });

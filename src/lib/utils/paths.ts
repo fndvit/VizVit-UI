@@ -74,3 +74,30 @@ export function isInternalPath(href: string): boolean {
 export function isExternalUrl(href: string): boolean {
 	return /^(?:https?:)?\/\/[^/]/i.test(href);
 }
+
+/**
+ * Which link is the page the reader is on — the one rule Nav and Footer
+ * both mark `aria-current` by. `/what-we-do` stays current on
+ * `/what-we-do/<slug>`; Home is current on the root alone, since every path
+ * is under `/`. `path` is the canonical (unlocalized) pathname.
+ */
+export function currentPage(path: string): { path: string; isCurrent(href: string): boolean } {
+	return {
+		path,
+		isCurrent: (href) => (href === '/' ? path === '/' || path === '' : isPathUnder(path, href))
+	};
+}
+
+/**
+ * How a content link opens — the one rule every component that renders an
+ * editor's destination asks: a site path goes through the host's localizing
+ * `Link`, an external URL is a plain `rel="external noopener"` anchor, and
+ * anything else (`javascript:`, `data:`, a bare word) is no link at all.
+ */
+export type LinkDoor = 'internal' | 'external' | 'none';
+
+export function linkDoor(href: string | null | undefined): LinkDoor {
+	if (!href) return 'none';
+	if (isInternalPath(href)) return 'internal';
+	return isExternalUrl(href) ? 'external' : 'none';
+}

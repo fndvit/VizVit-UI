@@ -16,21 +16,27 @@ classes re-declared, as the website does — see the header of that file).
 
 ## Colors
 
-| Token                   | Website value | Role                                                 |
-| ----------------------- | ------------- | ---------------------------------------------------- |
-| `--color-brand`         | `#0899b1`     | brand fill: buttons, active states, edit affordances |
-| `--color-brand-light`   | `#5ac7d2`     | brand tint                                           |
-| `--color-navy`          | `#1f2a5e`     | secondary brand: hovers, navy buttons, admin rail    |
-| `--color-orange`        | `#eb6834`     | accent (reserved)                                    |
-| `--color-magenta`       | `#e87ba4`     | accent                                               |
-| `--color-cream`         | `#f6f1e7`     | warm band background, decor shapes                   |
-| `--color-band-grey`     | `#ececec`     | neutral band background                              |
-| `--color-ink`           | `#101418`     | primary text; overlay backdrops derive from it       |
-| `--color-ink-secondary` | `#475259`     | secondary text                                       |
-| `--color-ink-muted`     | `#7d868c`     | muted text, placeholders                             |
-| `--color-hairline`      | `#e3e7e9`     | separators                                           |
-| `--color-axis`          | `#c5cbcf`     | form-control borders (`.control`)                    |
-| `--color-surface`       | `#ffffff`     | cards, dialogs, button label on fills                |
+| Token                                             | Website value                           | Role                                                                                                                                                                                                   |
+| ------------------------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `--color-brand`                                   | `#e0005c`                               | brand fill: buttons, active states, edit affordances — the ViT mark's pink, deepened to read at AA                                                                                                     |
+| `--color-brand-light`                             | `#ff80b5`                               | brand tint (the mark at half strength)                                                                                                                                                                 |
+| `--color-navy`                                    | `#1f2a5e`                               | secondary brand: hovers, navy buttons, admin rail                                                                                                                                                      |
+| `--color-orange`                                  | `#eb6834`                               | accent (reserved)                                                                                                                                                                                      |
+| `--color-magenta`                                 | `#e87ba4`                               | accent                                                                                                                                                                                                 |
+| `--color-cream`                                   | `#f6f1e7`                               | warm band background, decor shapes                                                                                                                                                                     |
+| `--color-wine`                                    | `#9b2f5c`                               | the splash mosaic's fourth hue (`TileMosaic`)                                                                                                                                                          |
+| `--vit-brand-mark`                                | `#ff006a`                               | the ViT mark's pink (`BrandMark`: nav logo, splash)                                                                                                                                                    |
+| `--vit-splash-offset`                             | `3.75rem`                               | the nav's height, which `SplashHero` subtracts                                                                                                                                                         |
+| `--vit-rail-top` / `-step` / `-stack` / `-bottom` | `4rem` / `2.5rem` / `1.5rem` / `5.5rem` | the timeline rail's geometry (`TimelineAreas`): CSS places the nodes by them, JS reads them                                                                                                            |
+| (sheet) `site.css`                                | —                                       | the site's element rules (body text, page and section headings, images), scoped to `.vit-site`: the site puts the class on `<body>`, the CMS mirror on its wrapper — one owner, `:where()` specificity |
+| `--color-plum`                                    | `#662542`                               | the design's plum under a tinted photo and the collage mask                                                                                                                                            |
+| `--color-band-grey`                               | `#ececec`                               | neutral band background                                                                                                                                                                                |
+| `--color-ink`                                     | `#101418`                               | primary text; overlay backdrops derive from it                                                                                                                                                         |
+| `--color-ink-secondary`                           | `#475259`                               | secondary text                                                                                                                                                                                         |
+| `--color-ink-muted`                               | `#7d868c`                               | muted text, placeholders                                                                                                                                                                               |
+| `--color-hairline`                                | `#e3e7e9`                               | separators                                                                                                                                                                                             |
+| `--color-axis`                                    | `#c5cbcf`                               | form-control borders (`.control`)                                                                                                                                                                      |
+| `--color-surface`                                 | `#ffffff`                               | cards, dialogs, button label on fills                                                                                                                                                                  |
 
 ## Dataviz series
 

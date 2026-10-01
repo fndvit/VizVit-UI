@@ -3,6 +3,21 @@
 `import { … } from '@vit-foundation/ui/primitives'` — generic UI atoms,
 domain-free. All of them also re-export from the package root.
 
+## ArrowLink
+
+A link that is a short sentence and a long thin arrow — «To our **lab
+timeline** ⟶», «Go to **weeklies** ⟶», «Meet our **team** ⟶»: the wording
+with its `**runs**` bold (`InlineText`), the arrow drawn in the text's colour
+and lengthening under the pointer. One primitive for every such link, so they
+all read the same. Props: `href`, `text`.
+
+## BrandMark
+
+The ViT mark — the six strokes of the wordmark at their own opacities, in
+`--vit-brand-mark` — scaling with its box. Decorative unless `title` names it
+(then `role="img"`). Props: `title?`, `class?`. The nav's logo and the splash's
+wordmark.
+
 ## Button
 
 Button (or anchor styled as one) in the brand style. Two prop branches that
@@ -77,8 +92,11 @@ The `<h3>` a card titles itself with; children may be plain text or a Link.
 
 ## CopyIntro
 
-Editorial intro paragraph (muted, 60ch measure).
-Props: `text: string`, `edit?: EditDescriptor`.
+Editorial intro paragraph, in one of two roles: `intro` (muted, 60ch
+measure) or `lede` (light, navy, 36ch — the band lede under a large light
+heading, the home page's). Renders `**runs**` as `<strong>`, raw while a
+caret is in it. Props: `text: string`, `edit?: EditDescriptor`,
+`role?: 'intro' | 'lede'`.
 
 ## DateText
 
@@ -90,6 +108,28 @@ Props: `value: string` — ISO date or timestamp.
 
 The brand's decorative corner composition (static SVG, `aria-hidden`).
 Props: `flip?: boolean`.
+
+## ImageCollage
+
+Up to four pictures as one composition in a fixed frame: the first large on
+the left, two small ones stacked in the column beside it, the fourth further
+right and a row lower, the design's placement. A fifth and later are not
+shown; one, two and three each have a layout, so no count leaves a hole. A
+picture with an `href` is a link to it — an internal path through `Link`, an
+https URL as an outbound anchor, anything else a plain picture — and says so
+under the pointer: a navy mask covers the blurred picture and names where it
+leads, `timeline_toProject` with the picture's `label` in bold (the
+`linkLabel` when it has none). Props: `images: { url; href?; label?; alt? }[]`,
+`alt?` (on the large image only; the rest are decorative), `linkLabel?`
+(«Read more» by default).
+
+## InlineText
+
+A paragraph's runs as real elements: `**text**` in the source is a
+`<strong>`. Renders no element of its own — the caller owns the `<p>` — so it
+drops into an `Editable` snippet; pass `raw={'contenteditable' in attrs}`
+there, because a live editor reads the draft back as `innerText` and a
+`<strong>` run would commit without its markers. Props: `text`, `raw?`.
 
 ## FilterChips
 
@@ -181,18 +221,40 @@ ancestor with `overflow: hidden` clips it. Tokens: `--vit-figure-width`,
 
 ## RichText
 
-Renders the block mini-format (`## ` subheadings, blank-line paragraphs) with
-real elements — never `{@html}`. With `edit` (format `'richtext'`) and an
+Renders the block mini-format (`## ` subheadings, blank-line paragraphs,
+`**strong**` runs) with real elements — never `{@html}`. With `edit` (format `'richtext'`) and an
 active adapter it offers a source editor with live preview.
 Props: `body: string`, `edit?: EditDescriptor`. Parse with the exported
 `renderBody(body)` if you need the blocks yourself.
+
+## TileMosaic
+
+The brand's geometric mosaic: a grid of squares, quarter and half circles,
+triangles, discs and hatched squares in navy, magenta, cream and wine
+(`--color-wine`). Décor, `aria-hidden`, and deterministic from `seed` — the
+same seed draws the same picture on the server and in the browser. Fills its
+container (`slice`). Props: `cols?` (8), `rows?` (5), `seed?` (1), `density?`
+(0.8, the share of cells that draw a tile), `focus?` (a denser cluster around
+one cell, falling off over a radius), `clear?` (rectangles in cell units
+that draw nothing — a cell any part of a zone touches stays empty, so text
+laid over the mosaic never meets a tile) and `arrive?` (an entrance: each
+tile is born a way in towards the focus, turned and small, and travels out
+to its place with a little overshoot, in waves from the centre — pure CSS
+from the server's markup, so it starts with the first paint). Under the
+pointer a tile turns a quarter at once and takes the next hue of the
+palette, a disc swells, the hatching flips its stripes, and it settles back
+slowly, so a hand passing over leaves a wake of turned tiles returning one
+after another — the paces are `--vit-tile-turn` (260ms) and
+`--vit-tile-settle` (1600ms), set on the svg or any ancestor; the pointer is
+felt by an unseen, still cell, never by the shape that turns, so nothing
+flickers; none of it moves under `prefers-reduced-motion`.
 
 ## SearchInput
 
 Debounced `role="search"` box with echo-detection (a caller writing the
 emitted value back mid-debounce doesn't clobber typing).
 Props: `placeholder`, `label`, `onsearch(query)`, `value?`, `id?`,
-`debounceMs?` (300).
+`debounceMs?` (300), `shape?` (`box` | `pill`).
 
 ## ShareRow
 

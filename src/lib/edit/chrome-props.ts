@@ -32,6 +32,13 @@ export interface EditableAttrs {
 	'aria-label'?: string;
 	'aria-multiline'?: 'true';
 	'data-vit-editing'?: 'idle' | 'dirty' | 'saving' | 'error';
+	/**
+	 * Present only while a caret is in the element — the one signal a run
+	 * renderer (`InlineText`) reads to show the source raw: `contenteditable`
+	 * is on for as long as edit mode is, which is not "being edited".
+	 */
+	'data-vit-caret'?: '';
+	onfocus?: (event: FocusEvent) => void;
 	onbeforeinput?: (event: InputEvent) => void;
 	oninput?: (event: Event) => void;
 	onblur?: (event: FocusEvent) => void;

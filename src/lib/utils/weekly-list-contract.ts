@@ -1,3 +1,4 @@
+import { buildQueryString } from './paths.js';
 import type { SortDirection, WeeklyCardData } from '../content/types.js';
 
 /**
@@ -74,6 +75,33 @@ export interface WeeklyListServerData {
  * zod fields, and nothing said they were these four.
  */
 export const WEEKLY_LIST_PARAMS = ['q', 'theme', 'sort', 'page'] as const;
+
+/** The index's path, which a host's localized router prefixes. */
+export const WEEKLIES_PATH = '/weeklies';
+
+/**
+ * The WRITE half: a link to the index, filtered. The read half below had an
+ * owner; links were still built by hand in three repositories (`?q=` from
+ * the home page's search on the site and in the CMS mirror, `?theme=` from
+ * the home collage), so a renamed param could not fail anywhere. `base` is
+ * the path to append to — the contract's own by default; the home page
+ * passes the editable `weeklies_goHref`, so its theme links and its «go to
+ * weeklies» agree. A page at the default is not written.
+ */
+export function weekliesHref(
+	filters: Partial<WeeklyListFilters> & { page?: number },
+	base = WEEKLIES_PATH
+): string {
+	return `${base}${buildQueryString({
+		q: filters.q || null,
+		theme: filters.theme ?? null,
+		sort: filters.sort && filters.sort !== WEEKLY_LIST_DEFAULTS.sort ? filters.sort : null,
+		page:
+			filters.page !== undefined && filters.page > WEEKLY_LIST_DEFAULTS.page
+				? String(filters.page)
+				: null
+	})}`;
+}
 
 /**
  * The READ half of the weeklies URL contract — what a URL this package wrote

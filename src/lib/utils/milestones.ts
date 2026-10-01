@@ -17,7 +17,8 @@ export const MILESTONE_CATEGORY_COLOR: Record<MilestoneCategory, string> = {
 	lab: 'var(--series-2)',
 	education: 'var(--series-3)',
 	collaboration: 'var(--series-4)',
-	press: 'var(--series-5)'
+	press: 'var(--series-5)',
+	tools: 'var(--series-6)'
 };
 
 /**
@@ -52,5 +53,7 @@ export function milestoneCategoryLabel(category: MilestoneCategory, messages: Ui
 			return messages.category_collaboration();
 		case 'press':
 			return messages.category_press();
+		case 'tools':
+			return messages.category_tools();
 	}
 }

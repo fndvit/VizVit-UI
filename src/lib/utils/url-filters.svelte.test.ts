@@ -1,5 +1,6 @@
 import { flushSync } from 'svelte';
 import { describe, expect, it, vi } from 'vitest';
+import { transparencyHref } from './milestone-list-contract.js';
 import { createUrlFilters } from './url-filters.svelte.js';
 
 /**
@@ -23,9 +24,8 @@ function setup(options: { onChange?: () => void } = {}) {
 
 	const stop = $effect.root(() => {
 		filters = createUrlFilters<Filters>({
-			path: '/transparency',
 			initial: () => server,
-			toQuery: (values) => ({ q: values.q, category: values.category }),
+			href: (values) => transparencyHref(values),
 			onChange: options.onChange,
 			replaceUrl: (path) => urls.push(path)
 		});
@@ -61,17 +61,6 @@ describe('createUrlFilters', () => {
 
 		expect(h.filters.values).toEqual({ q: 'pressupost', category: 'finances' });
 		expect(h.urls).toEqual(['/transparency?q=pressupost&category=finances']);
-		h.stop();
-	});
-
-	it('exposes the params riding the URL so a caller can add its own', () => {
-		// The weeklies index appends a page number to these; what that means,
-		// and when it survives a filter change, is the caller's rule.
-		const h = setup();
-
-		h.filters.update({ q: 'pressupost' });
-
-		expect(h.filters.query).toEqual({ q: 'pressupost', category: null });
 		h.stop();
 	});
 

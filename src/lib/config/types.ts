@@ -65,6 +65,8 @@ export interface UiMessages {
 	account_navLabel(): string;
 	lang_switcherLabel(): string;
 	footer_rights(): string;
+	/** The foundation's name beside the mark in the footer, with `**bold**` runs. */
+	footer_name(): string;
 	jobs_empty(): string;
 	jobs_newsletterNudge(): string;
 	login_title(): string;
@@ -108,6 +110,8 @@ export interface UiMessages {
 	account_error_unavailable(): string;
 	newsletter_title(): string;
 	newsletter_intro(): string;
+	/** The privacy line under the newsletter's way in. */
+	newsletter_privacy(): string;
 	newsletter_promptLoggedOut(): string;
 	newsletter_subscribedNote(): string;
 	comments_title(): string;
@@ -147,6 +151,17 @@ export interface UiMessages {
 	category_education(): string;
 	category_collaboration(): string;
 	category_press(): string;
+	category_tools(): string;
+	/** The splash hero's «Scroll» hint under the mouse icon. */
+	hero_scrollHint(): string;
+	/** Accessible name of the home page's area timeline (the scrolly). */
+	timeline_areasLabel(): string;
+	/** «To our **{area} timeline**», the link under each area's paragraph; may carry `**` runs. */
+	timeline_toArea(params: { area: string }): string;
+	/** «To our full timeline →», the scrolly's closing link (paired with `common_seeAllHref`). */
+	timeline_toFull(): string;
+	/** «To the {project} project», the mask over a collage picture that leads to one. */
+	timeline_toProject(params: { project: string }): string;
 	/**
 	 * The wording the PAGE MODULES read (`components/pages/*`), REQUIRED like
 	 * every key but the *Href pair above.
@@ -173,6 +188,9 @@ export interface UiMessages {
 	cta_contactUsHref(): string;
 	weeklies_searchPlaceholder(): string;
 	weeklies_exploreOne(): string;
+	/** The home page's «Go to **weeklies**» link, with `**bold**` runs, and where it goes. */
+	weeklies_go(): string;
+	weeklies_goHref(): string;
 	weeklies_filterLabel(): string;
 	weeklies_searchResultsLabel(): string;
 	weeklies_loadError(): string;

@@ -47,10 +47,13 @@ toggle, data export link, logout, and the danger-zone deletion. Props:
 
 ## NewsletterSignup
 
-The site-wide newsletter band. Logged out it routes to the auth pages
-carrying the intent; subscribed it links to /account; otherwise it renders
-the one-click subscribe form. Props: `account?: { displayName,
-newsletterSubscribed } | null`, `newsletterToggleForm`.
+The site-wide newsletter band: a white card over a mosaic of big tiles in
+navy, the mark's pink and cream — the heading and the blurb side by side,
+then the way in, then the privacy line (`newsletter_privacy`). Logged out it
+routes to the auth pages carrying the intent, as two pills; subscribed it
+links to /account; otherwise it renders the one-click subscribe form. Props:
+`account?: { displayName, newsletterSubscribed } | null`,
+`newsletterToggleForm`.
 
 ## CommentSection
 

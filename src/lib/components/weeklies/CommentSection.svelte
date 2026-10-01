@@ -9,10 +9,10 @@
 </script>
 
 <script lang="ts">
+	import { AUTH_PATHS } from '../../forms/transport.js';
 	import { getUiConfig } from '../../config/context.js';
 	import ActionLabel from '../../edit/ActionLabel.svelte';
-	import LinkEdit from '../../edit/chrome/LinkEdit.svelte';
-	import { chromeProperty } from '../../edit/helpers.js';
+	import WordedLink from '../../edit/chrome/WordedLink.svelte';
 	import Editable from '../../edit/Editable.svelte';
 	import { COMMENT_BODY } from '../../forms/constraints.js';
 	import type { CommentData, CommentThreadData } from '../../content/types.js';
@@ -54,14 +54,6 @@
 	const main = $derived(commentForm);
 
 	const errorMessages = $derived({ unauthenticated: msg.comments_loginPrompt() });
-
-	// Optional catalog keys; hosts without them keep the built-in paths.
-	const signupHref = $derived(msg.comments_signupLinkHref?.() ?? '/signup');
-	const loginHref = $derived(msg.comments_loginLinkHref?.() ?? '/login');
-	const hrefProperty = (key: string) =>
-		config.messageEdit
-			? chromeProperty(key, { type: 'text', label: config.editMessages.edit_linkUrl() })
-			: undefined;
 </script>
 
 {#snippet commentMeta(comment: CommentData)}
@@ -190,22 +182,22 @@
 			>
 				{#snippet children(text, attrs)}<span {...attrs}>{text}</span>{/snippet}
 			</Editable>
-			<LinkEdit
-				text={{ edit: config.messageEdit?.('comments_loginLink'), value: msg.comments_loginLink() }}
-				href={{ descriptor: hrefProperty('comments_loginLinkHref'), value: loginHref }}
+			<!-- Optional catalog keys; hosts without them keep the built-in paths. -->
+			<WordedLink
+				text="comments_loginLink"
+				href="comments_loginLinkHref"
+				fallback={AUTH_PATHS.login}
 			>
-				{#snippet control()}<Link href={loginHref}>{msg.comments_loginLink()}</Link>{/snippet}
-			</LinkEdit>
+				{#snippet link(href, text)}<Link {href}>{text}</Link>{/snippet}
+			</WordedLink>
 			·
-			<LinkEdit
-				text={{
-					edit: config.messageEdit?.('comments_signupLink'),
-					value: msg.comments_signupLink()
-				}}
-				href={{ descriptor: hrefProperty('comments_signupLinkHref'), value: signupHref }}
+			<WordedLink
+				text="comments_signupLink"
+				href="comments_signupLinkHref"
+				fallback={AUTH_PATHS.signup}
 			>
-				{#snippet control()}<Link href={signupHref}>{msg.comments_signupLink()}</Link>{/snippet}
-			</LinkEdit>
+				{#snippet link(href, text)}<Link {href}>{text}</Link>{/snippet}
+			</WordedLink>
 		</p>
 	{/if}
 </section>
