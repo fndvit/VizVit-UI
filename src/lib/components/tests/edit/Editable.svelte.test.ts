@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import type { EditAdapter, EditDescriptor } from '../../../edit/types.js';
 import EditableProbe from './EditableProbe.svelte';
+// The edit affordance's styles: the empty placeholder is printed there.
+import '../../../styles/base.css';
 
 const descriptor: EditDescriptor = {
 	ref: { kind: 'page-copy', page: 'home', sectionKey: 'hero_title' },
@@ -199,6 +201,62 @@ describe('Editable', () => {
 		await expect.poll(() => target(container).textContent).toBe('Hola');
 		expect(calls).toEqual([]);
 	});
+
+	it('shows a placeholder on an empty block, so there is something to see and click', () => {
+		const { container } = render(EditableProbe, {
+			props: { value: '', edit: descriptor, adapter: adapterWith(() => Promise.resolve()) }
+		});
+
+		const element = target(container);
+		expect(element.getAttribute('data-vit-empty')).toBe('Buit — clica per escriure');
+		// Printed by base.css, not written into the node: the draft stays empty.
+		expect(getComputedStyle(element, '::before').content).toBe('"Buit — clica per escriure"');
+		expect(element.textContent).toBe('');
+	});
+
+	it('drops the placeholder as soon as the reader types, and it never reaches the draft', async () => {
+		const calls: SaveCall[] = [];
+		const { container } = render(EditableProbe, {
+			props: {
+				value: '',
+				edit: descriptor,
+				adapter: adapterWith(async (d, v) => {
+					calls.push({ descriptor: d, value: v });
+				})
+			}
+		});
+
+		const element = target(container);
+		type(element, 'Primer text');
+		await expect.poll(() => element.hasAttribute('data-vit-empty')).toBe(false);
+		element.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+
+		await expect.poll(() => calls).toEqual([{ descriptor, value: 'Primer text' }]);
+	});
+
+	it('brings the placeholder back when Escape reverts a draft to empty', async () => {
+		const { container } = render(EditableProbe, {
+			props: { value: '', edit: descriptor, adapter: adapterWith(() => Promise.resolve()) }
+		});
+
+		type(target(container), 'Descartat');
+		await expect.poll(() => target(container).hasAttribute('data-vit-empty')).toBe(false);
+		target(container).dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+
+		await expect.poll(() => target(container).hasAttribute('data-vit-empty')).toBe(true);
+	});
+
+	it('shows no placeholder on a block with text, nor outside edit mode', () => {
+		const withText = render(EditableProbe, {
+			props: { value: 'Hola', edit: descriptor, adapter: adapterWith(() => Promise.resolve()) }
+		});
+		expect(target(withText.container).hasAttribute('data-vit-empty')).toBe(false);
+
+		const readOnly = render(EditableProbe, {
+			props: { value: '', edit: descriptor, adapter: null }
+		});
+		expect(target(readOnly.container).hasAttribute('data-vit-empty')).toBe(false);
+	});
 });
 
 describe('editMessages', () => {
@@ -228,6 +286,7 @@ describe('editMessages', () => {
 					edit_draftBadge: () => 'Esborrany (proves)',
 					edit_clearValue: () => 'x',
 					edit_emptyRequired: () => 'x',
+					edit_emptyPlaceholder: () => 'x',
 					edit_editLink: () => 'x',
 					edit_linkText: () => 'x',
 					edit_linkUrl: () => 'x',

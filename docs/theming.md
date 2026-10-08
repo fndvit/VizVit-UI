@@ -25,7 +25,8 @@ Utility classes the components rely on, plus the edit-mode affordance:
 - `.control` — the shared form-control border/radius/background skin
 - `.form-stack` / `.actions` / `.divider` / `.subsection-heading` — form and
   section rhythm
-- `[data-vit-editing]` (+ `='saving'`, `='error'`) — the inline-edit outline;
+- `[data-vit-editing]` (+ `='saving'`, `='error'`) and `[data-vit-empty]` (the
+  placeholder an empty block prints in edit mode) — the inline-edit outline;
   global because the editable element is rendered by the consuming
   component's own markup, which scoped styles cannot reach
 

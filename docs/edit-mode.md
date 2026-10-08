@@ -341,6 +341,13 @@ in the error outline so nothing typed is lost. State is announced through a
 visually-hidden `role="status"` region (Desant… / Desat / Error en desar).
 The outline styles live in `base.css` under `[data-vit-editing]` — import it.
 
+A block with no text — a row the CMS has not written yet — carries
+`data-vit-empty`, whose value is `editMessages.edit_emptyPlaceholder()`
+(«Buit — clica per escriure»). `base.css` prints it with `::before`, faded,
+inside a faint ring, so the block has something to see and click. It is
+not in the node's text, so it never reaches the draft, and it goes with the
+first keystroke.
+
 A card title being edited renders as plain text instead of its link: a
 contenteditable inside an anchor still navigates on click.
 

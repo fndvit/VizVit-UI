@@ -56,6 +56,24 @@
 		if (adopted !== null) renderText = adopted;
 	});
 
+	/**
+	 * Whether the element holds no text — a block whose row has none yet.
+	 * Exposed as `data-vit-empty`, carrying the placeholder base.css prints
+	 * with `::before`: an empty h1 or p shows nothing, so in edit mode there
+	 * was nothing to see or point at. Read from the DOM while the reader
+	 * types (the draft lives there), from the rendered value otherwise.
+	 */
+	let empty = $derived(isBlank(renderText));
+
+	function isBlank(text: string): boolean {
+		return text.trim() === '';
+	}
+
+	/** While the reader types the draft is in the DOM, not in `renderText`. */
+	function syncEmpty(element: HTMLElement): void {
+		empty = isBlank(textOf(element));
+	}
+
 	const active = $derived(edit !== undefined && (adapter?.isEditing ?? false));
 	const multiline = $derived(edit?.format === 'multiline' || edit?.format === 'richtext');
 	/**
@@ -94,10 +112,12 @@
 		range.deleteContents();
 		range.insertNode(document.createTextNode(multiline ? text : text.replace(/\s*\n\s*/g, ' ')));
 		selection.collapseToEnd();
+		syncEmpty(event.currentTarget as HTMLElement);
 		commit_.markDirty();
 	}
 
-	function handleInput(): void {
+	function handleInput(event: Event): void {
+		syncEmpty(event.currentTarget as HTMLElement);
 		commit_.markDirty();
 	}
 
@@ -131,6 +151,10 @@
 			// runs with it — and the caret leaves.
 			commit_.revert();
 			renderText = commit_.saved;
+			// Not redundant with the $derived: when the saved text equals the
+			// rendered one, the assignment above changes nothing, the derived
+			// does not re-run, and the value typing wrote into `empty` stays.
+			empty = isBlank(renderText);
 			focused = false;
 			generation += 1;
 			element.blur();
@@ -154,6 +178,7 @@
 					'aria-multiline': multiline ? 'true' : undefined,
 					'data-vit-editing': commit_.status,
 					...(focused ? { 'data-vit-caret': '' as const } : {}),
+					...(empty ? { 'data-vit-empty': config.editMessages.edit_emptyPlaceholder() } : {}),
 					onfocus: handleFocus,
 					onbeforeinput: handleBeforeInput,
 					oninput: handleInput,

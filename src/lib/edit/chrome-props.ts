@@ -38,6 +38,12 @@ export interface EditableAttrs {
 	 * is on for as long as edit mode is, which is not "being edited".
 	 */
 	'data-vit-caret'?: '';
+	/**
+	 * Present only while the element holds no text, carrying the placeholder
+	 * base.css prints in its place — so an empty block still has a box to
+	 * see and click.
+	 */
+	'data-vit-empty'?: string;
 	onfocus?: (event: FocusEvent) => void;
 	onbeforeinput?: (event: InputEvent) => void;
 	oninput?: (event: Event) => void;
