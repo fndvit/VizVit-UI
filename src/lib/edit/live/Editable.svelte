@@ -63,7 +63,16 @@
 	 * was nothing to see or point at. Read from the DOM while the reader
 	 * types (the draft lives there), from the rendered value otherwise.
 	 */
-	let empty = $derived(renderText.trim() === '');
+	let empty = $derived(isBlank(renderText));
+
+	function isBlank(text: string): boolean {
+		return text.trim() === '';
+	}
+
+	/** While the reader types the draft is in the DOM, not in `renderText`. */
+	function syncEmpty(element: HTMLElement): void {
+		empty = isBlank(textOf(element));
+	}
 
 	const active = $derived(edit !== undefined && (adapter?.isEditing ?? false));
 	const multiline = $derived(edit?.format === 'multiline' || edit?.format === 'richtext');
@@ -103,12 +112,12 @@
 		range.deleteContents();
 		range.insertNode(document.createTextNode(multiline ? text : text.replace(/\s*\n\s*/g, ' ')));
 		selection.collapseToEnd();
-		empty = textOf(event.currentTarget as HTMLElement).trim() === '';
+		syncEmpty(event.currentTarget as HTMLElement);
 		commit_.markDirty();
 	}
 
 	function handleInput(event: Event): void {
-		empty = textOf(event.currentTarget as HTMLElement).trim() === '';
+		syncEmpty(event.currentTarget as HTMLElement);
 		commit_.markDirty();
 	}
 
@@ -142,7 +151,10 @@
 			// runs with it — and the caret leaves.
 			commit_.revert();
 			renderText = commit_.saved;
-			empty = renderText.trim() === '';
+			// Not redundant with the $derived: when the saved text equals the
+			// rendered one, the assignment above changes nothing, the derived
+			// does not re-run, and the value typing wrote into `empty` stays.
+			empty = isBlank(renderText);
 			focused = false;
 			generation += 1;
 			element.blur();

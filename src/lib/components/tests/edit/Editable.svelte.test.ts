@@ -234,6 +234,18 @@ describe('Editable', () => {
 		await expect.poll(() => calls).toEqual([{ descriptor, value: 'Primer text' }]);
 	});
 
+	it('brings the placeholder back when Escape reverts a draft to empty', async () => {
+		const { container } = render(EditableProbe, {
+			props: { value: '', edit: descriptor, adapter: adapterWith(() => Promise.resolve()) }
+		});
+
+		type(target(container), 'Descartat');
+		await expect.poll(() => target(container).hasAttribute('data-vit-empty')).toBe(false);
+		target(container).dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+
+		await expect.poll(() => target(container).hasAttribute('data-vit-empty')).toBe(true);
+	});
+
 	it('shows no placeholder on a block with text, nor outside edit mode', () => {
 		const withText = render(EditableProbe, {
 			props: { value: 'Hola', edit: descriptor, adapter: adapterWith(() => Promise.resolve()) }
