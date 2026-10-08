@@ -36,6 +36,8 @@ export interface EditMessages {
 	edit_draftBadge(): string;
 	edit_clearValue(): string;
 	edit_emptyRequired(): string;
+	/** What an inline-editable block with no text shows in edit mode. */
+	edit_emptyPlaceholder(): string;
 	/** The link modal: one dialog edits a link's text and destination. */
 	edit_editLink(params: { label: string }): string;
 	edit_linkText(): string;
@@ -75,6 +77,7 @@ export const defaultEditMessages: EditMessages = {
 	edit_draftBadge: () => 'Esborrany',
 	edit_clearValue: () => 'Buida el valor',
 	edit_emptyRequired: () => 'Aquest camp no pot quedar buit',
+	edit_emptyPlaceholder: () => 'Buit — clica per escriure',
 	edit_editLink: ({ label }) => `Edita l’enllaç «${label}»`,
 	edit_linkText: () => 'Text',
 	edit_linkUrl: () => 'Adreça',

@@ -113,6 +113,19 @@
 	opacity: 0.6;
 }
 
+/* A block with no text yet: the placeholder gives it a box to see and
+   click, and a dashed-looking ring says it is waiting to be written. The
+   pseudo-element is not in innerText, so it never reaches a draft. */
+[data-vit-empty] {
+	box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 35%, transparent);
+}
+
+[data-vit-empty]::before {
+	content: attr(data-vit-empty);
+	font-style: italic;
+	opacity: 0.55;
+}
+
 /* A failed save must be seen without pointing at it. */
 [data-vit-editing='error'] {
 	box-shadow: inset 0 0 0 2px var(--series-8);

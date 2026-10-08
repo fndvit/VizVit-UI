@@ -56,6 +56,15 @@
 		if (adopted !== null) renderText = adopted;
 	});
 
+	/**
+	 * Whether the element holds no text — a block whose row has none yet.
+	 * Exposed as `data-vit-empty`, carrying the placeholder base.css prints
+	 * with `::before`: an empty h1 or p shows nothing, so in edit mode there
+	 * was nothing to see or point at. Read from the DOM while the reader
+	 * types (the draft lives there), from the rendered value otherwise.
+	 */
+	let empty = $derived(renderText.trim() === '');
+
 	const active = $derived(edit !== undefined && (adapter?.isEditing ?? false));
 	const multiline = $derived(edit?.format === 'multiline' || edit?.format === 'richtext');
 	/**
@@ -94,10 +103,12 @@
 		range.deleteContents();
 		range.insertNode(document.createTextNode(multiline ? text : text.replace(/\s*\n\s*/g, ' ')));
 		selection.collapseToEnd();
+		empty = textOf(event.currentTarget as HTMLElement).trim() === '';
 		commit_.markDirty();
 	}
 
-	function handleInput(): void {
+	function handleInput(event: Event): void {
+		empty = textOf(event.currentTarget as HTMLElement).trim() === '';
 		commit_.markDirty();
 	}
 
@@ -131,6 +142,7 @@
 			// runs with it — and the caret leaves.
 			commit_.revert();
 			renderText = commit_.saved;
+			empty = renderText.trim() === '';
 			focused = false;
 			generation += 1;
 			element.blur();
@@ -154,6 +166,7 @@
 					'aria-multiline': multiline ? 'true' : undefined,
 					'data-vit-editing': commit_.status,
 					...(focused ? { 'data-vit-caret': '' as const } : {}),
+					...(empty ? { 'data-vit-empty': config.editMessages.edit_emptyPlaceholder() } : {}),
 					onfocus: handleFocus,
 					onbeforeinput: handleBeforeInput,
 					oninput: handleInput,
