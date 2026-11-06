@@ -110,6 +110,18 @@ asset; pass `overlay` to replace it.
 The elements are keyed on their sources and recreated when those change:
 swapping the `<source>` children of a live `<video>` otherwise has no effect.
 
+On Apple's WebKit — Safari on a Mac, and every browser on an iPhone or iPad —
+the webm `<source>` is left out and the element plays the "safe" mp4. Those
+engines say they can play `video/webm`, so they pick the VP9 source first; they
+ignore its alpha channel — Safari 18 on a Mac paints the transparent area
+opaque white, older WebKit never plays the clip — and a `<video>` never falls
+back once it has chosen. There is no feature
+test for transparent VP9: the engine comes from the user agent
+(`isAppleWebKit`), read once the component is on the page. The server still
+renders all three sources, and a WebKit client rebuilds the elements without
+the webm right after mount — one extra element setup, on that engine only.
+Other browsers are untouched.
+
 ## ScrollyStepIndicator
 
 The row (or column) of dots showing which step the reader is on, optionally

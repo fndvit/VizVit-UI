@@ -83,6 +83,53 @@ describe('CrossfadeVideo sources', () => {
 	});
 });
 
+describe('CrossfadeVideo on Apple WebKit', () => {
+	const SAFARI_MAC =
+		'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15';
+
+	/** Makes the test browser report a user agent, and hands back the undo. */
+	function reportAs(ua: string): () => void {
+		const original = Object.getOwnPropertyDescriptor(Navigator.prototype, 'userAgent');
+		Object.defineProperty(navigator, 'userAgent', { get: () => ua, configurable: true });
+		return () => {
+			delete (navigator as { userAgent?: string }).userAgent;
+			if (original) Object.defineProperty(Navigator.prototype, 'userAgent', original);
+		};
+	}
+
+	it('leaves the webm out when the browser reports as Safari', async () => {
+		const restore = reportAs(SAFARI_MAC);
+		try {
+			const { container } = render(CrossfadeVideo, { props: { srcBase: '/clips/tillage' } });
+			// The decision is taken on mount and rebuilds the elements; let it settle.
+			await new Promise((r) => setTimeout(r, 0));
+
+			const [desktop, mobile] = videos(container);
+			expect(videos(container)).toHaveLength(2);
+			expect([...desktop.querySelectorAll('source')].map((s) => s.getAttribute('src'))).toEqual([
+				'/clips/tillage/desktop-safe.mp4',
+				'/clips/tillage/desktop.mp4'
+			]);
+			expect([...mobile.querySelectorAll('source')].map((s) => s.getAttribute('src'))).toEqual([
+				'/clips/tillage/mobile-safe.mp4',
+				'/clips/tillage/mobile.mp4'
+			]);
+			expect(container.querySelector('source[type="video/webm"]')).toBeNull();
+		} finally {
+			restore();
+		}
+	});
+
+	it('keeps the webm first everywhere else (the test browser is Chromium)', async () => {
+		const { container } = render(CrossfadeVideo, { props: { srcBase: '/clips/tillage' } });
+		await new Promise((r) => setTimeout(r, 0));
+
+		for (const video of videos(container)) {
+			expect(video.querySelector('source')?.getAttribute('type')).toBe('video/webm');
+		}
+	});
+});
+
 describe('CrossfadeVideo playback', () => {
 	it('plays both elements when it is the active one', () => {
 		render(CrossfadeVideo, { props: { srcBase: '/clips/tillage', active: true } });

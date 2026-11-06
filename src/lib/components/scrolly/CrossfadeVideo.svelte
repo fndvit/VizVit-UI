@@ -19,6 +19,16 @@
 	Swapping the `<source>` children of a live `<video>` has no effect, so the
 	elements are keyed on their sources and recreated when those change.
 
+	On Apple's WebKit (Safari on a Mac, every browser on iOS) the webm is left
+	out: those engines claim they can play `video/webm` and so pick the VP9
+	source first, ignore its alpha channel (the transparent area paints opaque
+	white — or, on older WebKit, the clip never plays), and never fall back to
+	the mp4s behind it. There is no feature test for transparent VP9, so the
+	engine is read from the user agent
+	once the component is on the page (`isAppleWebKit`); the server renders
+	all three sources, and a WebKit client rebuilds the elements without the
+	webm right after mount — one extra element setup, on that engine only.
+
 	@prop {string} [srcBase] - Folder the standard file names expand from:
 		`<srcBase>/desktop.webm`, `/desktop-safe.mp4`, `/desktop.mp4` and the
 		matching `mobile.*`. Ignored when `sources` is given.
@@ -65,7 +75,8 @@
 </script>
 
 <script lang="ts">
-	import type { Snippet } from 'svelte';
+	import { onMount, type Snippet } from 'svelte';
+	import { isAppleWebKit } from '../../utils/webkit.js';
 
 	let {
 		srcBase = '',
@@ -114,8 +125,20 @@
 		}
 	);
 
+	/**
+	 * Whether to leave the webm `<source>` out — true on Apple's WebKit, which
+	 * drops transparent VP9's alpha (or does not play it) and never falls back
+	 * once it has picked it.
+	 * Decided on mount: the server cannot know the browser, so it renders every
+	 * source and the client drops the webm, rebuilding the elements, if needed.
+	 */
+	let skipWebm = $state(false);
+	onMount(() => {
+		skipWebm = isAppleWebKit();
+	});
+
 	/** Recreating the elements is the only way a `<source>` swap takes effect. */
-	const srcKey = $derived(`${resolved.desktop.webm}|${resolved.mobile.webm}`);
+	const srcKey = $derived(`${skipWebm}|${resolved.desktop.webm}|${resolved.mobile.webm}`);
 
 	let desktopEl = $state<HTMLVideoElement | null>(null);
 	let mobileEl = $state<HTMLVideoElement | null>(null);
@@ -173,7 +196,9 @@
 		onended={handleEnded}
 		class="{className} {desktopClass}"
 	>
-		<source src={resolved.desktop.webm} type="video/webm" />
+		{#if !skipWebm}
+			<source src={resolved.desktop.webm} type="video/webm" />
+		{/if}
 		<source src={resolved.desktop.mp4Safe} type="video/mp4" />
 		<source src={resolved.desktop.mp4} type="video/mp4" />
 	</video>
@@ -189,7 +214,9 @@
 		onended={handleEnded}
 		class="{className} {mobileClass}"
 	>
-		<source src={resolved.mobile.webm} type="video/webm" />
+		{#if !skipWebm}
+			<source src={resolved.mobile.webm} type="video/webm" />
+		{/if}
 		<source src={resolved.mobile.mp4Safe} type="video/mp4" />
 		<source src={resolved.mobile.mp4} type="video/mp4" />
 	</video>
